@@ -1,36 +1,10 @@
 import Mathlib.Analysis.Complex.TaylorSeries
 import VD.cauchyRiemann
+import VD.holomorphicAt
 
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
 variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F]
 variable {G : Type*} [NormedAddCommGroup G] [NormedSpace ℂ G]
-
-def HolomorphicAt (f : E → F) (x : E) : Prop :=
-  ∃ s ∈ nhds x, ∀ z ∈ s, DifferentiableAt ℂ f z
-
-
-theorem HolomorphicAt_iff
-  {f : E → F}
-  {x : E} :
-  HolomorphicAt f x ↔ ∃ s :
-  Set E, IsOpen s ∧ x ∈ s ∧ (∀ z ∈ s, DifferentiableAt ℂ f z) := by
-  constructor
-  · intro hf
-    obtain ⟨t, h₁t, h₂t⟩ := hf
-    obtain ⟨s, h₁s, h₂s, h₃s⟩ := mem_nhds_iff.1 h₁t
-    use s
-    constructor
-    · assumption
-    · constructor
-      · assumption
-      · intro z hz
-        exact h₂t z (h₁s hz)
-  · intro hyp
-    obtain ⟨s, h₁s, h₂s, hf⟩ := hyp
-    use s
-    constructor
-    · apply (IsOpen.mem_nhds_iff h₁s).2 h₂s
-    · assumption
 
 
 theorem HolomorphicAt_analyticAt
@@ -56,67 +30,6 @@ theorem HolomorphicAt_differentiableAt
   obtain ⟨s, _, h₂s, h₃s⟩ := HolomorphicAt_iff.1 hf
   exact h₃s x h₂s
 
-
-theorem HolomorphicAt_isOpen
-  (f : E → F) :
-  IsOpen { x : E | HolomorphicAt f x } := by
-
-  rw [← subset_interior_iff_isOpen]
-  intro x hx
-  simp at hx
-  obtain ⟨s, h₁s, h₂s, h₃s⟩ := HolomorphicAt_iff.1 hx
-  use s
-  constructor
-  · simp
-    constructor
-    · exact h₁s
-    · intro x hx
-      simp
-      use s
-      constructor
-      · exact IsOpen.mem_nhds h₁s hx
-      · exact h₃s
-  · exact h₂s
-
-
-theorem HolomorphicAt_comp
-  {g : E → F}
-  {f : F → G}
-  {z : E}
-  (hf : HolomorphicAt f (g z))
-  (hg : HolomorphicAt g z) :
-  HolomorphicAt (f ∘ g) z := by
-  obtain ⟨UE, h₁UE, h₂UE⟩ := hg
-  obtain ⟨UF, h₁UF, h₂UF⟩ := hf
-  use UE ∩ g⁻¹' UF
-  constructor
-  · simp
-    constructor
-    · assumption
-    · apply ContinuousAt.preimage_mem_nhds
-      apply (h₂UE z (mem_of_mem_nhds h₁UE)).continuousAt
-      assumption
-  · intro x hx
-    apply DifferentiableAt.comp
-    apply h₂UF
-    exact hx.2
-    apply h₂UE
-    exact hx.1
-
-
-theorem HolomorphicAt_neg
-  {f : E → F}
-  {z : E}
-  (hf : HolomorphicAt f z) :
-  HolomorphicAt (-f) z := by
-  obtain ⟨UF, h₁UF, h₂UF⟩ := hf
-  use UF
-  constructor
-  · assumption
-  · intro z hz
-    apply differentiableAt_neg_iff.mp
-    simp
-    exact h₂UF z hz
 
 
 theorem HolomorphicAt_contDiffAt
