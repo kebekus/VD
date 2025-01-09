@@ -6,6 +6,57 @@ open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
 
+lemma intervalIntegrable_even₀
+  {f : ℝ → ℝ}
+  (h₁f : ∀ x, f x = f (-x))
+  (h₂f : ∀ x, 0 < x → IntervalIntegrable f volume 0 x)
+  : ∀ x, IntervalIntegrable f volume 0 x := by
+  intro x
+  by_cases hx : x = 0
+  · rw [hx]
+
+  by_cases h₁x : 0 < x
+  · exact h₂f x h₁x
+
+  simp [hx] at h₁x
+  sorry
+
+
+lemma intervalIntegrable_even
+  {f : ℝ → ℝ}
+  (h₁f : ∀ x, f x = f (-x))
+  (h₂f : ∀ x, 0 < x → IntervalIntegrable f volume 0 x)
+  : ∀ x y, IntervalIntegrable log volume x y := by
+  intro x y
+  apply IntervalIntegrable.trans (b := 0)
+  sorry
+  sorry
+
+lemma intervalIntegrable_log₀ : IntervalIntegrable log volume 0 1 := by
+  rw [← neg_neg log]
+  apply IntervalIntegrable.neg
+  apply intervalIntegrable_deriv_of_nonneg
+  · exact (continuous_mul_log.continuousOn.sub continuous_id.continuousOn).neg
+  · intro x hx; norm_num at hx
+    convert ((hasDerivAt_mul_log hx.left.ne.symm).sub (hasDerivAt_id x)).neg using 1
+    norm_num
+  · intro x hx; norm_num at hx; simp
+    exact (log_nonpos_iff hx.left).mpr hx.right.le
+
+lemma intervalIntegrable_log₁
+  {x : ℝ}
+  (hx : 0 < x) :
+  IntervalIntegrable log volume 0 x := by
+  apply IntervalIntegrable.trans (b := 1)
+  · exact intervalIntegrable_log₀
+  · apply ContinuousOn.intervalIntegrable
+    apply ContinuousOn.mono
+    apply Real.continuousOn_log
+    simp
+    exact Set.not_mem_uIcc_of_lt zero_lt_one hx
+
+
+
 
 lemma logsinBound : ∀ x ∈ (Set.Icc 0 1), ‖(log ∘ sin) x‖ ≤ ‖log ((π / 2)⁻¹ * x)‖ := by
 
@@ -19,10 +70,9 @@ lemma logsinBound : ∀ x ∈ (Set.Icc 0 1), ‖(log ∘ sin) x‖ ≤ ‖log ((
     apply mul_nonneg
     apply le_of_lt
     apply inv_pos.2
-    apply div_pos
-    exact pi_pos
-    exact zero_lt_two
-    apply (Set.mem_Icc.1 hx).1
+    norm_num [pi_pos]
+    exact (Set.mem_Icc.1 hx).1
+    --
     simp
     apply mul_le_one₀
     rw [div_le_one pi_pos]
@@ -101,24 +151,11 @@ lemma logsinBound : ∀ x ∈ (Set.Icc 0 1), ‖(log ∘ sin) x‖ ≤ ‖log ((
     exact one_le_pi_div_two
 
 
+
 lemma intervalIntegrable_log_sin₁ : IntervalIntegrable (log ∘ sin) volume 0 1 := by
 
   have int_log : IntervalIntegrable (fun x ↦ ‖log x‖) volume 0 1 := by
-    apply IntervalIntegrable.norm
-    -- Extract lemma here: log is integrable on [0, 1], and in fact on any
-    -- interval [a, b]
-    rw [← neg_neg log]
-    apply IntervalIntegrable.neg
-    apply intervalIntegrable_deriv_of_nonneg (g := fun x ↦ -(x * log x - x))
-    · exact (continuous_mul_log.continuousOn.sub continuous_id.continuousOn).neg
-    · intro x hx
-      norm_num at hx
-      convert ((hasDerivAt_mul_log hx.left.ne.symm).sub (hasDerivAt_id x)).neg using 1
-      norm_num
-    · intro x hx
-      norm_num at hx
-      rw [Pi.neg_apply, Left.nonneg_neg_iff]
-      exact (log_nonpos_iff hx.left).mpr hx.right.le
+    apply IntervalIntegrable.norm intervalIntegrable_log₀
 
 
   have int_log : IntervalIntegrable (fun x ↦ ‖log ((π / 2)⁻¹ * x)‖) volume 0 1 := by
@@ -209,6 +246,7 @@ lemma intervalIntegrable_log_sin₂ : IntervalIntegrable (log ∘ sin) volume 0 
   simp at this
   exact one_le_pi_div_two
 
+
 theorem intervalIntegrable_log_sin : IntervalIntegrable (log ∘ sin) volume 0 π := by
   apply IntervalIntegrable.trans (b := π / 2)
   exact intervalIntegrable_log_sin₂
@@ -218,6 +256,7 @@ theorem intervalIntegrable_log_sin : IntervalIntegrable (log ∘ sin) volume 0 �
   let B := IntervalIntegrable.symm A
   have : π - π / 2 = π / 2 := by linarith
   rwa [this] at B
+
 
 theorem intervalIntegrable_log_cos : IntervalIntegrable (log ∘ cos) volume 0 (π / 2) := by
   let A := IntervalIntegrable.comp_sub_left intervalIntegrable_log_sin₂ (π / 2)
