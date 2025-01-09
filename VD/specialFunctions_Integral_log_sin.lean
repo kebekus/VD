@@ -5,6 +5,8 @@ import Mathlib.Analysis.Convex.SpecificFunctions.Deriv
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
+/- An even function that is integrable on every interval of the form [0,x], for
+positive x, is integrable on every interval. -/
 
 lemma intervalIntegrable_even₀
   {f : ℝ → ℝ}
