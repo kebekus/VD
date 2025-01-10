@@ -87,3 +87,53 @@ theorem intervalIntegral.intervalIntegrable_log'
     apply (ContinuousOn.mono Real.continuousOn_log)
     simp
     exact Set.not_mem_uIcc_of_lt zero_lt_one hx
+
+
+
+-- This should go to Mathlib.Analysis.SpecialFunctions.Integrals
+
+theorem integral_log'
+  {x y : ℝ} :
+  ∫ s in x..y, log s = y * log y - x * log x - y + x := by
+
+  -- Simple case one: x is positive, y is zero
+  have case₁ {t : ℝ} (ht : 0 < t) : ∫ s in (0)..t, log s = t * log t - t := by
+    -- Compute the integral by giving a primitive and considering it limit as x
+    -- approaches 0 from the right. The following lines were suggested by Gareth
+    -- Ma on Zulip.
+    rw [integral_eq_sub_of_hasDerivAt_of_tendsto (f := fun x ↦ x * log x - x) (fa := 0) (fb := t * log t - t)]
+    · abel
+    · exact ht
+    · intro s hs
+      norm_num at hs
+      convert (hasDerivAt_mul_log hs.left.ne.symm).sub (hasDerivAt_id s) using 1
+      abel
+    · exact intervalIntegrable_log'
+    · have := tendsto_log_mul_rpow_nhds_zero zero_lt_one
+      simp_rw [rpow_one, mul_comm] at this
+      convert this.sub (tendsto_nhdsWithin_of_tendsto_nhds tendsto_id)
+      abel
+    · apply tendsto_nhdsWithin_of_tendsto_nhds
+      apply ContinuousAt.tendsto
+      fun_prop
+
+  -- Simple case two: y is zero
+  have case₂ {t : ℝ} : ∫ s in (0)..t, log s = t * log t - t := by
+    rcases lt_trichotomy t 0 with h|h|h
+    · -- If t is negative, use that log is an even function to reduce to the positive case.
+      conv => arg 1; arg 1; intro t; rw [← log_neg_eq_log]
+      rw [intervalIntegral.integral_comp_neg]
+      rw [intervalIntegral.integral_symm]
+      simp
+      rw [case₁ (Left.neg_pos_iff.mpr h)]
+      simp; abel
+    · rw [h]; simp
+    · exact case₁ h
+  clear case₁
+
+  -- General case
+  rw [←intervalIntegral.integral_add_adjacent_intervals (b := 0)]
+  rw [intervalIntegral.integral_symm]
+  rw [case₂, case₂]
+  ring
+  repeat exact intervalIntegrable_log'
