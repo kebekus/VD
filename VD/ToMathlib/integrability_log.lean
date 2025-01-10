@@ -7,6 +7,8 @@ open Real Filter MeasureTheory intervalIntegral
     on every interval iff it is interval integrable (with respect to the volume
     measure) on every interval of the form [0,x], for positive x. -/
 
+-- This should go to Mathlib.MeasureTheory.Integral.IntervalIntegral
+
 theorem intervalIntegrable_of_even
   {f : ℝ → ℝ}
   (hf : ∀ x, f x = f (-x))
@@ -27,9 +29,12 @@ theorem intervalIntegrable_of_even
     exact IntervalIntegrable.trans (b := 0) (IntervalIntegrable.symm (this x)) (this y)
   · tauto
 
+
 /-- An odd function is interval integrable (with respect to the volume measure)
     on every interval iff it is interval integrable (with respect to the volume
     measure) on every interval of the form [0,x], for positive x. -/
+
+-- This should go to Mathlib.MeasureTheory.Integral.IntervalIntegral
 
 theorem intervalIntegrable_of_odd
   {f : ℝ → ℝ}

@@ -1,13 +1,11 @@
 import Mathlib.Analysis.SpecialFunctions.Integrals
 import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
-import Mathlib.MeasureTheory.Integral.CircleIntegral
-import Mathlib.MeasureTheory.Measure.Restrict
+import VD.ToMathlib.integrability_log
 
-open scoped Interval Topology
-open Real Filter MeasureTheory intervalIntegral
+open Real Filter intervalIntegral
 
 -- The following theorem was suggested by Gareth Ma on Zulip
-
+-- This should go to Mathlib.Analysis.SpecialFunctions.Integrals
 
 theorem logInt
   {t : ℝ}
@@ -24,18 +22,7 @@ theorem logInt
         norm_num at hx
         convert (hasDerivAt_mul_log hx.left.ne.symm).sub (hasDerivAt_id x) using 1
         norm_num
-      · rw [← neg_neg log]
-        apply IntervalIntegrable.neg
-        apply intervalIntegrable_deriv_of_nonneg (g := fun x ↦ -(x * log x - x))
-        · exact (continuous_mul_log.continuousOn.sub continuous_id.continuousOn).neg
-        · intro x hx
-          norm_num at hx
-          convert ((hasDerivAt_mul_log hx.left.ne.symm).sub (hasDerivAt_id x)).neg using 1
-          norm_num
-        · intro x hx
-          norm_num at hx
-          rw [Pi.neg_apply, Left.nonneg_neg_iff]
-          exact (log_nonpos_iff hx.left).mpr hx.right.le
+      · exact intervalIntegrable_log'
       · have := tendsto_log_mul_rpow_nhds_zero zero_lt_one
         simp_rw [rpow_one, mul_comm] at this
         -- tendsto_nhdsWithin_of_tendsto_nhds should be under Tendsto namespace
@@ -49,17 +36,6 @@ theorem logInt
       norm_num
   · abel
   · -- log is integrable on [[0, 1]]
-    rw [← neg_neg log]
-    apply IntervalIntegrable.neg
-    apply intervalIntegrable_deriv_of_nonneg (g := fun x ↦ -(x * log x - x))
-    · exact (continuous_mul_log.continuousOn.sub continuous_id.continuousOn).neg
-    · intro x hx
-      norm_num at hx
-      convert ((hasDerivAt_mul_log hx.left.ne.symm).sub (hasDerivAt_id x)).neg using 1
-      norm_num
-    · intro x hx
-      norm_num at hx
-      rw [Pi.neg_apply, Left.nonneg_neg_iff]
-      exact (log_nonpos_iff hx.left).mpr hx.right.le
+    exact intervalIntegrable_log'
   · -- log is integrable on [[1, t]]
-    simp [Set.mem_uIcc, ht]
+    exact intervalIntegrable_log'
