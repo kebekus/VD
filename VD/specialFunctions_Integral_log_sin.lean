@@ -5,29 +5,11 @@ import Mathlib.Analysis.Convex.SpecificFunctions.Deriv
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
-/- An even function that is integrable on every interval of the form [0,x], for
-positive x, is integrable on every interval. -/
+/- An even function is interval integrable (with respect to the volume measure)
+on every interval iff it is interval integrable (with respect to the volume
+measure) on every interval of the form [0,x], for positive x. -/
 
-lemma intervalIntegrable_even
-  {f : ℝ → ℝ}
-  (h₁f : ∀ x, f x = f (-x))
-  (h₂f : ∀ x, 0 < x → IntervalIntegrable f volume 0 x)
-  : ∀ x y, IntervalIntegrable f volume x y := by
-  -- Lemma: Prove statement first in case where x = 0
-  have : ∀ t, IntervalIntegrable f volume 0 t := by
-    intro t
-    rcases lt_trichotomy t 0 with h|h|h
-    · rw [IntervalIntegrable.iff_comp_neg]
-      conv => arg 1; intro t; rw [← h₁f]
-      simp [h₂f (-t) (by norm_num [h])]
-    · rw [h]
-    · exact h₂f t h
-  -- Split integral and apply lemma
-  intro x y
-  exact IntervalIntegrable.trans (b := 0) (IntervalIntegrable.symm (this x)) (this y)
-
-
-lemma intervalIntegrable_even'
+theorem intervalIntegrable_even
   {f : ℝ → ℝ}
   (hf : ∀ x, f x = f (-x))
   : (∀ x, 0 < x → IntervalIntegrable f volume 0 x) ↔ (∀ x y, IntervalIntegrable f volume x y) := by
@@ -48,11 +30,14 @@ lemma intervalIntegrable_even'
   · tauto
 
 
-/- The logarithm is interval integrable on any interval. -/
+/- The real logarithm is interval integrable (with respect to the volume
+measure) on every interval. -/
 
 theorem intervalIntegrable_log
   {x y : ℝ} : IntervalIntegrable log volume x y := by
-  apply intervalIntegrable_even (fun x ↦ Eq.symm (log_neg_eq_log x))
+  -- Log is even, so it suffices to consider the case y = 0
+  apply (intervalIntegrable_even (fun x ↦ Eq.symm (log_neg_eq_log x))).1
+
   intro t ht
   -- Split integral
   apply IntervalIntegrable.trans (b := 1)
