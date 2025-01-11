@@ -1,4 +1,5 @@
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+import VD.ToMathlib.log
 
 open Real
 
@@ -48,13 +49,6 @@ theorem logpos_abs
   log⁺ x = log⁺ |x| := by
   unfold logpos
   simp
-
--- Warning: This should be fixed in Mathlib
-
-theorem log_pos_iff' (hx : 0 ≤ x) : 0 < log x ↔ 1 < x := by
-  by_cases h₁x : x = 0
-  · rw [h₁x]; simp
-  · exact log_pos_iff (lt_of_le_of_ne hx (Ne.symm h₁x))
 
 
 theorem Real.monotoneOn_logpos :
