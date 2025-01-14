@@ -1,3 +1,5 @@
+import VD.ToMathlib.integrability_log
+import VD.ToMathlib.log
 import VD.analyticAt
 import VD.cauchyRiemann
 import VD.codiscreteWithin
@@ -17,7 +19,6 @@ import VD.leftovers.bilinear
 import VD.leftovers.diffOp
 import VD.leftovers.holomorphic
 import VD.leftovers.holomorphic_zero
-import VD.leftovers.specialFunctions_Integral_log
 import VD.logpos
 import VD.mathlibAddOn
 import VD.meromorphicAt
