@@ -1,7 +1,6 @@
 import Mathlib.Analysis.SpecialFunctions.Integrals
 import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
 import Mathlib.Analysis.Convex.SpecificFunctions.Deriv
-import VD.ToMathlib.integrability_log
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral

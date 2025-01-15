@@ -1,4 +1,3 @@
-import VD.ToMathlib.integrability_log
 import VD.ToMathlib.log
 import VD.analyticAt
 import VD.cauchyRiemann
