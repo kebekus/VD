@@ -30,7 +30,7 @@ theorem MeromorphicOn.integrable_log_abs_f₀
 
     have h₂U : IsConnected (Metric.closedBall (0 : ℂ) r) := by
       constructor
-      · exact Metric.nonempty_closedBall.mpr (le_of_lt hr)
+      · exact Metric.nonempty_closedBall.mpr hr.le
       · exact (convex_closedBall (0 : ℂ) r).isPreconnected
 
     -- This is where we use 'ball' instead of sphere. However, better
@@ -38,7 +38,7 @@ theorem MeromorphicOn.integrable_log_abs_f₀
     have h₃U : interior (Metric.closedBall (0 : ℂ) r) ≠ ∅ := by
       rw [interior_closedBall, ← Set.nonempty_iff_ne_empty]
       use 0; simp [hr];
-      repeat exact Ne.symm (ne_of_lt hr)
+      repeat exact hr.ne.symm
 
     have h₃f : Set.Finite (Function.support h₁f.divisor) := by
       exact Divisor.finiteSupport h₁U h₁f.divisor
@@ -66,13 +66,13 @@ theorem MeromorphicOn.integrable_log_abs_f₀
     · simp
       have : (circleMap 0 r x) ∈ (Metric.closedBall (0 : ℂ) r) := by
         apply circleMap_mem_closedBall
-        exact le_of_lt hr
+        exact hr.le
       exact h₂g ⟨(circleMap 0 r x), this⟩
     apply ContinuousAt.comp
     · apply Continuous.continuousAt Complex.continuous_abs
     apply ContinuousAt.comp
     · have : (circleMap 0 r x) ∈ (Metric.closedBall (0 : ℂ) r) := by
-        apply circleMap_mem_closedBall (0 : ℂ) (le_of_lt hr) x
+        apply circleMap_mem_closedBall (0 : ℂ) hr.le x
       apply (h₁g (circleMap 0 r x) this).continuousAt
     apply Continuous.continuousAt (continuous_circleMap 0 r)
     --
@@ -86,8 +86,7 @@ theorem MeromorphicOn.integrable_log_abs_f₀
     intro s hs
     apply IntervalIntegrable.const_mul
 
-    apply intervalIntegrable_logAbs_circleMap_sub_const
-    exact Ne.symm (ne_of_lt hr)
+    apply intervalIntegrable_logAbs_circleMap_sub_const hr.ne.symm
 
   · push_neg at h₂f
 

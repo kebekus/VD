@@ -138,9 +138,9 @@ lemma int₁₁ : ∫ (x : ℝ) in (0)..π, log (4 * sin x ^ 2) = 0 := by
     intro hx
     rw [log_mul, log_pow]
     rfl
-    exact Ne.symm (NeZero.ne' 4)
+    exact (NeZero.ne' 4).symm
     apply pow_ne_zero 2
-    apply (fun a => Ne.symm (ne_of_lt a))
+    apply (fun a => (ne_of_lt a).symm)
     exact sin_pos_of_mem_Ioo hx
 
 
@@ -412,7 +412,7 @@ lemma int₄
   have {x : ℝ} : circleMap 0 R x - a = R * (circleMap 0 1 x - (a / R)) := by
     rw [t₀, mul_sub, mul_div_cancel₀]
     rw [ne_eq, Complex.ofReal_eq_zero]
-    exact Ne.symm (ne_of_lt hR)
+    exact hR.ne.symm
 
   have {x : ℝ} : circleMap 0 R x ≠ a → log ‖circleMap 0 R x - a‖ = log R + log ‖circleMap 0 1 x - (a / R)‖ := by
     intro hx
@@ -421,11 +421,10 @@ lemma int₄
     rw [log_mul]
     congr
     --
-    simp
-    exact le_of_lt hR
+    simpa using hR.le
     --
     simp
-    exact Ne.symm (ne_of_lt hR)
+    exact hR.ne.symm
     --
     simp
     rw [t₀] at hx
@@ -435,7 +434,7 @@ lemma int₄
     rw [mul_div_cancel₀] at hx
     tauto
     simp
-    exact Ne.symm (ne_of_lt hR)
+    exact hR.ne.symm
 
   have : ∫ x in (0)..(2 * π), log ‖circleMap 0 R x - a‖ = ∫ x in (0)..(2 * π), log R + log ‖circleMap 0 1 x - (a / R)‖ := by
     rw [intervalIntegral.integral_congr_ae]
@@ -456,7 +455,7 @@ lemma int₄
     have s₁ : A.Countable := by
       apply Set.Countable.preimage_circleMap
       exact Set.countable_singleton a
-      exact Ne.symm (ne_of_lt hR)
+      exact hR.ne.symm
     exact Set.Countable.mono s₀ s₁
 
   rw [this]

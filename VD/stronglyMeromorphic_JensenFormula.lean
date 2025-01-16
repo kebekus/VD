@@ -14,20 +14,18 @@ theorem jensen₀
 
   have h₁U : IsConnected (Metric.closedBall (0 : ℂ) R) := by
     constructor
-    · apply Metric.nonempty_closedBall.mpr
-      exact le_of_lt hR
+    · exact Metric.nonempty_closedBall.mpr hR.le
     · exact (convex_closedBall (0 : ℂ) R).isPreconnected
 
   have h₂U : IsCompact (Metric.closedBall (0 : ℂ) R) :=
     isCompact_closedBall 0 R
 
   have h'₂f : ∃ u : (Metric.closedBall (0 : ℂ) R), f u ≠ 0 := by
-    use ⟨0, Metric.mem_closedBall_self (le_of_lt hR)⟩
+    use ⟨0, Metric.mem_closedBall_self hR.le⟩
 
   have h'₁f : StronglyMeromorphicAt f 0 := by
     apply h₁f
-    simp
-    exact le_of_lt hR
+    simpa using hR.le
 
   have h''₂f : h'₁f.meromorphicAt.order = 0 := by
     rwa [h'₁f.order_eq_zero_iff]
@@ -135,7 +133,7 @@ theorem jensen₀
       by_contra C
       have t₀ : (circleMap 0 R a) ∈ Metric.closedBall 0 R := by
         apply circleMap_mem_closedBall
-        exact le_of_lt hR
+        exact hR.le
       have t₁ : f (circleMap 0 R a) ≠ 0 := by
         let A := h₁f (circleMap 0 R a) t₀
         rw [← A.order_eq_zero_iff]
@@ -147,8 +145,8 @@ theorem jensen₀
           let C := fun q ↦ B.1 q ⟨(circleMap 0 R a), t₀⟩
           rw [C₂] at C
           have : ∃ u : (Metric.closedBall (0 : ℂ) R), (h₁f u u.2).meromorphicAt.order ≠ ⊤ := by
-            use ⟨(0 : ℂ), (by simp; exact le_of_lt hR)⟩
-            let H := h₁f 0 (by simp; exact le_of_lt hR)
+            use ⟨(0 : ℂ), (by simp; exact hR.le)⟩
+            let H := h₁f 0 (by simp; exact hR.le)
             let K := H.order_eq_zero_iff.2 h₂f
             rw [K]
             simp
@@ -161,7 +159,7 @@ theorem jensen₀
     apply Set.Finite.countable
     exact Finset.finite_toSet h₃f.toFinset
     --
-    exact Ne.symm (ne_of_lt hR)
+    exact hR.ne.symm
 
 
   have decompose_int_G : ∫ (x : ℝ) in (0)..2 * π, G (circleMap 0 R x)
@@ -211,13 +209,13 @@ theorem jensen₀
     apply ContinuousAt.comp
     apply Real.continuousAt_log
     simp
-    let A := h₃F ⟨(circleMap 0 R x), circleMap_mem_closedBall 0 (le_of_lt hR) x⟩
+    let A := h₃F ⟨(circleMap 0 R x), circleMap_mem_closedBall 0 hR.le x⟩
     exact A
     --
     apply ContinuousAt.comp
     apply Complex.continuous_abs.continuousAt
     apply ContinuousAt.comp
-    let A := h₂F (circleMap 0 R x) (circleMap_mem_closedBall 0 (le_of_lt hR) x)
+    let A := h₂F (circleMap 0 R x) (circleMap_mem_closedBall 0 hR.le x)
     apply A.continuousAt
     exact (continuous_circleMap 0 R).continuousAt
     -- IntervalIntegrable (fun x => ∑ᶠ (s : ℂ), ↑(↑⋯.divisor s) * log (Complex.abs (circleMap 0 1 x - s))) MeasureTheory.volume 0 (2 * π)
@@ -239,7 +237,7 @@ theorem jensen₀
     by_cases h₂i : ‖i‖ = R
     -- case pos
     --exact int'₂ h₂i
-    apply intervalIntegrable_logAbs_circleMap_sub_const (Ne.symm (ne_of_lt hR))
+    apply intervalIntegrable_logAbs_circleMap_sub_const hR.ne.symm
     -- case neg
     apply Continuous.intervalIntegrable
     apply continuous_iff_continuousAt.2
@@ -338,7 +336,7 @@ theorem jensen₀
   rw [mul_add]
   ring
   --
-  exact Ne.symm (ne_of_lt hR)
+  exact hR.ne.symm
   --
   simp
   by_contra hCon
@@ -356,7 +354,7 @@ theorem jensen₀
   --
   simp only [ne_eq, map_eq_zero]
   rw [← ne_eq]
-  exact h₃F ⟨0, (by simp; exact le_of_lt hR)⟩
+  exact h₃F ⟨0, (by simp; exact hR.le)⟩
   --
   rw [Finset.prod_ne_zero_iff]
   intro s hs
@@ -382,8 +380,7 @@ theorem jensen
   have : F 0 = f 0 := by
     unfold F
     have : 0 ∈ (Metric.closedBall 0 R) := by
-      simp [hR]
-      exact le_of_lt hR
+      simp [hR.le]
     unfold MeromorphicOn.makeStronglyMeromorphicOn
     simp [this]
     intro h₁R
@@ -415,7 +412,7 @@ theorem jensen
     intro x
     rw [this]
 
-  have h'R : R ≠ 0 := by exact Ne.symm (ne_of_lt hR)
+  have h'R : R ≠ 0 := hR.ne.symm
   have hU : Metric.sphere (0 : ℂ) |R| ⊆ (Metric.closedBall (0 : ℂ) R) := by
     have : R = |R| := by exact Eq.symm (abs_of_pos hR)
     nth_rw 2 [this]

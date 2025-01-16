@@ -63,7 +63,7 @@ theorem Nevanlinna_counting₁₁
     have h' : 0 ≤ -((hf.restrict |r|).divisor x) := by
       apply Int.le_neg_of_le_neg
       simp
-      exact Int.le_of_lt h
+      exact h.le
     simp [h']
     clear h'
 
@@ -71,7 +71,7 @@ theorem Nevanlinna_counting₁₁
     have A' : 0 ≤ -((MeromorphicOn.add (MeromorphicOn.restrict hf |r|) (MeromorphicOn.const a)).divisor x) := by
       apply Int.le_neg_of_le_neg
       simp
-      exact Int.le_of_lt A
+      exact A.le
     simp [A']
     clear A A'
 
@@ -168,7 +168,7 @@ theorem Nevanlinna_counting
       simp at h
       apply Int.le_neg_of_le_neg
       simp
-      exact Int.le_of_lt h
+      exact h.le
     simp at h
     simp [h']
     linarith
@@ -415,11 +415,13 @@ theorem Nevanlinna_firstMain₂
 open Asymptotics
 
 
+/- The Nevanlinna height functions `T_infty` of a meromorphic function `f` and
+of `f - const` agree asymptotically, up to a constant. -/
 theorem Nevanlinna_firstMain'₂
   {f : ℂ → ℂ}
   {a : ℂ}
-  (h₁f : MeromorphicOn f ⊤) :
-  |(h₁f.T_infty) - ((h₁f.sub (MeromorphicOn.const a)).T_infty)| =O[Filter.atTop] (1 : ℝ → ℝ) := by
+  (hf : MeromorphicOn f ⊤) :
+  |(hf.T_infty) - ((hf.sub (MeromorphicOn.const a)).T_infty)| =O[Filter.atTop] (1 : ℝ → ℝ) := by
 
   rw [Asymptotics.isBigO_iff']
   use logpos ‖a‖ + log 2

@@ -398,7 +398,7 @@ theorem MeromorphicAt.order_add_of_ne_orders
       · left; assumption
       · right
         simp at h
-        exact le_of_lt h
+        exact h.le
     rcases this with h|h
     · rw [h]
       have : n₂ - n₁ ≠ 0 := by
@@ -483,10 +483,9 @@ theorem MeromorphicAt.order_add_const
       · simpa
     rw [←hf.order_add_of_ne_orders (MeromorphicAt.const a z)]
     rw [this]
-    simp
-    exact le_of_lt h
+    simp [h.le]
     rw [this]
-    exact ne_of_lt h
+    exact h.ne
 
 
 -- might want theorem MeromorphicAt.order_zpow

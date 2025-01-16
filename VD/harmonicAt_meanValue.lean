@@ -65,7 +65,7 @@ theorem harmonic_meanValue
     simp
     apply inv_mul_cancel₀
     apply circleMap_ne_center
-    exact Ne.symm (ne_of_lt hR)
+    exact hR.ne.symm
   have t'₁  {θ : ℝ} : circleMap 0 R θ = circleMap z R θ - z := by
     exact Eq.symm (circleMap_sub_center z R θ)
   simp_rw [← t'₁, t₁] at this
@@ -81,7 +81,7 @@ theorem harmonic_meanValue
     rw [Complex.dist_eq]
     rw [circleMap_sub_center]
     simp
-    rwa [abs_of_nonneg (le_of_lt hR)]
+    rwa [abs_of_nonneg hR.le]
   have x₁ {z : ℂ} : z.re = Complex.reCLM z := by rfl
   rw [x₁] at t₂
   rw [← ContinuousLinearMap.intervalIntegral_comp_comm] at t₂
@@ -103,7 +103,7 @@ theorem harmonic_meanValue
   simp
   rw [Complex.dist_eq, circleMap_sub_center]
   simp
-  rwa [abs_of_nonneg (le_of_lt hR)]
+  rwa [abs_of_nonneg hR.le]
   apply Continuous.continuousOn
   exact continuous_circleMap z R
 

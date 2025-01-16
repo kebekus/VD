@@ -259,7 +259,7 @@ theorem MeromorphicOn.divisor_add_const₂
     by_cases ha: (MeromorphicAt.const a z).order = ⊤
     · simp [ha]
     · calc (hf z hz).order
-      _ ≤ 0 := by exact le_of_lt t₀
+      _ ≤ 0 := t₀.le
       _ ≤ (MeromorphicAt.const a z).order := by
         apply AnalyticAt.meromorphicAt_order_nonneg
         exact analyticAt_const
@@ -308,7 +308,7 @@ theorem MeromorphicOn.divisor_add_const₃
     by_cases ha: (MeromorphicAt.const a z).order = ⊤
     · simp [ha]
     · calc (hf z hz).order
-      _ ≤ 0 := by exact le_of_lt t₀
+      _ ≤ 0 := t₀.le
       _ ≤ (MeromorphicAt.const a z).order := by
         apply AnalyticAt.meromorphicAt_order_nonneg
         exact analyticAt_const

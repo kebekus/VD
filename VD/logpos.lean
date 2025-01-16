@@ -15,7 +15,7 @@ theorem loglogpos {r : ℝ} : log r = log⁺ r - log⁺ r⁻¹ := by
   by_cases h : 0 ≤ log r
   · simp [h]
   · simp at h
-    have : 0 ≤ -log r := Left.nonneg_neg_iff.2 (le_of_lt h)
+    have : 0 ≤ -log r := Left.nonneg_neg_iff.2 h.le
     simp [h, this]
     exact neg_nonneg.mp this
 
@@ -149,5 +149,5 @@ theorem monoOn_logpos :
       assumption
     simp [this]
     calc 0
-    _ ≤ log x := by exact le_of_lt h₂x
+    _ ≤ log x := h₂x.le
     _ ≤ log y := this

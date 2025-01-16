@@ -243,7 +243,7 @@ theorem primitive_fderivAtBasepointZero
       · simp [hy] at A
         simp [hy] at B
         rw [abs_of_nonneg hy]
-        rw [abs_of_nonneg (le_of_lt A)]
+        rw [abs_of_nonneg A.le]
         exact B
       · simp [hy] at A
         simp [hy] at B
@@ -707,12 +707,12 @@ theorem primitive_additivity'
         dsimp [dist] at t₀
         nth_rw 2 [abs_of_nonneg]
         assumption
-        apply add_nonneg dist_nonneg (le_of_lt h₀ε)
+        apply add_nonneg dist_nonneg h₀ε.le
       · rw [sq_lt_sq]
         dsimp [dist] at t₁
         nth_rw 2 [abs_of_nonneg]
         assumption
-        apply add_nonneg dist_nonneg (le_of_lt h₀ε)
+        apply add_nonneg dist_nonneg h₀ε.le
       apply add_nonneg
       exact sq_nonneg (x.re - z₀.re)
       exact sq_nonneg (x.im - z₀.im)

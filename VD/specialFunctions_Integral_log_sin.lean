@@ -94,7 +94,7 @@ lemma logsinBound : ∀ x ∈ (Set.Icc 0 1), ‖(log ∘ sin) x‖ ≤ ‖log ((
   apply this
   apply Set.mem_Icc.mpr
   constructor
-  · exact le_of_lt l₃
+  · exact l₃.le
   · trans 1
     exact (Set.mem_Icc.1 hx).2
     exact one_le_pi_div_two
@@ -154,7 +154,7 @@ lemma intervalIntegrable_log_sin₁ : IntervalIntegrable (log ∘ sin) volume 0 
     simp
     simp at hx
     constructor
-    · exact le_of_lt hx.1
+    · exact hx.1.le
     · exact hx.2
   let A := logsinBound x this
   simp only [Function.comp_apply, norm_eq_abs] at A
@@ -237,7 +237,7 @@ theorem intervalIntegral.integral_congr_volume
       · exact hx.1
       · by_contra H
         exact hx.2 (h₁ H)
-    rw [Set.uIoc_of_le (le_of_lt h₀)] at t₂
+    rw [Set.uIoc_of_le h₀.le] at t₂
     rw [Set.Ioc_diff_Ioo_same h₀] at t₂
     assumption
   calc volume {a_1 | a_1 ∈ Ι a b ∧ f a_1 ≠ g a_1}
@@ -292,20 +292,20 @@ lemma integral_log_sin₁ : ∫ (x : ℝ) in (0)..(π / 2), log (sin x) = -log 2
     rw [sin_two_mul x, log_mul, log_mul]
     exact Ne.symm (NeZero.ne' 2)
     -- sin x ≠ 0
-    apply (fun a => Ne.symm (ne_of_lt a))
+    apply (fun a => (ne_of_lt a).symm)
     apply sin_pos_of_mem_Ioo
     constructor
     · exact hx.1
     · linarith [pi_pos, hx.2]
     -- 2 * sin x ≠ 0
     simp
-    apply (fun a => Ne.symm (ne_of_lt a))
+    apply (fun a => (ne_of_lt a).symm)
     apply sin_pos_of_mem_Ioo
     constructor
     · exact hx.1
     · linarith [pi_pos, hx.2]
     -- cos x ≠ 0
-    apply (fun a => Ne.symm (ne_of_lt a))
+    apply (fun a => (ne_of_lt a).symm)
     apply cos_pos_of_mem_Ioo
     constructor
     · linarith [pi_pos, hx.1]
