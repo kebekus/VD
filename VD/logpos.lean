@@ -19,7 +19,6 @@ theorem loglogpos {r : ℝ} : log r = log⁺ r - log⁺ r⁻¹ := by
     simp [h, this]
     exact neg_nonneg.mp this
 
-
 theorem logpos_norm {r : ℝ} : log⁺ r = 2⁻¹ * (log r + ‖log r‖) := by
   by_cases hr : 0 ≤ log r
   · rw [norm_of_nonneg hr]
@@ -37,18 +36,9 @@ theorem logpos_norm {r : ℝ} : log⁺ r = 2⁻¹ * (log r + ‖log r‖) := by
     ring
 
 
-theorem logpos_nonneg
-  {x : ℝ} :
-  0 ≤ log⁺ x := by
-  unfold logpos
-  simp
+theorem logpos_nonneg {x : ℝ} : 0 ≤ log⁺ x := by simp [logpos]
 
-
-theorem logpos_abs
-  {x : ℝ} :
-  log⁺ x = log⁺ |x| := by
-  unfold logpos
-  simp
+theorem logpos_abs {x : ℝ} : log⁺ x = log⁺ |x| := by simp [logpos]
 
 
 theorem Real.monotoneOn_logpos :
