@@ -13,6 +13,9 @@ theorem AnalyticAt.order_eq_zero_iff (hf : AnalyticAt 𝕜 f z₀) :
   · intro ⟨g, _, _, hg⟩; simpa [Filter.Eventually.self_of_nhds hg]
   · intro hz; use f; exact ⟨hf, hz, by simp⟩
 
+/- An analytic function vanishes at a point if its order vanishes when converted to ℕ. -/
+theorem AnalyticAt.zero_if_order_toNat_eq_zero (hf : AnalyticAt 𝕜 f z₀) :
+    hf.order.toNat ≠ 0 → f z₀ = 0 := by simp [hf.order_eq_zero_iff]; tauto
 
 /- An analytic function `f` has finite order at a point `z₀` iff locally looks
   like `(z - z₀) ^ order • g`, where `g` is analytic and does not vanish at

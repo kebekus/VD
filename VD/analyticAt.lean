@@ -71,17 +71,6 @@ theorem AnalyticAt.order_pow
     rw [hn]
 
 
-theorem AnalyticAt.supp_order_toNat
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf : AnalyticAt ℂ f z₀) :
-  hf.order.toNat ≠ 0 → f z₀ = 0 := by
-
-  contrapose
-  intro h₁f
-  simp [hf.order_eq_zero_iff.2 h₁f]
-
-
 theorem eventually_nhds_comp_composition
   {f₁ f₂ ℓ : ℂ → ℂ}
   {z₀ : ℂ}
@@ -105,7 +94,7 @@ theorem AnalyticAt.order_congr
   {f₁ f₂ : ℂ → ℂ}
   {z₀ : ℂ}
   (hf₁ : AnalyticAt ℂ f₁ z₀)
-  (hf : f₁ =ᶠ[nhds z₀] f₂) :
+  (hf : f₁ =ᶠ[𝓝 z₀] f₂) :
   hf₁.order = (hf₁.congr hf).order := by
 
   by_cases h₁f₁ : hf₁.order = ⊤
