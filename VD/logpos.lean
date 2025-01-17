@@ -56,7 +56,7 @@ theorem Real.monotoneOn_logpos :
     have : log x ≤ log y := by
       apply log_le_log
       --
-      rw [log_pos_iff' hx] at h
+      rw [log_pos_iff hx] at h
       have : (0 : ℝ) < 1 := by exact Real.zero_lt_one
       exact lt_trans this h
       assumption
