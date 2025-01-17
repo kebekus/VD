@@ -1,22 +1,9 @@
 import Mathlib.Analysis.Analytic.IsolatedZeros
 import Mathlib.Analysis.Complex.Basic
 import Mathlib.Analysis.Analytic.Linear
+import VD.ToMathlib.analyticAt
 
 open Topology
-
-
-theorem AnalyticAt.order_neq_top_iff
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf : AnalyticAt ℂ f z₀) :
-  hf.order ≠ ⊤ ↔ ∃ (g : ℂ → ℂ), AnalyticAt ℂ g z₀ ∧ g z₀ ≠ 0 ∧ ∀ᶠ (z : ℂ) in nhds z₀, f z = (z - z₀) ^ (hf.order.toNat) • g z := by
-  rw [← hf.order_eq_nat_iff]
-  constructor
-  · intro h₁f
-    exact Eq.symm (ENat.coe_toNat h₁f)
-  · intro h₁f
-    exact ENat.coe_toNat_eq_self.mp (id (Eq.symm h₁f))
-
 
 theorem AnalyticAt.order_mul
   {f₁ f₂ : ℂ → ℂ}
@@ -66,30 +53,6 @@ theorem AnalyticAt.order_mul
           · constructor
             · exact IsOpen.inter h₂t₁ h₂t₂
             · exact Set.mem_inter h₃t₁ h₃t₂
-
-
-theorem AnalyticAt.order_eq_zero_iff
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf : AnalyticAt ℂ f z₀) :
-  hf.order = 0 ↔ f z₀ ≠ 0 := by
-
-  have : (0 : ENat) = (0 : Nat) := by rfl
-  rw [this, AnalyticAt.order_eq_nat_iff hf 0]
-
-  constructor
-  · intro hz
-    obtain ⟨g, _, h₂g, h₃g⟩ := hz
-    simp at h₃g
-    rw [Filter.Eventually.self_of_nhds h₃g]
-    tauto
-  · intro hz
-    use f
-    constructor
-    · exact hf
-    · constructor
-      · exact hz
-      · simp
 
 
 theorem AnalyticAt.order_pow
@@ -311,8 +274,7 @@ theorem AnalyticAt.zpow
 
 
 /- A function is analytic at a point iff it is analytic after multiplication
-   with a non-vanishing analytic function
--/
+  with a non-vanishing analytic function -/
 theorem analyticAt_of_mul_analytic
   {f g : ℂ → ℂ}
   {z₀ : ℂ}
