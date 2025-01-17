@@ -5,7 +5,4 @@ theorem codiscreteWithin_congr
   {S T U : Set X}
   (hST : S ∩ U = T ∩ U) :
   S ∈ Filter.codiscreteWithin U ↔ T ∈ Filter.codiscreteWithin U := by
-  repeat rw [mem_codiscreteWithin]
-  rw [← Set.diff_inter_self_eq_diff (t := S)]
-  rw [← Set.diff_inter_self_eq_diff (t := T)]
-  rw [hST]
+  rw [mem_codiscreteWithin, mem_codiscreteWithin, ← Set.diff_inter_self_eq_diff, hST, Set.diff_inter_self_eq_diff]
