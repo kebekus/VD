@@ -5,70 +5,8 @@ import VD.ToMathlib.analyticAt
 
 open Topology
 
-theorem AnalyticAt.order_mul
-  {f₁ f₂ : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf₁ : AnalyticAt ℂ f₁ z₀)
-  (hf₂ : AnalyticAt ℂ f₂ z₀) :
-  (hf₁.mul hf₂).order = hf₁.order + hf₂.order := by
-  by_cases h₂f₁ : hf₁.order = ⊤
-  · simp [h₂f₁]
-    rw [AnalyticAt.order_eq_top_iff, eventually_nhds_iff]
-    rw [AnalyticAt.order_eq_top_iff, eventually_nhds_iff] at h₂f₁
-    obtain ⟨t, h₁t, h₂t, h₃t⟩ := h₂f₁
-    use t
-    constructor
-    · intro y hy
-      rw [h₁t y hy]
-      ring
-    · exact ⟨h₂t, h₃t⟩
-  · by_cases h₂f₂ : hf₂.order = ⊤
-    · simp [h₂f₂]
-      rw [AnalyticAt.order_eq_top_iff, eventually_nhds_iff]
-      rw [AnalyticAt.order_eq_top_iff, eventually_nhds_iff] at h₂f₂
-      obtain ⟨t, h₁t, h₂t, h₃t⟩ := h₂f₂
-      use t
-      constructor
-      · intro y hy
-        rw [h₁t y hy]
-        ring
-      · exact ⟨h₂t, h₃t⟩
-    · obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := (AnalyticAt.order_eq_nat_iff hf₁ ↑hf₁.order.toNat).1 (eq_comm.1 (ENat.coe_toNat h₂f₁))
-      obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := (AnalyticAt.order_eq_nat_iff hf₂ ↑hf₂.order.toNat).1 (eq_comm.1 (ENat.coe_toNat h₂f₂))
-      rw [← ENat.coe_toNat h₂f₁, ← ENat.coe_toNat h₂f₂, ← ENat.coe_add]
-      rw [AnalyticAt.order_eq_nat_iff (AnalyticAt.mul hf₁ hf₂) ↑(hf₁.order.toNat + hf₂.order.toNat)]
-      use g₁ * g₂
-      constructor
-      · exact AnalyticAt.mul h₁g₁ h₁g₂
-      · constructor
-        · simp; tauto
-        · obtain ⟨t₁, h₁t₁, h₂t₁, h₃t₁⟩ := eventually_nhds_iff.1 h₃g₁
-          obtain ⟨t₂, h₁t₂, h₂t₂, h₃t₂⟩ := eventually_nhds_iff.1 h₃g₂
-          rw [eventually_nhds_iff]
-          use t₁ ∩ t₂
-          constructor
-          · intro y hy
-            rw [h₁t₁ y hy.1, h₁t₂ y hy.2]
-            simp; ring
-          · constructor
-            · exact IsOpen.inter h₂t₁ h₂t₂
-            · exact Set.mem_inter h₃t₁ h₃t₂
-
-
-theorem AnalyticAt.order_pow
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  {n : ℕ}
-  (hf : AnalyticAt ℂ f z₀) :
-  (hf.pow n).order = n * hf.order := by
-
-  induction' n with n hn
-  · simp; rw [AnalyticAt.order_eq_zero_iff]; simp
-  · simp
-    simp_rw [add_mul, pow_add]
-    simp
-    rw [AnalyticAt.order_mul (hf.pow n) hf]
-    rw [hn]
+variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*} [NormedAddCommGroup E]
+  [NormedSpace 𝕜 E] {s : E} {p q : FormalMultilinearSeries 𝕜 𝕜 E} {f g : 𝕜 → E} {n : ℕ} {z z₀ : 𝕜}
 
 
 theorem eventually_nhds_comp_composition
@@ -80,14 +18,7 @@ theorem eventually_nhds_comp_composition
   obtain ⟨t, h₁t, h₂t, h₃t⟩ := eventually_nhds_iff.1 hf
   apply eventually_nhds_iff.2
   use ℓ⁻¹' t
-  constructor
-  · intro y hy
-    exact h₁t (ℓ y) hy
-  · constructor
-    · apply IsOpen.preimage
-      exact hℓ
-      exact h₂t
-    · exact h₃t
+  exact ⟨fun y hy ↦ h₁t (ℓ y) hy, h₂t.preimage hℓ, h₃t⟩
 
 
 theorem AnalyticAt.order_congr
@@ -98,21 +29,13 @@ theorem AnalyticAt.order_congr
   hf₁.order = (hf₁.congr hf).order := by
 
   by_cases h₁f₁ : hf₁.order = ⊤
-  rw [h₁f₁, eq_comm, AnalyticAt.order_eq_top_iff]
-  rw [AnalyticAt.order_eq_top_iff] at h₁f₁
-  exact Filter.EventuallyEq.rw h₁f₁ (fun x => Eq (f₂ x)) (id (Filter.EventuallyEq.symm hf))
-  --
-  let n := hf₁.order.toNat
-  have hn : hf₁.order = n := Eq.symm (ENat.coe_toNat h₁f₁)
-  rw [hn, eq_comm, AnalyticAt.order_eq_nat_iff]
-  rw [AnalyticAt.order_eq_nat_iff] at hn
-  obtain ⟨g, h₁g, h₂g, h₃g⟩ := hn
-  use g
-  constructor
-  · assumption
-  · constructor
-    · assumption
-    · exact Filter.EventuallyEq.rw h₃g (fun x => Eq (f₂ x)) (id (Filter.EventuallyEq.symm hf))
+  · rw [h₁f₁, eq_comm, AnalyticAt.order_eq_top_iff]
+    exact Filter.EventuallyEq.rw (hf₁.order_eq_top_iff.1 h₁f₁) (fun x ↦ Eq (f₂ x)) hf.symm
+
+  rw [← ENat.coe_toNat h₁f₁, eq_comm, AnalyticAt.order_eq_nat_iff]
+  obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf₁.order_eq_nat_iff hf₁.order.toNat).1 (ENat.coe_toNat h₁f₁).symm
+  use g; simp [h₁g, h₂g]
+  exact Filter.EventuallyEq.rw h₃g (fun x ↦ Eq (f₂ x)) hf.symm
 
 
 theorem AnalyticAt.order_comp_CLE
