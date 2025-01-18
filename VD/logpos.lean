@@ -1,5 +1,4 @@
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import VD.ToMathlib.log
 
 open Real
 
