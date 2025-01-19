@@ -1,5 +1,6 @@
 import Mathlib.Analysis.Analytic.Meromorphic
 import VD.analyticAt
+import VD.ToMathlib.analyticAt
 import VD.divisor
 
 
@@ -332,11 +333,12 @@ theorem MeromorphicAt.order_add_of_ne_orders
   · rw [h₂f₁]; simp
     rw [hf₁.order_eq_top_iff] at h₂f₁
     have h : f₁ + f₂ =ᶠ[𝓝[≠] z₀] f₂ := by
-      -- Optimize this, here an elsewhere
+      -- Optimize this, here and elsewhere
       rw [eventuallyEq_nhdsWithin_iff, eventually_iff_exists_mem]
       rw [eventually_nhdsWithin_iff, eventually_iff_exists_mem] at h₂f₁
       obtain ⟨v, hv⟩ := h₂f₁
-      use v; simp; trivial
+      use v
+      simpa
     rw [(hf₁.add hf₂).order_congr h]
   by_cases h₂f₂: hf₂.order = ⊤
   · rw [h₂f₂]; simp
@@ -355,14 +357,8 @@ theorem MeromorphicAt.order_add_of_ne_orders
   let n₂ := WithTop.untop' 0 hf₂.order
   have hn₁₂ : n₁ ≠ n₂ := by
     unfold n₁ n₂
-    let A := WithTop.untop'_eq_untop'_iff (d := 0) (x := hf₁.order) (y := hf₂.order)
-    let B := A.not
-    simp
-    rw [B]
-    push_neg
-    constructor
-    · assumption
-    · tauto
+    simp [WithTop.untop'_eq_untop'_iff]
+    tauto
 
   let n := min n₁ n₂
   have h₁n₁ : 0 ≤ n₁ - n := by

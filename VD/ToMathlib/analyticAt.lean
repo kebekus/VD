@@ -32,7 +32,7 @@ lemma AnalyticAt.order_of_locallyZero_mul_analytic {f g : 𝕜 → 𝕜} (hf : A
     (hf.mul hg).order = ⊤ := by
   rw [AnalyticAt.order_eq_top_iff, eventually_nhds_iff] at *
   obtain ⟨t, h₁t, h₂t, h₃t⟩ := h'f
-  use t; exact ⟨fun y hy ↦ (by rw [h₁t y hy]; ring), h₂t, h₃t⟩
+  exact ⟨t, fun y hy ↦ (by rw [h₁t y hy]; ring), h₂t, h₃t⟩
 
 /-- The order is additive when multiplying analytic functions -/
 theorem AnalyticAt.order_mul {f g : 𝕜 → 𝕜} (hf : AnalyticAt 𝕜 f z₀) (hg : AnalyticAt 𝕜 g z₀) :

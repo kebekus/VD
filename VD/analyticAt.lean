@@ -1,4 +1,5 @@
 import Mathlib.Analysis.Analytic.IsolatedZeros
+import VD.ToMathlib.analyticAt
 
 open Topology
 
@@ -60,3 +61,10 @@ theorem AnalyticAt.localIdentity
   rcases ((hf.sub hg).eventually_eq_zero_or_eventually_ne_zero) with h | h
   · exact h
   · simpa using (Filter.eventually_and.2 ⟨Filter.eventuallyEq_iff_sub.mp hfg, h⟩).exists
+
+
+
+/-- The leading coefficient in the power series expansion of f around z₀, or
+  zero of f vanishes identically near z₀. -/
+noncomputable def AnalyticAt.leadCoeff (hf : AnalyticAt 𝕜 f z₀) : E :=
+  if h : hf.order = ⊤ then 0 else ((hf.order_neq_top_iff.1 h).choose z₀)

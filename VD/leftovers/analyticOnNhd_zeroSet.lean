@@ -2,6 +2,7 @@ import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Analysis.Analytic.IsolatedZeros
 import Mathlib.Analysis.Complex.Basic
 import VD.analyticAt
+import VD.ToMathlib.analyticAt
 
 
 noncomputable def AnalyticOnNhd.order

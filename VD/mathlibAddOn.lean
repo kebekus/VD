@@ -2,6 +2,7 @@ import Mathlib.Analysis.Analytic.Meromorphic
 import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Add
 import VD.analyticAt
+import Mathlib.Analysis.SpecialFunctions.Exp
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
