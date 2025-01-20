@@ -106,8 +106,16 @@ theorem periodic_integrability4
   clear a
 
   have A := IntervalIntegrable.comp_sub_right h₂f ((k - ↑n₁) * T)
-  have : (fun x ↦ f (x - (↑k - ↑n₁) * T)) = f := by
-    refine Function.Periodic.funext ?_
+  have : (fun x ↦ f (x - (k - n₁) * T)) = f := by
+    let N : ℕ := k - n₁
+    rw [← N]
+    funext x
+    have : (k : ℝ ) - (n₁ : ℝ) = ((k - n₁) : ℝ) := by sorry
+    rw [this]
+    rw [h₁f.sub_int_mul_eq]
+    apply h₁f.sub_int_mul_eq --sub_zsmul_eq
+    refine h₁fFunction.Periodic.funext ?_
+
     sorry
   simp_rw [this] at A
   have : t + T + (k - ↑n₁) * T = t + (k + 1 - ↑n₁) * T := by ring
