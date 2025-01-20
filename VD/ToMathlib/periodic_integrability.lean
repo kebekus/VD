@@ -1,13 +1,11 @@
 import Mathlib.MeasureTheory.Integral.Periodic
 
-
-/-- A periodic function is interval integrable over every interval if it is
-  interval integrable over one period. -/
+/-- A periodic function is interval integrable over every interval if it is interval integrable
+  over one period. -/
 theorem Function.Periodic.intervalperiodic_integrability
   {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℝ E]
   {f : ℝ → E}
-  {t T : ℝ}
-  {a₁ a₂ : ℝ}
+  {a₁ a₂ t T : ℝ}
   (h₁f : Function.Periodic f T)
   (hT : 0 < T)
   (h₂f : IntervalIntegrable f MeasureTheory.volume t (t + T)) :
