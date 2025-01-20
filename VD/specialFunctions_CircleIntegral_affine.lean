@@ -210,7 +210,7 @@ lemma int''₁ : -- Integrability of log ‖circleMap 0 1 x - 1‖ for arbitrary
   ∀ (t₁ t₂ : ℝ), IntervalIntegrable (fun x ↦ log ‖circleMap 0 1 x - 1‖) volume t₁ t₂ := by
   intro t₁ t₂
 
-  apply periodic_integrability4 (T := 2 * π) (t := 0)
+  apply Function.Periodic.intervalperiodic_integrability (T := 2 * π) (t := 0)
   --
   have : (fun x => log ‖circleMap 0 1 x - 1‖) = (fun x => log ‖x - 1‖) ∘ (circleMap 0 1) := rfl
   rw [this]

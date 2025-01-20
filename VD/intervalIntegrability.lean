@@ -117,7 +117,7 @@ theorem integrability_congr_negRadius
     congr 1
     exact periodic_circleMap 0 r x
   rw [← zero_add (2 * π)] at h
-  have B := periodic_integrability4 (a₁ := π) (a₂ := 3 * π) t₀ two_pi_pos h
+  have B := t₀.intervalperiodic_integrability (a₁ := π) (a₂ := 3 * π) two_pi_pos h
   let A := IntervalIntegrable.comp_add_right B π
   simp at A
   have : 3 * π - π = 2 * π := by
