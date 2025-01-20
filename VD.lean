@@ -1,4 +1,5 @@
 import VD.ToMathlib.analyticAt
+import VD.ToMathlib.periodic_integrability
 import VD.analyticAt
 import VD.cauchyRiemann
 import VD.codiscreteWithin
@@ -25,7 +26,6 @@ import VD.meromorphicOn
 import VD.meromorphicOn_divisor
 import VD.meromorphicOn_integrability
 import VD.partialDeriv
-import VD.periodic_integrability
 import VD.specialFunctions_CircleIntegral_affine
 import VD.specialFunctions_Integral_log_sin
 import VD.stronglyMeromorphicAt

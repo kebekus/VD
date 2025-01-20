@@ -1,5 +1,5 @@
 import Mathlib.MeasureTheory.Integral.CircleIntegral
-import VD.periodic_integrability
+import VD.ToMathlib.periodic_integrability
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
