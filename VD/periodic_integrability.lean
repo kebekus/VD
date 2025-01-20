@@ -61,7 +61,8 @@ theorem periodic_integrability₃
   exact periodic_integrability₂ h₁f h₂f
   exact periodic_integrability₁ h₁f h₂f
 
-
+/-- A periodic function is interval integrable over every interval if it is
+  interval integrable over one period. -/
 theorem periodic_integrability4
   {E : Type u_1} [NormedAddCommGroup E] [NormedSpace ℝ E]
   {f : ℝ → E}
@@ -75,15 +76,11 @@ theorem periodic_integrability4
   obtain ⟨n₁, hn₁⟩ : ∃ n₁ : ℕ, t - n₁ * T ≤ min a₁ a₂ := by
     obtain ⟨n₁, hn₁⟩ := exists_nat_ge ((t -min a₁ a₂) / T)
     use n₁
-    rw [sub_le_iff_le_add]
     rw [div_le_iff₀ hT] at hn₁
-    rw [sub_le_iff_le_add] at hn₁
-    rw [add_comm]
-    exact hn₁
+    linarith
   obtain ⟨n₂, hn₂⟩ : ∃ n₂ : ℕ, max a₁ a₂ ≤ t + n₂ * T := by
     obtain ⟨n₂, hn₂⟩ := exists_nat_ge ((max a₁ a₂ - t) / T)
     use n₂
-    rw [← sub_le_iff_le_add]
     rw [div_le_iff₀ hT] at hn₂
     linarith
 
@@ -91,11 +88,28 @@ theorem periodic_integrability4
     apply Set.uIcc_subset_uIcc_iff_le.mpr
     constructor
     · calc min (t - ↑n₁ * T) (t + ↑n₂ * T)
-      _ ≤ (t - ↑n₁ * T) := by exact min_le_left (t - ↑n₁ * T) (t + ↑n₂ * T)
-      _ ≤ min a₁ a₂ := by exact hn₁
+      _ ≤ (t - ↑n₁ * T) := by apply min_le_left
+      _ ≤ min a₁ a₂ := hn₁
     · calc max a₁ a₂
-      _ ≤ t + n₂ * T := by exact hn₂
-      _ ≤ max (t - ↑n₁ * T) (t + ↑n₂ * T) := by exact le_max_right (t - ↑n₁ * T) (t + ↑n₂ * T)
+      _ ≤ t + n₂ * T := hn₂
+      _ ≤ max (t - ↑n₁ * T) (t + ↑n₂ * T) := by apply le_max_right
 
   apply IntervalIntegrable.mono_set _ this
-  exact periodic_integrability₃ h₁f h₂f
+  let a : ℕ → ℝ := fun n ↦ t + (n - n₁) * T
+  have a₀ : a 0 = t - n₁ * T := by sorry
+  rw [← a₀]; clear a₀
+  have a₁ : a (n₁ + n₂) = t + n₂ * T := by sorry
+  rw [← a₁]; clear a₁
+  apply IntervalIntegrable.trans_iterate
+  intro k hk
+  simp [a]
+  clear a
+
+  have A := IntervalIntegrable.comp_sub_right h₂f ((k - ↑n₁) * T)
+  have : (fun x ↦ f (x - (↑k - ↑n₁) * T)) = f := by
+    refine Function.Periodic.funext ?_
+    sorry
+  simp_rw [this] at A
+  have : t + T + (k - ↑n₁) * T = t + (k + 1 - ↑n₁) * T := by ring
+  rw [this] at A
+  tauto
