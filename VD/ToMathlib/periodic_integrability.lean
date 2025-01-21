@@ -26,7 +26,7 @@ theorem Function.Periodic.intervalperiodic_integrability
   apply IntervalIntegrable.mono_set _ this
   clear this
 
-  -- Suffices to show integrability over shifted period
+  -- Suffices to show integrability over shifted periods
   let a : ℕ → ℝ := fun n ↦ t + (n - n₁) * T
   rw [(by ring : t - n₁ * T = a 0), (by simp [a] : t + n₂ * T = a (n₁ + n₂))]
   apply IntervalIntegrable.trans_iterate (a := fun n ↦ t + (n - n₁) * T)
