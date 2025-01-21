@@ -93,62 +93,52 @@ theorem MeromorphicAt.order_congr
       · exact EventuallyEq.rw h₃g (fun x => Eq (f₂ x)) (_root_.id (EventuallyEq.symm h))
 
 
+/-- Helper lemma for `MeromorphicAt.order_mul` -/
+lemma MeromorphicAt.order_of_locallyZero_mul_meromorphic
+  {f g : ℂ → ℂ} (hf : MeromorphicAt f z₀)
+  (hg : MeromorphicAt g z₀) (h'f : hf.order = ⊤) :
+    (hf.mul hg).order = ⊤ := by
+  rw [MeromorphicAt.order_eq_top_iff, eventually_nhdsWithin_iff, eventually_nhds_iff] at *
+  obtain ⟨t, h₁t, h₂t⟩ := h'f
+  use t
+  simp [h₂t]
+  tauto
+
+/-- The order is additive when multiplying meromorphic functions -/
 theorem MeromorphicAt.order_mul
   {f₁ f₂ : ℂ → ℂ}
   {z₀ : ℂ}
   (hf₁ : MeromorphicAt f₁ z₀)
   (hf₂ : MeromorphicAt f₂ z₀) :
   (hf₁.mul hf₂).order = hf₁.order + hf₂.order := by
+  -- Trivial cases: one of the functions vanishes around z₀
   by_cases h₂f₁ : hf₁.order = ⊤
-  · simp [h₂f₁]
-    rw [hf₁.order_eq_top_iff, eventually_nhdsWithin_iff, eventually_nhds_iff] at h₂f₁
-    rw [(hf₁.mul hf₂).order_eq_top_iff, eventually_nhdsWithin_iff, eventually_nhds_iff]
-    obtain ⟨t, h₁t, h₂t, h₃t⟩ := h₂f₁
-    use t
+  · simp [hf₁.order_of_locallyZero_mul_meromorphic hf₂ h₂f₁, h₂f₁]
+  by_cases h₂f₂ : hf₂.order = ⊤
+  · have : f₁ * f₂ = f₂ * f₁ := by simp_rw [mul_comm]
+    simp [this, hf₂.order_of_locallyZero_mul_meromorphic hf₁ h₂f₂, h₂f₂]
+
+  -- Non-trivial case: both functions do not vanish around z₀
+  have h₃f₁ := (WithTop.coe_untop hf₁.order h₂f₁).symm
+  have h₃f₂ := (WithTop.coe_untop hf₂.order h₂f₂).symm
+  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := (hf₁.order_eq_int_iff (hf₁.order.untop h₂f₁)).1 h₃f₁
+  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := (hf₂.order_eq_int_iff (hf₂.order.untop h₂f₂)).1 h₃f₂
+  rw [h₃f₁, h₃f₂, ← WithTop.coe_add, MeromorphicAt.order_eq_int_iff]
+  use g₁ * g₂, h₁g₁.mul h₁g₂
+  constructor
+  · simp; tauto
+  · rw [eventually_nhdsWithin_iff, eventually_nhds_iff] at *
+    obtain ⟨t₁, h₁t₁, h₂t₁, h₃t₁⟩ := h₃g₁
+    obtain ⟨t₂, h₁t₂, h₂t₂, h₃t₂⟩ := h₃g₂
+    use t₁ ∩ t₂
     constructor
     · intro y h₁y h₂y
-      simp; left
-      rw [h₁t y h₁y h₂y]
-    · exact ⟨h₂t, h₃t⟩
-  · by_cases h₂f₂ : hf₂.order = ⊤
-    · simp [h₂f₂]
-      rw [hf₂.order_eq_top_iff, eventually_nhdsWithin_iff, eventually_nhds_iff] at h₂f₂
-      rw [(hf₁.mul hf₂).order_eq_top_iff, eventually_nhdsWithin_iff, eventually_nhds_iff]
-      obtain ⟨t, h₁t, h₂t, h₃t⟩ := h₂f₂
-      use t
-      constructor
-      · intro y h₁y h₂y
-        simp; right
-        rw [h₁t y h₁y h₂y]
-      · exact ⟨h₂t, h₃t⟩
-    · have h₃f₁ := Eq.symm (WithTop.coe_untop hf₁.order h₂f₁)
-      have h₃f₂ := Eq.symm (WithTop.coe_untop hf₂.order h₂f₂)
-      obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := (hf₁.order_eq_int_iff (hf₁.order.untop h₂f₁)).1 h₃f₁
-      obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := (hf₂.order_eq_int_iff (hf₂.order.untop h₂f₂)).1 h₃f₂
-      rw [h₃f₁, h₃f₂, ← WithTop.coe_add]
-      rw [MeromorphicAt.order_eq_int_iff]
-      use g₁ * g₂
-      constructor
-      · exact AnalyticAt.mul h₁g₁ h₁g₂
-      · constructor
-        · simp; tauto
-        · obtain ⟨t₁, h₁t₁, h₂t₁, h₃t₁⟩ := eventually_nhds_iff.1 (eventually_nhdsWithin_iff.1 h₃g₁)
-          obtain ⟨t₂, h₁t₂, h₂t₂, h₃t₂⟩ := eventually_nhds_iff.1 (eventually_nhdsWithin_iff.1 h₃g₂)
-          rw [eventually_nhdsWithin_iff, eventually_nhds_iff]
-          use t₁ ∩ t₂
-          constructor
-          · intro y h₁y h₂y
-            simp
-            rw [h₁t₁ y h₁y.1 h₂y, h₁t₂ y h₁y.2 h₂y]
-            simp
-            rw [zpow_add' (by left; exact sub_ne_zero_of_ne h₂y)]
-            group
-          · constructor
-            · exact IsOpen.inter h₂t₁ h₂t₂
-            · exact Set.mem_inter h₃t₁ h₃t₂
+      simp [h₁t₁ y h₁y.1 h₂y, h₁t₂ y h₁y.2 h₂y, zpow_add' (by left; exact sub_ne_zero_of_ne h₂y)]
+      group
+    · exact ⟨IsOpen.inter h₂t₁ h₂t₂, Set.mem_inter h₃t₁ h₃t₂⟩
 
 
-theorem MeromorphicAt.order_neg_zero_iff
+theorem MeromorphicAt.order_ne_zero_iff
   {f : ℂ → ℂ}
   {z₀ : ℂ}
   (hf : MeromorphicAt f z₀) :
@@ -256,8 +246,8 @@ theorem MeromorphicAt.order_add
       use v; simp; trivial
     rw [(hf₁.add hf₂).order_congr h]
 
-  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_neg_zero_iff.1 h₂f₁
-  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_neg_zero_iff.1 h₂f₂
+  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_ne_zero_iff.1 h₂f₁
+  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_ne_zero_iff.1 h₂f₂
 
   let n₁ := WithTop.untop' 0 hf₁.order
   let n₂ := WithTop.untop' 0 hf₂.order
@@ -350,8 +340,8 @@ theorem MeromorphicAt.order_add_of_ne_orders
       use v; simp; trivial
     rw [(hf₁.add hf₂).order_congr h]
 
-  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_neg_zero_iff.1 h₂f₁
-  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_neg_zero_iff.1 h₂f₂
+  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_ne_zero_iff.1 h₂f₁
+  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_ne_zero_iff.1 h₂f₂
 
   let n₁ := WithTop.untop' 0 hf₁.order
   let n₂ := WithTop.untop' 0 hf₂.order

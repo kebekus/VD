@@ -13,26 +13,15 @@ theorem loglogpos {r : ℝ} : log r = log⁺ r - log⁺ r⁻¹ := by
   rw [log_inv]
   by_cases h : 0 ≤ log r
   · simp [h]
-  · simp at h
-    have : 0 ≤ -log r := Left.nonneg_neg_iff.2 h.le
-    simp [h, this]
-    exact neg_nonneg.mp this
+  · rw [not_le] at h
+    simp [h, neg_nonneg.mp (Left.nonneg_neg_iff.2 h.le)]
 
-theorem logpos_norm {r : ℝ} : log⁺ r = 2⁻¹ * (log r + ‖log r‖) := by
+
+theorem logpos_norm {r : ℝ} : log⁺ r = 2⁻¹ * (log r + |log r|) := by
   by_cases hr : 0 ≤ log r
-  · rw [norm_of_nonneg hr]
-    have : logpos r = log r := by
-      unfold logpos
-      simp [hr]
-    rw [this]
+  · simp [logpos, hr, abs_of_nonneg hr]
     ring
-  · rw [norm_of_nonpos (le_of_not_ge hr)]
-    have : logpos r = 0 := by
-      unfold logpos
-      simp
-      exact le_of_not_ge hr
-    rw [this]
-    ring
+  · simp [logpos, le_of_not_ge hr, abs_of_nonpos (le_of_not_ge hr)]
 
 
 theorem logpos_nonneg {x : ℝ} : 0 ≤ log⁺ x := by simp [logpos]
@@ -49,20 +38,10 @@ theorem Real.monotoneOn_logpos :
 
   by_cases h : log x ≤ 0
   · tauto
-  · simp [h]
-    simp at h
-
-    have : log x ≤ log y := by
-      apply log_le_log
-      --
-      rw [log_pos_iff hx] at h
-      have : (0 : ℝ) < 1 := by exact Real.zero_lt_one
-      exact lt_trans this h
-      assumption
-
-    constructor
-    · linarith
-    · linarith
+  · right
+    have := log_le_log (lt_trans Real.zero_lt_one ((log_pos_iff hx).1 (not_le.1 h))) hxy
+    simp [this]
+    linarith
 
 
 theorem logpos_add_le_add_logpos_add_log2₀

@@ -19,10 +19,11 @@ open Real Filter MeasureTheory intervalIntegral
 theorem MeromorphicOn.integrable_log_abs_f₀
   {f : ℂ → ℂ}
   {r : ℝ}
+  -- WARNING: Not optimal. It suffices to be meromorphic on the Sphere
+  (h₁f : MeromorphicOn f (Metric.closedBall (0 : ℂ) r))
   -- WARNING: Not optimal. This needs to go
   (hr : 0 < r)
-  -- WARNING: Not optimal. It suffices to be meromorphic on the Sphere
-  (h₁f : MeromorphicOn f (Metric.closedBall (0 : ℂ) r)) :
+   :
   IntervalIntegrable (fun z ↦ log ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
 
   by_cases h₂f : ∃ u : (Metric.closedBall (0 : ℂ) r), (h₁f u u.2).order ≠ ⊤
@@ -132,32 +133,14 @@ theorem MeromorphicOn.integrable_log_abs_f
   {r : ℝ}
   -- WARNING: Not optimal. It suffices to be meromorphic on the Sphere
   (h₁f : MeromorphicOn f (Metric.closedBall (0 : ℂ) |r|)) :
-  IntervalIntegrable (fun z ↦ log ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
+    IntervalIntegrable (fun z ↦ log ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
 
-  by_cases h₁r : r = 0
-  · rw [h₁r]
-    simp
-  · by_cases h₂r : 0 < r
-    · have : |r| = r := by
-        exact abs_of_pos h₂r
-      rw [this] at h₁f
-      exact MeromorphicOn.integrable_log_abs_f₀ h₂r h₁f
-    · have t₀ : 0 < -r := by
-        have hr_neg : r < 0 := by
-          apply lt_of_le_of_ne
-          exact le_of_not_lt h₂r
-          exact h₁r
-        linarith
-      have : |r| = -r := by
-        apply abs_of_neg
-        exact Left.neg_pos_iff.mp t₀
-      rw [this] at h₁f
-      let A := MeromorphicOn.integrable_log_abs_f₀ t₀ h₁f
-
-      let B := integrability_congr_negRadius (f := fun z => log ‖f z‖) (r := -r)
-      let C := B A
-      simp at C
-      simpa
+  rcases lt_trichotomy r 0 with h|h|h
+  · rw [abs_of_neg h] at h₁f
+    simpa using integrability_congr_negRadius (f := fun z => log ‖f z‖) (r := -r) (h₁f.integrable_log_abs_f₀ (Left.neg_pos_iff.mpr h))
+  · simp [h]
+  · rw [abs_of_pos h] at h₁f
+    exact h₁f.integrable_log_abs_f₀ h
 
 
 theorem MeromorphicOn.integrable_logpos_abs_f
@@ -167,13 +150,7 @@ theorem MeromorphicOn.integrable_logpos_abs_f
   (h₁f : MeromorphicOn f (Metric.closedBall (0 : ℂ) |r|)) :
   IntervalIntegrable (fun z ↦ logpos ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
 
-  simp_rw [logpos_norm]
-  simp_rw [mul_add]
-
+  simp_rw [logpos_norm, mul_add]
   apply IntervalIntegrable.add
-  apply IntervalIntegrable.const_mul
-  exact MeromorphicOn.integrable_log_abs_f h₁f
-
-  apply IntervalIntegrable.const_mul
-  apply IntervalIntegrable.norm
-  exact MeromorphicOn.integrable_log_abs_f h₁f
+  apply h₁f.integrable_log_abs_f.const_mul
+  apply (IntervalIntegrable.abs h₁f.integrable_log_abs_f).const_mul
