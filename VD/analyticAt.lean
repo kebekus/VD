@@ -9,11 +9,8 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*} [NormedAddCom
 
 /- A function is analytic at a point iff it is analytic after multiplication
   with a non-vanishing analytic function -/
-theorem analyticAt_of_mul_analytic
-  {f g : 𝕜 → 𝕜}
-  (h₁g : AnalyticAt 𝕜 g z₀)
-  (h₂g : g z₀ ≠ 0) :
-  AnalyticAt 𝕜 f z₀ ↔ AnalyticAt 𝕜 (f * g) z₀ := by
+theorem analyticAt_of_mul_analytic {f g : 𝕜 → 𝕜} (h₁g : AnalyticAt 𝕜 g z₀) (h₂g : g z₀ ≠ 0) :
+    AnalyticAt 𝕜 f z₀ ↔ AnalyticAt 𝕜 (f * g) z₀ := by
   constructor
   · exact fun a ↦ a.mul h₁g
   · intro hprod
@@ -52,14 +49,11 @@ theorem AnalyticAt.zpow
     exact (h₁f.zpow_nonneg (by linarith)).inv (zpow_ne_zero (-n) h₂f)
 
 
-theorem AnalyticAt.localIdentity
-  (hf : AnalyticAt 𝕜 f z₀)
-  (hg : AnalyticAt 𝕜 g z₀)
-  (hfg : f =ᶠ[𝓝[≠] z₀] g) :
+theorem AnalyticAt.localIdentity (hf : AnalyticAt 𝕜 f z₀) (hg : AnalyticAt 𝕜 g z₀)
+(hfg : f =ᶠ[𝓝[≠] z₀] g) :
     f =ᶠ[𝓝 z₀] g := by
-  apply Filter.eventuallyEq_iff_sub.mpr
   rcases ((hf.sub hg).eventually_eq_zero_or_eventually_ne_zero) with h | h
-  · exact h
+  · exact Filter.eventuallyEq_iff_sub.2 h
   · simpa using (Filter.eventually_and.2 ⟨Filter.eventuallyEq_iff_sub.mp hfg, h⟩).exists
 
 
