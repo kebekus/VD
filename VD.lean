@@ -1,5 +1,5 @@
 import VD.ToMathlib.analyticAt
-import VD.ToMathlib.periodic_integrability
+import VD.ToMathlib.meromorphicAt
 import VD.analyticAt
 import VD.cauchyRiemann
 import VD.codiscreteWithin

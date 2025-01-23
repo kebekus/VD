@@ -1,5 +1,5 @@
 import Mathlib.MeasureTheory.Integral.CircleIntegral
-import VD.ToMathlib.periodic_integrability
+import Mathlib.MeasureTheory.Integral.Periodic
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
@@ -117,7 +117,7 @@ theorem integrability_congr_negRadius
     congr 1
     exact periodic_circleMap 0 r x
   rw [← zero_add (2 * π)] at h
-  have B := t₀.intervalperiodic_integrability (a₁ := π) (a₂ := 3 * π) two_pi_pos h
+  have B := t₀.intervalIntegrable two_pi_pos h (π) (3 * π)
   let A := IntervalIntegrable.comp_add_right B π
   simp at A
   have : 3 * π - π = 2 * π := by

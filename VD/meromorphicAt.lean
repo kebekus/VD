@@ -14,6 +14,7 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
 
 
 /-- The order multiplies by `n` when taking an analytic function to its `n`th power -/
+
 theorem MeromorphicAt.order_pow (hf : MeromorphicAt f z₀) {n : ℕ} :
     (hf.pow n).order = n * hf.order := by
   induction' n with n hn
