@@ -16,18 +16,13 @@ lemma logsinBound : ∀ x ∈ (Set.Icc 0 1), ‖(log ∘ sin) x‖ ≤ ‖log ((
   -- Now handle the case where x ≠ 0
   have l₀ : log ((π / 2)⁻¹ * x) ≤ 0 := by
     apply log_nonpos
-    apply mul_nonneg
-    apply le_of_lt
-    apply inv_pos.2
     norm_num [pi_pos]
-    exact (Set.mem_Icc.1 hx).1
+    exact hx.1
     --
     simp
-    apply mul_le_one₀
+    apply mul_le_one₀ _ hx.1 hx.2
     rw [div_le_one pi_pos]
     exact two_le_pi
-    exact (Set.mem_Icc.1 hx).1
-    exact (Set.mem_Icc.1 hx).2
 
   have l₁ : 0 ≤ sin x := by
     apply sin_nonneg_of_nonneg_of_le_pi (Set.mem_Icc.1 hx).1
@@ -103,11 +98,10 @@ lemma logsinBound : ∀ x ∈ (Set.Icc 0 1), ‖(log ∘ sin) x‖ ≤ ‖log ((
 
 lemma intervalIntegrable_log_sin₁ : IntervalIntegrable (log ∘ sin) volume 0 1 := by
 
-  have int_log : IntervalIntegrable (fun x ↦ ‖log x‖) volume 0 1 := by
-    apply IntervalIntegrable.norm intervalIntegrable_log'
-
 
   have int_log : IntervalIntegrable (fun x ↦ ‖log ((π / 2)⁻¹ * x)‖) volume 0 1 := by
+    have int_log : IntervalIntegrable (fun x ↦ ‖log x‖) volume 0 1 :=
+      intervalIntegrable_log'.norm
 
     have A := IntervalIntegrable.comp_mul_right int_log (π / 2)⁻¹
     simp only [norm_eq_abs] at A
@@ -200,9 +194,8 @@ theorem intervalIntegrable_log_sin : IntervalIntegrable (log ∘ sin) volume 0 �
   apply IntervalIntegrable.trans (b := π / 2)
   exact intervalIntegrable_log_sin₂
   -- IntervalIntegrable (log ∘ sin) volume (π / 2) π
-  let A := IntervalIntegrable.comp_sub_left intervalIntegrable_log_sin₂ π
-  simp at A
-  let B := IntervalIntegrable.symm A
+  have B := (IntervalIntegrable.comp_sub_left intervalIntegrable_log_sin₂ π).symm
+  simp at B
   have : π - π / 2 = π / 2 := by linarith
   rwa [this] at B
 
