@@ -23,7 +23,6 @@ theorem MeromorphicAt.order_mul (hf : MeromorphicAt f z₀) (hg : MeromorphicAt 
   · simp [hf.order_of_locallyZero_mul_meromorphic hg, h₂f]
   by_cases h₂g : hg.order = ⊤
   · simp [mul_comm f g, hg.order_of_locallyZero_mul_meromorphic hf, h₂g]
-
   -- Non-trivial case: both functions do not vanish around z₀
   have h₃f := (hf.order.coe_untop h₂f).symm
   have h₃g := (hg.order.coe_untop h₂g).symm
@@ -41,21 +40,3 @@ theorem MeromorphicAt.order_mul (hf : MeromorphicAt f z₀) (hg : MeromorphicAt 
     simp [h₁s y h₁y.1 h₂y, h₁t y h₁y.2 h₂y, zpow_add' (by left; exact sub_ne_zero_of_ne h₂y)]
     group
   · exact ⟨IsOpen.inter h₂s h₂t, Set.mem_inter h₃s h₃t⟩
-
-
-/-- The order multiplies by `n` when taking an analytic function to its `n`th power -/
-theorem MeromorphicAt.order_pow (hf : MeromorphicAt f z₀) {n : ℕ} :
-    (hf.pow n).order = n * hf.order := by
-  induction' n with n hn
-  · simp
-    rw [← WithTop.coe_zero, MeromorphicAt.order_eq_int_iff]
-    use 1, analyticAt_const
-    simp
-  · simp [add_mul, pow_add, (hf.pow n).order_mul hf, hn]
-
-    sorry
-
-
--- TODO: `order_zpow` is not yet ported to mathlib
-
--- TODO: `order_inv` is not yet ported to mathlib

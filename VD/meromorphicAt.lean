@@ -1,12 +1,31 @@
 import Mathlib.Analysis.Analytic.Meromorphic
-import VD.analyticAt
 import VD.ToMathlib.analyticAt
+import VD.ToMathlib.meromorphicAt
+import VD.analyticAt
 import VD.divisor
 
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
+
+
+/-- The order multiplies by `n` when taking an analytic function to its `n`th power -/
+theorem MeromorphicAt.order_pow (hf : MeromorphicAt f z₀) {n : ℕ} :
+    (hf.pow n).order = n * hf.order := by
+  induction' n with n hn
+  · simp
+    rw [← WithTop.coe_zero, MeromorphicAt.order_eq_int_iff]
+    use 1, analyticAt_const
+    simp
+  · simp [add_mul, pow_add, (hf.pow n).order_mul hf, hn]
+
+    sorry
+
+
+-- TODO: `order_zpow` is not yet ported to mathlib
+
+-- TODO: `order_inv` is not yet ported to mathlib
 
 theorem meromorphicAt_congr
   {𝕜 : Type u_1} [NontriviallyNormedField 𝕜]
@@ -91,51 +110,6 @@ theorem MeromorphicAt.order_congr
     · constructor
       · assumption
       · exact EventuallyEq.rw h₃g (fun x => Eq (f₂ x)) (_root_.id (EventuallyEq.symm h))
-
-
-/-- Helper lemma for `MeromorphicAt.order_mul` -/
-lemma MeromorphicAt.order_of_locallyZero_mul_meromorphic
-  {f g : ℂ → ℂ} (hf : MeromorphicAt f z₀)
-  (hg : MeromorphicAt g z₀) (h'f : hf.order = ⊤) :
-    (hf.mul hg).order = ⊤ := by
-  rw [MeromorphicAt.order_eq_top_iff, eventually_nhdsWithin_iff, eventually_nhds_iff] at *
-  obtain ⟨t, h₁t, h₂t⟩ := h'f
-  use t
-  simp [h₂t]
-  tauto
-
-/-- The order is additive when multiplying meromorphic functions -/
-theorem MeromorphicAt.order_mul
-  {f₁ f₂ : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf₁ : MeromorphicAt f₁ z₀)
-  (hf₂ : MeromorphicAt f₂ z₀) :
-  (hf₁.mul hf₂).order = hf₁.order + hf₂.order := by
-  -- Trivial cases: one of the functions vanishes around z₀
-  by_cases h₂f₁ : hf₁.order = ⊤
-  · simp [hf₁.order_of_locallyZero_mul_meromorphic hf₂ h₂f₁, h₂f₁]
-  by_cases h₂f₂ : hf₂.order = ⊤
-  · have : f₁ * f₂ = f₂ * f₁ := by simp_rw [mul_comm]
-    simp [this, hf₂.order_of_locallyZero_mul_meromorphic hf₁ h₂f₂, h₂f₂]
-
-  -- Non-trivial case: both functions do not vanish around z₀
-  have h₃f₁ := (WithTop.coe_untop hf₁.order h₂f₁).symm
-  have h₃f₂ := (WithTop.coe_untop hf₂.order h₂f₂).symm
-  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := (hf₁.order_eq_int_iff (hf₁.order.untop h₂f₁)).1 h₃f₁
-  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := (hf₂.order_eq_int_iff (hf₂.order.untop h₂f₂)).1 h₃f₂
-  rw [h₃f₁, h₃f₂, ← WithTop.coe_add, MeromorphicAt.order_eq_int_iff]
-  use g₁ * g₂, h₁g₁.mul h₁g₂
-  constructor
-  · simp; tauto
-  · rw [eventually_nhdsWithin_iff, eventually_nhds_iff] at *
-    obtain ⟨t₁, h₁t₁, h₂t₁, h₃t₁⟩ := h₃g₁
-    obtain ⟨t₂, h₁t₂, h₂t₂, h₃t₂⟩ := h₃g₂
-    use t₁ ∩ t₂
-    constructor
-    · intro y h₁y h₂y
-      simp [h₁t₁ y h₁y.1 h₂y, h₁t₂ y h₁y.2 h₂y, zpow_add' (by left; exact sub_ne_zero_of_ne h₂y)]
-      group
-    · exact ⟨IsOpen.inter h₂t₁ h₂t₂, Set.mem_inter h₃t₁ h₃t₂⟩
 
 
 theorem MeromorphicAt.order_ne_zero_iff
