@@ -8,6 +8,9 @@ import VD.divisor
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
+variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
+  {f g : 𝕜 → 𝕜} {z₀ : 𝕜}
 
 
 /-- The order multiplies by `n` when taking an analytic function to its `n`th power -/
@@ -19,7 +22,6 @@ theorem MeromorphicAt.order_pow (hf : MeromorphicAt f z₀) {n : ℕ} :
     use 1, analyticAt_const
     simp
   · simp [add_mul, pow_add, (hf.pow n).order_mul hf, hn]
-
     sorry
 
 
@@ -111,20 +113,14 @@ theorem MeromorphicAt.order_congr
       · assumption
       · exact EventuallyEq.rw h₃g (fun x => Eq (f₂ x)) (_root_.id (EventuallyEq.symm h))
 
+theorem MeromorphicAt.order_ne_top_iff {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
+    hf.order ≠ ⊤ ↔ ∃ (g : ℂ → ℂ), AnalyticAt ℂ g z₀ ∧ g z₀ ≠ 0 ∧ f =ᶠ[𝓝[≠] z₀] fun z ↦ (z - z₀) ^ (hf.order.untop' 0) • g z :=
+  ⟨fun h ↦ (hf.order_eq_int_iff (hf.order.untop' 0)).1 (untop'_of_ne_top h).symm,
+    fun h ↦ Option.ne_none_iff_exists'.2 ⟨hf.order.untop' 0, (hf.order_eq_int_iff (hf.order.untop' 0)).2 h⟩⟩
 
-theorem MeromorphicAt.order_ne_zero_iff
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf : MeromorphicAt f z₀) :
-  hf.order ≠ ⊤ ↔ ∃ (g : ℂ → ℂ), AnalyticAt ℂ g z₀ ∧ g z₀ ≠ 0 ∧ ∀ᶠ (z : ℂ) in nhdsWithin z₀ {z₀}ᶜ, f z = (z - z₀) ^ (hf.order.untop' 0) • g z := by
-
-  constructor
-  · intro h
-    exact (hf.order_eq_int_iff (hf.order.untop' 0)).1 (Eq.symm (untop'_of_ne_top h))
-  · rw [← hf.order_eq_int_iff]
-    intro h
-    exact Option.ne_none_iff_exists'.mpr ⟨hf.order.untop' 0, h⟩
-
+theorem MeromorphicAt.order_ne_top_iff' {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
+    hf.order ≠ ⊤ ↔ f * f⁻¹ =ᶠ[𝓝[≠] z₀] 1 := by
+  sorry
 
 theorem MeromorphicAt.order_inv
   {f : ℂ → ℂ}
@@ -220,8 +216,8 @@ theorem MeromorphicAt.order_add
       use v; simp; trivial
     rw [(hf₁.add hf₂).order_congr h]
 
-  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_ne_zero_iff.1 h₂f₁
-  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_ne_zero_iff.1 h₂f₂
+  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_ne_top_iff.1 h₂f₁
+  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_ne_top_iff.1 h₂f₂
 
   let n₁ := WithTop.untop' 0 hf₁.order
   let n₂ := WithTop.untop' 0 hf₂.order
@@ -314,8 +310,8 @@ theorem MeromorphicAt.order_add_of_ne_orders
       use v; simp; trivial
     rw [(hf₁.add hf₂).order_congr h]
 
-  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_ne_zero_iff.1 h₂f₁
-  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_ne_zero_iff.1 h₂f₂
+  obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_ne_top_iff.1 h₂f₁
+  obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_ne_top_iff.1 h₂f₂
 
   let n₁ := WithTop.untop' 0 hf₁.order
   let n₂ := WithTop.untop' 0 hf₂.order
