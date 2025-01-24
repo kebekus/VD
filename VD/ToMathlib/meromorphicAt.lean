@@ -6,14 +6,12 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {f g : 𝕜 → 𝕜} {z₀ : 𝕜}
 
 /-- Helper lemma for `MeromorphicAt.order_mul` -/
-lemma MeromorphicAt.order_of_locallyZero_mul_meromorphic
-  (hf : MeromorphicAt f z₀) (hg : MeromorphicAt g z₀) (h'f : hf.order = ⊤) :
+lemma MeromorphicAt.order_of_locallyZero_mul_meromorphic (hf : MeromorphicAt f z₀)
+    (hg : MeromorphicAt g z₀) (h'f : hf.order = ⊤) :
     (hf.mul hg).order = ⊤ := by
   rw [MeromorphicAt.order_eq_top_iff, eventually_nhdsWithin_iff, eventually_nhds_iff] at *
   obtain ⟨t, h₁t, h₂t⟩ := h'f
-  use t
-  simp
-  tauto
+  use t, fun y h₁y h₂y ↦ (by rw [Pi.mul_apply, h₁t y h₁y h₂y, zero_mul])
 
 /-- The order is additive when multiplying meromorphic functions -/
 theorem MeromorphicAt.order_mul (hf : MeromorphicAt f z₀) (hg : MeromorphicAt g z₀) :
