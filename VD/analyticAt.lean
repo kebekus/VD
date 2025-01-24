@@ -34,6 +34,14 @@ lemma AnalyticAt.zpow_nonneg
   apply AnalyticAt.pow hf
 
 
+lemma AnalyticAt.zpow_nonneg'
+  {f : 𝕜 → 𝕜}
+  {n : ℤ}
+  (hf : AnalyticAt 𝕜 f z₀)
+  (hn : 0 ≤ n) :
+  AnalyticAt 𝕜 (f ^ n) z₀ := hf.zpow_nonneg hn
+
+
 theorem AnalyticAt.zpow
   {f : 𝕜 → 𝕜}
   {n : ℤ}

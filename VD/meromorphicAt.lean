@@ -1,9 +1,5 @@
-import Mathlib.Analysis.Analytic.Meromorphic
-import VD.ToMathlib.analyticAt
 import VD.ToMathlib.meromorphicAt
-import VD.analyticAt
 import VD.divisor
-
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
