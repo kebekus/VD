@@ -16,12 +16,10 @@ theorem analyticAt_of_mul_analytic {f g : 𝕜 → 𝕜} (h₁g : AnalyticAt �
   · intro hprod
     have : f =ᶠ[𝓝 z₀] f * g * g⁻¹ := by
       apply Filter.eventually_iff_exists_mem.mpr
-      use g⁻¹' {0}ᶜ
-      constructor
-      · exact h₁g.continuousAt.preimage_mem_nhds (compl_singleton_mem_nhds_iff.mpr h₂g)
-      · intro y hy
-        rw [Set.preimage_compl, Set.mem_compl_iff, Set.mem_preimage, Set.mem_singleton_iff] at hy
-        simp [hy]
+      use g⁻¹' {0}ᶜ, h₁g.continuousAt.preimage_mem_nhds (compl_singleton_mem_nhds_iff.mpr h₂g)
+      intro y hy
+      rw [Set.preimage_compl, Set.mem_compl_iff, Set.mem_preimage, Set.mem_singleton_iff] at hy
+      simp [hy]
     rw [analyticAt_congr this]
     exact hprod.mul (h₁g.inv h₂g)
 
