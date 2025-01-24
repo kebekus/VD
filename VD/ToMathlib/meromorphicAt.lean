@@ -1,6 +1,5 @@
 import Mathlib.Analysis.Analytic.Meromorphic
 
-
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
   {f g : 𝕜 → 𝕜} {z₀ : 𝕜}
