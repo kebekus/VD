@@ -25,10 +25,21 @@ theorem MeromorphicAt.order_pow (hf : MeromorphicAt f z₀) {n : ℕ} :
   · simp [add_mul, pow_add, (hf.pow n).order_mul hf, hn]
     sorry
 
+-- TODO: `order_zpow`
 
--- TODO: `order_zpow` is not yet ported to mathlib
+-- TODO: `order_inv`
 
--- TODO: `order_inv` is not yet ported to mathlib
+
+theorem MeromorphicAt.order_ne_top_iff {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
+    hf.order ≠ ⊤ ↔ ∃ (g : ℂ → ℂ), AnalyticAt ℂ g z₀ ∧ g z₀ ≠ 0 ∧ f =ᶠ[𝓝[≠] z₀] fun z ↦ (z - z₀) ^ (hf.order.untop' 0) • g z :=
+  ⟨fun h ↦ (hf.order_eq_int_iff (hf.order.untop' 0)).1 (untop'_of_ne_top h).symm,
+    fun h ↦ Option.ne_none_iff_exists'.2 ⟨hf.order.untop' 0, (hf.order_eq_int_iff (hf.order.untop' 0)).2 h⟩⟩
+
+
+theorem MeromorphicAt.order_ne_top_iff' {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
+    hf.order ≠ ⊤ ↔ f * f⁻¹ =ᶠ[𝓝[≠] z₀] 1 := by
+  sorry
+
 
 theorem meromorphicAt_congr
   {𝕜 : Type u_1} [NontriviallyNormedField 𝕜]
@@ -107,21 +118,8 @@ theorem MeromorphicAt.order_congr
   · obtain ⟨n, hn : hf₁.order = n⟩ := Option.ne_none_iff_exists'.mp hord
     obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf₁.order_eq_int_iff n).1 hn
     rw [hn, eq_comm, (hf₁.congr h).order_eq_int_iff]
-    use g
-    constructor
-    · assumption
-    · constructor
-      · assumption
-      · exact EventuallyEq.rw h₃g (fun x => Eq (f₂ x)) (_root_.id (EventuallyEq.symm h))
-
-theorem MeromorphicAt.order_ne_top_iff {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
-    hf.order ≠ ⊤ ↔ ∃ (g : ℂ → ℂ), AnalyticAt ℂ g z₀ ∧ g z₀ ≠ 0 ∧ f =ᶠ[𝓝[≠] z₀] fun z ↦ (z - z₀) ^ (hf.order.untop' 0) • g z :=
-  ⟨fun h ↦ (hf.order_eq_int_iff (hf.order.untop' 0)).1 (untop'_of_ne_top h).symm,
-    fun h ↦ Option.ne_none_iff_exists'.2 ⟨hf.order.untop' 0, (hf.order_eq_int_iff (hf.order.untop' 0)).2 h⟩⟩
-
-theorem MeromorphicAt.order_ne_top_iff' {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
-    hf.order ≠ ⊤ ↔ f * f⁻¹ =ᶠ[𝓝[≠] z₀] 1 := by
-  sorry
+    use g, h₁g, h₂g
+    exact EventuallyEq.rw h₃g (fun x => Eq (f₂ x)) (_root_.id (EventuallyEq.symm h))
 
 theorem MeromorphicAt.order_inv
   {f : ℂ → ℂ}
