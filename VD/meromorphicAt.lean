@@ -19,7 +19,13 @@ theorem MeromorphicAt.order_pow (hf : MeromorphicAt f z₀) {n : ℕ} :
     use 1, analyticAt_const
     simp
   · simp [add_mul, pow_add, (hf.pow n).order_mul hf, hn]
-    sorry
+    -- Really want rdistrib here
+    cases hf.order
+    · simp
+      rfl
+    · norm_cast
+      simp
+      ring
 
 -- TODO: `order_zpow`
 
@@ -34,6 +40,7 @@ theorem MeromorphicAt.order_ne_top_iff {f : ℂ → ℂ} {z₀ : ℂ} (hf : Mero
 
 theorem MeromorphicAt.order_ne_top_iff' {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
     hf.order ≠ ⊤ ↔ f * f⁻¹ =ᶠ[𝓝[≠] z₀] 1 := by
+
   sorry
 
 
