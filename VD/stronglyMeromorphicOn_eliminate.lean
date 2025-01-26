@@ -180,9 +180,7 @@ theorem MeromorphicOn.decompose₂
     apply Finset.analyticAt_prod
     intro p hp
     apply AnalyticAt.zpow
-    apply AnalyticAt.sub
-    apply analyticAt_id
-    apply analyticAt_const
+    fun_prop
     by_contra hCon
     rw [sub_eq_zero] at hCon
     have : p.1 = u := by
@@ -233,9 +231,7 @@ theorem MeromorphicOn.decompose₂
           --
           simp
           apply AnalyticAt.zpow
-          apply AnalyticAt.sub
-          apply analyticAt_id
-          apply analyticAt_const
+          fun_prop
           by_contra hCon
           rw [sub_eq_zero] at hCon
 

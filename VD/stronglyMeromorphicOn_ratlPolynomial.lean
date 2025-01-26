@@ -16,9 +16,7 @@ theorem analyticAt_ratlPolynomial₁
   apply Finset.analyticAt_prod
   intro u hu
   apply AnalyticAt.zpow
-  apply AnalyticAt.sub
-  apply analyticAt_id
-  apply analyticAt_const
+  fun_prop
   rw [sub_ne_zero, ne_comm]
   exact ne_of_mem_of_not_mem hu hz
 

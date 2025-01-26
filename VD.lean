@@ -1,4 +1,3 @@
-import VD.ToMathlib.analyticAt
 import VD.ToMathlib.meromorphicAt
 import VD.analyticAt
 import VD.cauchyRiemann

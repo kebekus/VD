@@ -1,5 +1,4 @@
 import Mathlib.Analysis.Analytic.IsolatedZeros
-import VD.ToMathlib.analyticAt
 
 open Topology
 

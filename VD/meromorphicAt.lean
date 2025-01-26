@@ -60,53 +60,6 @@ theorem meromorphicAt_congr'
   meromorphicAt_congr (Filter.EventuallyEq.filter_mono h nhdsWithin_le_nhds)
 
 
-theorem MeromorphicAt.eventually_eq_zero_or_eventually_ne_zero
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf : MeromorphicAt f z₀) :
-  (∀ᶠ (z : ℂ) in nhdsWithin z₀ {z₀}ᶜ, f z = 0) ∨ ∀ᶠ (z : ℂ) in nhdsWithin z₀ {z₀}ᶜ, f z ≠ 0 := by
-
-  obtain ⟨n, h⟩ := hf
-  let A := h.eventually_eq_zero_or_eventually_ne_zero
-
-  rw [eventually_nhdsWithin_iff]
-  rw [eventually_nhds_iff]
-  rcases A with h₁|h₂
-  · rw [eventually_nhds_iff] at h₁
-    obtain ⟨N, h₁N, h₂N, h₃N⟩ := h₁
-    left
-    use N
-    constructor
-    · intro y h₁y h₂y
-      let A := h₁N y h₁y
-      simp at A
-      rcases A with h₃|h₄
-      · let B := h₃.1
-        simp at h₂y
-        let C := sub_eq_zero.1 B
-        tauto
-      · assumption
-    · constructor
-      · exact h₂N
-      · exact h₃N
-  · right
-    rw [eventually_nhdsWithin_iff]
-    rw [eventually_nhds_iff]
-    rw [eventually_nhdsWithin_iff] at h₂
-    rw [eventually_nhds_iff] at h₂
-    obtain ⟨N, h₁N, h₂N, h₃N⟩ := h₂
-    use N
-    constructor
-    · intro y h₁y h₂y
-      by_contra h
-      let A := h₁N y h₁y h₂y
-      rw [h] at A
-      simp at A
-    · constructor
-      · exact h₂N
-      · exact h₃N
-
-
 theorem MeromorphicAt.order_congr
   {f₁ f₂ : ℂ → ℂ}
   {z₀ : ℂ}
@@ -236,15 +189,11 @@ theorem MeromorphicAt.order_add
     apply AnalyticAt.add
     apply AnalyticAt.mul
     apply AnalyticAt.zpow_nonneg _ h₁n₁
-    apply AnalyticAt.sub
-    apply analyticAt_id
-    apply analyticAt_const
+    fun_prop
     exact h₁g₁
     apply AnalyticAt.mul
     apply AnalyticAt.zpow_nonneg _ h₁n₂
-    apply AnalyticAt.sub
-    apply analyticAt_id
-    apply analyticAt_const
+    fun_prop
     exact h₁g₂
   have h₂g : 0 ≤ h₁g.meromorphicAt.order := h₁g.meromorphicAt_order_nonneg
 
@@ -261,11 +210,7 @@ theorem MeromorphicAt.order_add
 
   rw [(hf₁.add hf₂).order_congr this]
 
-  have t₀ : MeromorphicAt (fun z ↦ (z - z₀) ^ n) z₀ := by
-    apply MeromorphicAt.zpow
-    apply MeromorphicAt.sub
-    apply MeromorphicAt.id
-    apply MeromorphicAt.const
+  have t₀ : MeromorphicAt (fun z ↦ (z - z₀) ^ n) z₀ := by fun_prop
   rw [t₀.order_mul h₁g.meromorphicAt]
   have t₁ : t₀.order = n := by
     rw [t₀.order_eq_int_iff]
@@ -335,15 +280,11 @@ theorem MeromorphicAt.order_add_of_ne_orders
     apply AnalyticAt.add
     apply AnalyticAt.mul
     apply AnalyticAt.zpow_nonneg _ h₁n₁
-    apply AnalyticAt.sub
-    apply analyticAt_id
-    apply analyticAt_const
+    fun_prop
     exact h₁g₁
     apply AnalyticAt.mul
     apply AnalyticAt.zpow_nonneg _ h₁n₂
-    apply AnalyticAt.sub
-    apply analyticAt_id
-    apply analyticAt_const
+    fun_prop
     exact h₁g₂
   have h₂g : 0 ≤ h₁g.meromorphicAt.order := h₁g.meromorphicAt_order_nonneg
   have h₂'g : g z₀ ≠ 0 := by
@@ -393,11 +334,7 @@ theorem MeromorphicAt.order_add_of_ne_orders
 
   rw [(hf₁.add hf₂).order_congr this]
 
-  have t₀ : MeromorphicAt (fun z ↦ (z - z₀) ^ n) z₀ := by
-    apply MeromorphicAt.zpow
-    apply MeromorphicAt.sub
-    apply MeromorphicAt.id
-    apply MeromorphicAt.const
+  have t₀ : MeromorphicAt (fun z ↦ (z - z₀) ^ n) z₀ := by fun_prop
   rw [t₀.order_mul h₁g.meromorphicAt]
   have t₁ : t₀.order = n := by
     rw [t₀.order_eq_int_iff]
