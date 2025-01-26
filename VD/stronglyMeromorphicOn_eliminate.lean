@@ -1,5 +1,5 @@
 import Mathlib.Analysis.Analytic.Meromorphic
-import VD.analyticAt
+import VD.ToMathlib.analyticAt
 import VD.codiscreteWithin
 import VD.divisor
 import VD.meromorphicAt
@@ -225,7 +225,7 @@ theorem MeromorphicOn.decompose₂
         · rwa [hv]
         · let A := h₂g₀ ⟨v₁, hv⟩
           rw [h₄g] at A
-          rw [← analyticAt_of_mul_analytic] at A
+          rw [mul_comm, ← analyticAt_of_mul_analytic] at A
           simp at A
           exact A
           --

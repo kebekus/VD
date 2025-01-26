@@ -1,5 +1,4 @@
 import Mathlib.Analysis.Analytic.Meromorphic
-import VD.analyticAt
 import VD.divisor
 import VD.meromorphicAt
 import VD.meromorphicOn

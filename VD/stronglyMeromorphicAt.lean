@@ -1,6 +1,5 @@
 import Mathlib.Analysis.Analytic.Meromorphic
 import Mathlib.Algebra.Order.AddGroupWithTop
-import VD.analyticAt
 import VD.mathlibAddOn
 import VD.meromorphicAt
 

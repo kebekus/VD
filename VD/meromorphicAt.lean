@@ -37,12 +37,12 @@ theorem MeromorphicAt.order_ne_top_iff {f : ℂ → ℂ} {z₀ : ℂ} (hf : Mero
   ⟨fun h ↦ (hf.order_eq_int_iff (hf.order.untop' 0)).1 (untop'_of_ne_top h).symm,
     fun h ↦ Option.ne_none_iff_exists'.2 ⟨hf.order.untop' 0, (hf.order_eq_int_iff (hf.order.untop' 0)).2 h⟩⟩
 
-
+/-
 theorem MeromorphicAt.order_ne_top_iff' {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
     hf.order ≠ ⊤ ↔ f * f⁻¹ =ᶠ[𝓝[≠] z₀] 1 := by
 
   sorry
-
+-/
 
 theorem meromorphicAt_congr
   {𝕜 : Type u_1} [NontriviallyNormedField 𝕜]

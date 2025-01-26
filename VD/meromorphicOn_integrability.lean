@@ -1,7 +1,6 @@
 import Mathlib.Analysis.Analytic.Meromorphic
 import Mathlib.MeasureTheory.Integral.CircleIntegral
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
-import VD.analyticAt
 import VD.divisor
 import VD.intervalIntegrability
 import VD.logpos
