@@ -1,4 +1,3 @@
-import VD.analyticAt
 import VD.divisor
 
 open scoped Interval Topology

@@ -1,5 +1,5 @@
 import VD.ToMathlib.meromorphicAt
-import VD.analyticAt
+import VD.ToMathlib.analyticAt
 import VD.cauchyRiemann
 import VD.codiscreteWithin
 import VD.divisor
