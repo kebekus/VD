@@ -1,41 +1,55 @@
+/-
+Copyright (c) 2025 Stefan Kebekus. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Stefan Kebekus
+-/
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
+
+/-!
+# The Positive Part of the Logarithm
+
+This file defines the function `log⁺ = r ↦ max 0 (log r)`, and establishes
+standard estimates.
+-/
 
 open Real
 
 
-noncomputable def logpos : ℝ → ℝ := fun r ↦ max 0 (log r)
+/-!
+## Definition, Notation and Reformulations
+-/
+noncomputable def Real.logpos : ℝ → ℝ := fun r ↦ max 0 (log r)
 
 notation "log⁺" => logpos
 
+theorem Real.logpos_def {r : ℝ} : log⁺ r = max 0 (log r) := rfl
 
-theorem loglogpos {r : ℝ} : log r = log⁺ r - log⁺ r⁻¹ := by
-  unfold logpos
-  rw [log_inv]
+theorem Real.log_eq_logpos_sub_logpos_inv {r : ℝ} : log r = log⁺ r - log⁺ r⁻¹ := by
+  rw [logpos_def, logpos_def, log_inv]
   by_cases h : 0 ≤ log r
   · simp [h]
   · rw [not_le] at h
     simp [h, neg_nonneg.mp (Left.nonneg_neg_iff.2 h.le)]
 
-
-theorem logpos_norm {r : ℝ} : log⁺ r = 2⁻¹ * (log r + |log r|) := by
+theorem Real.logpos_eq_half_mul_log_add_log_abs {r : ℝ} : log⁺ r = 2⁻¹ * (log r + |log r|) := by
   by_cases hr : 0 ≤ log r
   · simp [logpos, hr, abs_of_nonneg hr]
     ring
   · simp [logpos, le_of_not_ge hr, abs_of_nonpos (le_of_not_ge hr)]
 
 
-theorem logpos_nonneg {x : ℝ} : 0 ≤ log⁺ x := by simp [logpos]
+/-!
+## Elementary Properties
+-/
+theorem Real.logpos_nonneg {x : ℝ} : 0 ≤ log⁺ x := by simp [logpos]
 
-theorem logpos_abs {x : ℝ} : log⁺ x = log⁺ |x| := by simp [logpos]
+theorem Real.logpos_neg {x : ℝ} : log⁺ x = log⁺ (-x) := by simp [logpos]
 
+theorem Real.logpos_abs {x : ℝ} : log⁺ x = log⁺ |x| := by simp [logpos]
 
-theorem Real.monotoneOn_logpos :
-  MonotoneOn logpos (Set.Ici 0) := by
-
+theorem Real.monotoneOn_logpos : MonotoneOn log⁺ (Set.Ici 0) := by
   intro x hx y hy hxy
-  unfold logpos
-  simp
-
+  simp [logpos]
   by_cases h : log x ≤ 0
   · tauto
   · right
@@ -43,7 +57,9 @@ theorem Real.monotoneOn_logpos :
     simp [this]
     linarith
 
-
+/-!
+## Estimates for Sums and Products
+-/
 theorem logpos_add_le_add_logpos_add_log2₀
   {a b : ℝ}
   (h : |a| ≤ |b|) :
@@ -96,26 +112,26 @@ theorem logpos_add_le_add_logpos_add_log2
     apply logpos_add_le_add_logpos_add_log2₀
     exact le_of_not_ge h
 
-theorem monoOn_logpos :
-  MonotoneOn log⁺ (Set.Ici 0) := by
-  intro x hx y hy hxy
-  by_cases h₁x : x = 0
-  · rw [h₁x]
-    unfold logpos
-    simp
+theorem xx
+    (S : Finset ℝ) :
+    log⁺ (∑ s ∈ S, s) ≤ log S.card + ∑ s ∈ S, log⁺ s := by
 
-  simp at hx hy
-  unfold logpos
-  simp
-  by_cases h₂x : log x ≤ 0
-  · tauto
-  · simp [h₂x]
-    simp at h₂x
-    have : log x ≤ log y := by
-      apply log_le_log
-      exact lt_of_le_of_ne hx fun a => h₁x (id (Eq.symm a))
-      assumption
-    simp [this]
-    calc 0
-    _ ≤ log x := h₂x.le
-    _ ≤ log y := this
+  have : (∑ s ∈ S, s) ≤ S.card * S.max := by
+    sorry
+
+  sorry
+
+/-
+For any positive real numbers a₁,...,aₙ: log⁺(a₁ + ... + aₙ) ≤ log⁺ a₁ + ... +
+log⁺ aₙ + log n Proof:
+
+First, a₁ + ... + aₙ ≤ n max(a₁,...,aₙ)
+
+Taking logarithms: log(a₁ + ... + aₙ) ≤ log n + log(max(a₁,...,aₙ))
+
+Note that log(max(a₁,...,aₙ)) ≤ max(log a₁,...,log aₙ) ≤ log⁺ a₁ + ... + log⁺ aₙ
+
+Therefore log(a₁ + ... + aₙ) ≤ log n + log⁺ a₁ + ... + log⁺ aₙ
+
+Taking positive parts of both sides gives the desired inequality.
+-/

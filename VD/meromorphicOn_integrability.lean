@@ -149,7 +149,7 @@ theorem MeromorphicOn.integrable_logpos_abs_f
   (h₁f : MeromorphicOn f (Metric.closedBall (0 : ℂ) |r|)) :
   IntervalIntegrable (fun z ↦ logpos ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
 
-  simp_rw [logpos_norm, mul_add]
+  simp_rw [logpos_eq_half_mul_log_add_log_abs, mul_add]
   apply IntervalIntegrable.add
   apply h₁f.integrable_log_abs_f.const_mul
   apply (IntervalIntegrable.abs h₁f.integrable_log_abs_f).const_mul

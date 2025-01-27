@@ -201,7 +201,7 @@ theorem Nevanlinna_proximity
   rw [← mul_sub]; congr
   rw [← intervalIntegral.integral_sub]; congr
   funext x
-  simp_rw [loglogpos]; congr
+  simp_rw [log_eq_logpos_sub_logpos_inv]; congr
   exact Eq.symm (IsAbsoluteValue.abv_inv Norm.norm (f (circleMap 0 r x)))
   --
   apply MeromorphicOn.integrable_logpos_abs_f
@@ -321,7 +321,7 @@ theorem Nevanlinna_firstMain₂
       unfold g
       simp
     _ ≤ log⁺ (‖g (circleMap 0 r x)‖ + ‖a‖) := by
-      apply monoOn_logpos
+      apply monotoneOn_logpos
       refine Set.mem_Ici.mpr ?_
       apply norm_nonneg
       refine Set.mem_Ici.mpr ?_
@@ -349,7 +349,7 @@ theorem Nevanlinna_firstMain₂
       unfold g
       simp
     _ ≤ log⁺ (‖f (circleMap 0 r x)‖ + ‖a‖) := by
-      apply monoOn_logpos
+      apply monotoneOn_logpos
       refine Set.mem_Ici.mpr ?_
       apply norm_nonneg
       refine Set.mem_Ici.mpr ?_
