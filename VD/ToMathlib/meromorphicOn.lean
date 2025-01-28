@@ -1,8 +1,8 @@
 import Mathlib.Analysis.Analytic.Meromorphic
-import VD.stronglyMeromorphicOn
+import VD.ToMathlib.meromorphicAt
 
-open scoped Interval Topology
-open Real Filter MeasureTheory intervalIntegral
+--open scoped Topology
+--open Real Filter
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [CompleteSpace E]
@@ -43,10 +43,8 @@ theorem MeromorphicOn.clopen_of_order_eq_top {U : Set 𝕜} (h₁f : Meromorphic
     · rw [h₁w]
       tauto
     -- Nontrivial case: w ≠ z
-    use t' \ {z.1}
+    use t' \ {z.1}, fun y hy _ ↦ h₁t' y (Set.mem_of_mem_diff hy) (Set.mem_of_mem_inter_right hy)
     constructor
-    · exact fun y h₁y _ ↦ h₁t' y (Set.mem_of_mem_diff h₁y) (Set.mem_of_mem_inter_right h₁y)
-    · constructor
-      · exact h₂t'.sdiff isClosed_singleton
-      · apply (Set.mem_diff w).1
-        exact ⟨hw, Set.mem_singleton_iff.not.1 (Subtype.coe_ne_coe.2 h₁w)⟩
+    · exact h₂t'.sdiff isClosed_singleton
+    · apply (Set.mem_diff w).1
+      exact ⟨hw, Set.mem_singleton_iff.not.1 (Subtype.coe_ne_coe.2 h₁w)⟩
