@@ -112,14 +112,27 @@ theorem logpos_add_le_add_logpos_add_log2
     apply logpos_add_le_add_logpos_add_log2₀
     exact le_of_not_ge h
 
-theorem xx
-    (S : Finset ℝ) :
-    log⁺ (∑ s ∈ S, s) ≤ log S.card + ∑ s ∈ S, log⁺ s := by
+theorem Real.logpos_sum {n : ℕ} (f : Fin n → ℝ) :
+    log⁺ (∑ t, f t) ≤ log n + ∑ t, log⁺ (f t) := by
 
-  have : (∑ s ∈ S, s) ≤ S.card * S.max := by
+  by_cases hs : n = 0
+  · simp [hs, Fin.isEmpty', logpos]
+
+  have nonEmpty := Fin.pos_iff_nonempty.mp (Nat.zero_lt_of_ne_zero hs)
+  obtain ⟨t_max, ht_max⟩ := Finite.exists_max (fun t ↦ |f t|)
+
+  calc log⁺ (∑ t, f t)
+  _ = log⁺ |∑ t, f t| := Real.logpos_abs
+  _ ≤ log⁺ (∑ t, |f t|) := by
+    apply monotoneOn_logpos (by simp) (by simp [Finset.sum_nonneg])
+    simp [Finset.abs_sum_le_sum_abs]
+  _ ≤ log⁺ (∑ t : Fin n, |f t_max|) := by
+    apply monotoneOn_logpos (by simp [Finset.sum_nonneg]) (by simp [Finset.sum_nonneg]; positivity)
+    exact Finset.sum_le_sum fun i a ↦ ht_max i
+  _ = log⁺ (n * |f t_max|) := by
+    simp [Finset.sum_const]
+  _ ≤ log n + ∑ t, log⁺ (f t) := by
     sorry
-
-  sorry
 
 /-
 For any positive real numbers a₁,...,aₙ: log⁺(a₁ + ... + aₙ) ≤ log⁺ a₁ + ... +
