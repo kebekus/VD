@@ -43,9 +43,14 @@ theorem Real.logpos_eq_half_mul_log_add_log_abs {r : ℝ} : log⁺ r = 2⁻¹ * 
 -/
 theorem Real.logpos_nonneg {x : ℝ} : 0 ≤ log⁺ x := by simp [logpos]
 
-theorem Real.logpos_neg {x : ℝ} : log⁺ x = log⁺ (-x) := by simp [logpos]
+theorem Real.logpos_neg (x : ℝ) : log⁺ x = log⁺ (-x) := by simp [logpos]
 
-theorem Real.logpos_abs {x : ℝ} : log⁺ x = log⁺ |x| := by simp [logpos]
+theorem Real.logpos_abs (x : ℝ) : log⁺ x = log⁺ |x| := by simp [logpos]
+
+theorem Real.logpos_eq_zero_iff {x : ℝ} :
+    log⁺ x = 0 ↔ |x| ≤ 1 := by
+  rw [logpos_abs, ← log_nonpos_iff (abs_nonneg x)]
+  simp [logpos]
 
 theorem Real.monotoneOn_logpos : MonotoneOn log⁺ (Set.Ici 0) := by
   intro x hx y hy hxy
@@ -112,6 +117,26 @@ theorem logpos_add_le_add_logpos_add_log2
     apply logpos_add_le_add_logpos_add_log2₀
     exact le_of_not_ge h
 
+theorem Real.logpos_mul {a b : ℝ} :
+  log⁺ (a * b) ≤ log⁺ a + log⁺ b := by
+  by_cases ha : |a| ≤ 1
+  · simp [logpos_eq_zero_iff.2 ha, logpos_abs (a * b), logpos_abs b, abs_mul]
+    exact monotoneOn_logpos (by simp [mul_nonneg]) (abs_nonneg b) (mul_le_of_le_one_left (abs_nonneg b) ha)
+  by_cases hb : |b| ≤ 1
+  · simp [logpos_eq_zero_iff.2 hb, logpos_abs (a * b), logpos_abs a, abs_mul]
+    apply monotoneOn_logpos (by simp [mul_nonneg]) (abs_nonneg a) (mul_le_of_le_one_right (abs_nonneg a) hb)
+
+  rw [logpos_abs (a * b), logpos_abs a, logpos_abs b]
+
+  simp [logpos]
+  have : |a| > 1 := by
+    exact lt_of_not_ge ha
+  let A := log_pos (lt_of_not_ge ha)
+
+
+  sorry
+
+
 theorem Real.logpos_sum {n : ℕ} (f : Fin n → ℝ) :
     log⁺ (∑ t, f t) ≤ log n + ∑ t, log⁺ (f t) := by
 
@@ -132,6 +157,7 @@ theorem Real.logpos_sum {n : ℕ} (f : Fin n → ℝ) :
   _ = log⁺ (n * |f t_max|) := by
     simp [Finset.sum_const]
   _ ≤ log n + ∑ t, log⁺ (f t) := by
+
     sorry
 
 /-
