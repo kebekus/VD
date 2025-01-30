@@ -134,7 +134,9 @@ theorem Real.logpos_mul {n : ℕ}  {a : ℝ} :
     apply monotoneOn_logpos (by simp [mul_nonneg]) (by simp [Nat.cast_nonneg' n])
     simp [ha]
     apply (mul_le_iff_le_one_right (by positivity)).2 ha
+  rw [logpos_eq_log, logpos_eq_log]
 
+  sorry
   sorry
 
 
