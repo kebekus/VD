@@ -361,7 +361,8 @@ theorem Nevanlinna_firstMain₂
       --
       apply norm_sub_le
     _ ≤ log⁺ ‖f (circleMap 0 r x)‖ + log⁺ ‖a‖ + log 2 := by
-      apply logpos_add_le_add_logpos_add_log2
+      convert logpos_add using 1
+      ring
 
   have t₁₁ (x : ℝ) : log⁺ ‖g (circleMap 0 r x)‖ - log⁺ ‖f (circleMap 0 r x)‖ ≤ log⁺ ‖a‖ + log 2 := by
     rw [sub_le_iff_le_add]
