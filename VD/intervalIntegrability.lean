@@ -94,10 +94,7 @@ lemma circleMap_neg
   {r x : ℝ} :
   circleMap 0 (-r) x = circleMap 0 r (x + π) := by
   unfold circleMap
-  simp
-  rw [add_mul]
-  rw [Complex.exp_add]
-  simp
+  simp [add_mul, Complex.exp_add]
 
 
 theorem integrability_congr_negRadius
@@ -108,9 +105,6 @@ theorem integrability_congr_negRadius
 
   intro h
   simp_rw [circleMap_neg]
-
-  let A := IntervalIntegrable.comp_add_right h π
-
   have t₀ : Function.Periodic (fun (θ : ℝ) ↦ f (circleMap 0   r  θ)) (2 * π) := by
     intro x
     simp
@@ -137,8 +131,6 @@ theorem integrabl_congr_negRadius
     simp
     congr 1
     exact periodic_circleMap 0 r x
-  --rw [← zero_add (2 * π)] at h
-  --have B := periodic_integrability4 (a₁ := π) (a₂ := 3 * π) t₀ two_pi_pos h
   have B := intervalIntegral.integral_comp_add_right (a := 0) (b := 2 * π) (fun θ => f (circleMap 0 r θ)) π
   rw [B]
   let X := t₀.intervalIntegral_add_eq 0 (0 + π)

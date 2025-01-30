@@ -66,21 +66,17 @@ theorem laplace_add_ContDiffOn
 
   have hf₁ : ∀ z ∈ s, DifferentiableAt ℝ f₁ z := by
     intro z hz
-    convert DifferentiableOn.differentiableAt _ (IsOpen.mem_nhds hs hz)
-    apply ContDiffOn.differentiableOn h₁ one_le_two
+    exact (h₁.differentiableOn one_le_two).differentiableAt (hs.mem_nhds hz)
   have hf₂ : ∀ z ∈ s, DifferentiableAt ℝ f₂ z := by
     intro z hz
-    convert DifferentiableOn.differentiableAt _ (IsOpen.mem_nhds hs hz)
-    apply ContDiffOn.differentiableOn h₂ one_le_two
+    exact (h₂.differentiableOn one_le_two).differentiableAt (hs.mem_nhds hz)
   have : partialDeriv ℝ 1 (f₁ + f₂) =ᶠ[nhds x] (partialDeriv ℝ 1 f₁) + (partialDeriv ℝ 1 f₂) := by
     apply Filter.eventuallyEq_iff_exists_mem.2
-    use s
-    constructor
-    · exact IsOpen.mem_nhds hs hx
-    · intro z hz
-      apply partialDeriv_add₂_differentiableAt
-      exact hf₁ z hz
-      exact hf₂ z hz
+    use s, hs.mem_nhds hx
+    intro z hz
+    apply partialDeriv_add₂_differentiableAt
+    exact hf₁ z hz
+    exact hf₂ z hz
   rw [partialDeriv_eventuallyEq ℝ this]
   have t₁ : DifferentiableAt ℝ (partialDeriv ℝ 1 f₁) x := by
     let B₀ := (h₁ x hx).contDiffAt (IsOpen.mem_nhds hs hx)
@@ -94,22 +90,20 @@ theorem laplace_add_ContDiffOn
 
   have : partialDeriv ℝ Complex.I (f₁ + f₂) =ᶠ[nhds x] (partialDeriv ℝ Complex.I f₁) + (partialDeriv ℝ Complex.I f₂) := by
     apply Filter.eventuallyEq_iff_exists_mem.2
-    use s
-    constructor
-    · exact IsOpen.mem_nhds hs hx
-    · intro z hz
-      apply partialDeriv_add₂_differentiableAt
-      exact hf₁ z hz
-      exact hf₂ z hz
+    use s, hs.mem_nhds hx
+    intro z hz
+    apply partialDeriv_add₂_differentiableAt
+    exact hf₁ z hz
+    exact hf₂ z hz
   rw [partialDeriv_eventuallyEq ℝ this]
   have t₃ : DifferentiableAt ℝ (partialDeriv ℝ Complex.I f₁) x := by
-    let B₀ := (h₁ x hx).contDiffAt (IsOpen.mem_nhds hs hx)
+    let B₀ := (h₁ x hx).contDiffAt (hs.mem_nhds hx)
     let A₀ := partialDeriv_contDiffAt ℝ B₀ Complex.I
-    exact A₀.differentiableAt (Preorder.le_refl 1)
+    exact A₀.differentiableAt (le_refl 1)
   have t₄ : DifferentiableAt ℝ (partialDeriv ℝ Complex.I f₂) x := by
-    let B₀ := (h₂ x hx).contDiffAt (IsOpen.mem_nhds hs hx)
+    let B₀ := (h₂ x hx).contDiffAt (hs.mem_nhds hx)
     let A₀ := partialDeriv_contDiffAt ℝ B₀ Complex.I
-    exact A₀.differentiableAt (Preorder.le_refl 1)
+    exact A₀.differentiableAt (le_refl 1)
   rw [partialDeriv_add₂_differentiableAt ℝ t₃ t₄]
 
   -- I am super confused at this point because the tactic 'ring' does not work.
@@ -164,7 +158,7 @@ theorem laplace_add_ContDiffAt'
   unfold Complex.laplace
 
   rw [add_assoc]
-  nth_rw  5 [add_comm]
+  nth_rw 5 [add_comm]
   rw [add_assoc]
   rw [← add_assoc]
 
@@ -221,28 +215,15 @@ theorem laplace_compCLMAt
       rfl
       simp
     obtain ⟨v, hv₁, hv₂, hv₃⟩ := mem_nhds_iff.1 hu₁
-    use v
-    constructor
-    · exact IsOpen.mem_nhds hv₂ hv₃
-    · constructor
-      exact hv₂
-      constructor
-      · exact hv₃
-      · exact ContDiffOn.congr_mono hu₂ (fun x => congrFun rfl) hv₁
+    use v, hv₂.mem_nhds hv₃, hv₂, hv₃
+    exact hu₂.congr_mono (fun x => congrFun rfl) hv₁
 
-  have D : ∀ w : ℂ, partialDeriv ℝ w (l ∘ f) =ᶠ[nhds x] l ∘ partialDeriv ℝ w (f) := by
-    intro w
+  have D (w : ℂ) : partialDeriv ℝ w (l ∘ f) =ᶠ[nhds x] l ∘ partialDeriv ℝ w (f) := by
     apply Filter.eventuallyEq_iff_exists_mem.2
-    use v
-    constructor
-    · exact IsOpen.mem_nhds hv₂ hv₃
-    · intro y hy
-      apply partialDeriv_compContLinAt
-      let V := ContDiffOn.differentiableOn hv₄ one_le_two
-      apply DifferentiableOn.differentiableAt V
-      apply IsOpen.mem_nhds
-      assumption
-      assumption
+    use v, hv₂.mem_nhds hv₃
+    intro y hy
+    apply partialDeriv_compContLinAt
+    apply (hv₄.differentiableOn one_le_two).differentiableAt (hv₂.mem_nhds hy)
 
   unfold Complex.laplace
   simp
