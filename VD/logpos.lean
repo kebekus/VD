@@ -47,13 +47,11 @@ theorem Real.logpos_neg (x : ℝ) : log⁺ x = log⁺ (-x) := by simp [logpos]
 
 theorem Real.logpos_abs (x : ℝ) : log⁺ |x| = log⁺ x := by simp [logpos]
 
-theorem Real.logpos_eq_zero_iff (x : ℝ) :
-    log⁺ x = 0 ↔ |x| ≤ 1 := by
+theorem Real.logpos_eq_zero_iff (x : ℝ) : log⁺ x = 0 ↔ |x| ≤ 1 := by
   rw [← logpos_abs, ← log_nonpos_iff (abs_nonneg x)]
   simp [logpos]
 
-theorem Real.logpos_eq_log {x : ℝ} (hx : 1 ≤ |x|) :
-    log⁺ x = log x := by
+theorem Real.logpos_eq_log {x : ℝ} (hx : 1 ≤ |x|) : log⁺ x = log x := by
   simp [logpos]
   rw [← log_abs]
   apply log_nonneg hx
@@ -91,55 +89,6 @@ theorem Real.logpos_mul_nat {n : ℕ} {a : ℝ} :
   rw [logpos_eq_log_of_nat]
   exact logpos_mul
 
-theorem logpos_add_le_add_logpos_add_log2₀
-  {a b : ℝ}
-  (h : |a| ≤ |b|) :
-  log⁺ (a + b) ≤ log⁺ a + log⁺ b + log 2 := by
-
-  nth_rw 1 [← logpos_abs]
-  nth_rw 2 [← logpos_abs]
-  nth_rw 3 [← logpos_abs]
-
-  calc log⁺ |a + b|
-  _ ≤ log⁺ (|a| + |b|) := by
-    apply Real.monotoneOn_logpos
-    simp [abs_nonneg]; simp [abs_nonneg]
-    apply add_nonneg
-    simp [abs_nonneg]; simp [abs_nonneg]
-    exact abs_add_le a b
-  _ ≤ log⁺ (|b| + |b|) := by
-    apply Real.monotoneOn_logpos
-    simp [abs_nonneg]
-    apply add_nonneg
-    simp [abs_nonneg]; simp [abs_nonneg]
-    simp [h]
-    linarith
-  _ = log⁺ (2 * |b|) := by
-    congr; ring
-  _ ≤ log⁺ |b| + log 2 := by
-    unfold logpos; simp
-    constructor
-    · apply add_nonneg
-      simp
-      exact log_nonneg one_le_two
-    · by_cases hb: b = 0
-      · rw [hb]; simp
-        exact log_nonneg one_le_two
-      · rw [log_mul, log_abs, add_comm]
-        simp
-        exact Ne.symm (NeZero.ne' 2)
-        exact abs_ne_zero.mpr hb
-  _ ≤ log⁺ |a| + log⁺ |b| + log 2 := by
-    unfold logpos; simp
-
-theorem logpos_add_le_add_logpos_add_log2 {a b : ℝ} :
-    log⁺ (a + b) ≤ log⁺ a + log⁺ b + log 2 := by
-  by_cases h : |a| ≤ |b|
-  · exact logpos_add_le_add_logpos_add_log2₀ h
-  · rw [add_comm a b, add_comm (log⁺ a) (log⁺ b)]
-    apply logpos_add_le_add_logpos_add_log2₀
-    exact le_of_not_ge h
-
 theorem Real.logpos_sum {n : ℕ} (f : Fin n → ℝ) :
     log⁺ (∑ t, f t) ≤ log n + ∑ t, log⁺ (f t) := by
   -- Trivial case: empty sum
@@ -163,20 +112,10 @@ theorem Real.logpos_sum {n : ℕ} (f : Fin n → ℝ) :
     simp [Finset.sum_const]
   _ ≤ log n + log⁺ |f t_max| := Real.logpos_mul_nat
   _ ≤ log n + ∑ t, log⁺ (f t) := by
-    --Finset.single_le_sum
-    sorry
+    apply add_le_add (by rfl)
+    rw [logpos_abs]
+    exact Finset.single_le_sum (fun _ _ ↦ logpos_nonneg) (Finset.mem_univ t_max)
 
-/-
-For any positive real numbers a₁,...,aₙ: log⁺(a₁ + ... + aₙ) ≤ log⁺ a₁ + ... +
-log⁺ aₙ + log n Proof:
-
-First, a₁ + ... + aₙ ≤ n max(a₁,...,aₙ)
-
-Taking logarithms: log(a₁ + ... + aₙ) ≤ log n + log(max(a₁,...,aₙ))
-
-Note that log(max(a₁,...,aₙ)) ≤ max(log a₁,...,log aₙ) ≤ log⁺ a₁ + ... + log⁺ aₙ
-
-Therefore log(a₁ + ... + aₙ) ≤ log n + log⁺ a₁ + ... + log⁺ aₙ
-
-Taking positive parts of both sides gives the desired inequality.
--/
+theorem Real.logpos_add {a b : ℝ} : log⁺ (a + b) ≤ log 2 + log⁺ a + log⁺ b := by
+  convert logpos_sum (fun i => match i with | 0 => a | 1 => b : Fin 2 → ℝ) using 1
+  <;> simp [add_assoc]
