@@ -1,3 +1,4 @@
+import Mathlib.Analysis.SpecialFunctions.Log.PosLog
 import Mathlib.MeasureTheory.Integral.CircleIntegral
 import VD.divisor
 import VD.meromorphicOn_divisor
@@ -188,7 +189,7 @@ noncomputable def MeromorphicOn.m_infty
   {f : ℂ → ℂ}
   (_ : MeromorphicOn f ⊤) :
   ℝ → ℝ :=
-  fun r ↦ (2 * π)⁻¹ * ∫ x in (0)..(2 * π), poslog ‖f (circleMap 0 r x)‖
+  fun r ↦ (2 * π)⁻¹ * ∫ x in (0)..(2 * π), posLog ‖f (circleMap 0 r x)‖
 
 
 theorem Nevanlinna_proximity
@@ -201,7 +202,7 @@ theorem Nevanlinna_proximity
   rw [← mul_sub]; congr
   rw [← intervalIntegral.integral_sub]; congr
   funext x
-  simp_rw [log_eq_poslog_sub_poslog_inv]; congr
+  simp_rw [← posLog_sub_posLog_inv]; congr
   exact Eq.symm (IsAbsoluteValue.abv_inv Norm.norm (f (circleMap 0 r x)))
   --
   apply MeromorphicOn.integrable_poslog_abs_f
@@ -295,7 +296,7 @@ theorem Nevanlinna_firstMain₂
   {a : ℂ}
   {r : ℝ}
   (h₁f : MeromorphicOn f ⊤) :
-  |(h₁f.T_infty r) - ((h₁f.sub (MeromorphicOn.const a)).T_infty r)| ≤ poslog ‖a‖ + log 2 := by
+  |(h₁f.T_infty r) - ((h₁f.sub (MeromorphicOn.const a)).T_infty r)| ≤ posLog ‖a‖ + log 2 := by
 
   -- See Lang, p. 168
 
@@ -321,7 +322,7 @@ theorem Nevanlinna_firstMain₂
       unfold g
       simp
     _ ≤ log⁺ (‖g (circleMap 0 r x)‖ + ‖a‖) := by
-      apply monotoneOn_poslog
+      apply monotoneOn_posLog
       refine Set.mem_Ici.mpr ?_
       apply norm_nonneg
       refine Set.mem_Ici.mpr ?_
@@ -331,7 +332,7 @@ theorem Nevanlinna_firstMain₂
       --
       apply norm_add_le
     _ ≤ log⁺ ‖g (circleMap 0 r x)‖ + log⁺ ‖a‖ + log 2 := by
-      convert poslog_add using 1
+      convert posLog_add using 1
       ring
 
 
@@ -351,7 +352,7 @@ theorem Nevanlinna_firstMain₂
       unfold g
       simp
     _ ≤ log⁺ (‖f (circleMap 0 r x)‖ + ‖a‖) := by
-      apply monotoneOn_poslog
+      apply monotoneOn_posLog
       refine Set.mem_Ici.mpr ?_
       apply norm_nonneg
       refine Set.mem_Ici.mpr ?_
@@ -361,7 +362,7 @@ theorem Nevanlinna_firstMain₂
       --
       apply norm_sub_le
     _ ≤ log⁺ ‖f (circleMap 0 r x)‖ + log⁺ ‖a‖ + log 2 := by
-      convert poslog_add using 1
+      convert posLog_add using 1
       ring
 
   have t₁₁ (x : ℝ) : log⁺ ‖g (circleMap 0 r x)‖ - log⁺ ‖f (circleMap 0 r x)‖ ≤ log⁺ ‖a‖ + log 2 := by
@@ -427,10 +428,10 @@ theorem Nevanlinna_firstMain'₂
   |(hf.T_infty) - ((hf.sub (MeromorphicOn.const a)).T_infty)| =O[Filter.atTop] (1 : ℝ → ℝ) := by
 
   rw [Asymptotics.isBigO_iff']
-  use poslog ‖a‖ + log 2
+  use posLog ‖a‖ + log 2
   constructor
   · apply add_pos_of_nonneg_of_pos
-    apply poslog_nonneg
+    apply posLog_nonneg
     apply log_pos one_lt_two
   · rw [Filter.eventually_atTop]
     use 0

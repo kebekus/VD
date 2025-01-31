@@ -1,7 +1,7 @@
 import Mathlib.Analysis.Analytic.Meromorphic
+import Mathlib.Analysis.SpecialFunctions.Log.PosLog
 import Mathlib.MeasureTheory.Integral.CircleIntegral
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
-import VD.ToMathlib.poslog
 import VD.divisor
 import VD.intervalIntegrability
 import VD.meromorphicAt
@@ -147,9 +147,9 @@ theorem MeromorphicOn.integrable_poslog_abs_f
   {r : ℝ}
   -- WARNING: Not optimal. It suffices to be meromorphic on the Sphere
   (h₁f : MeromorphicOn f (Metric.closedBall (0 : ℂ) |r|)) :
-  IntervalIntegrable (fun z ↦ poslog ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
+  IntervalIntegrable (fun z ↦ posLog ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
 
-  simp_rw [poslog_eq_half_mul_log_add_log_abs, mul_add]
+  simp_rw [← half_mul_log_add_log_abs, mul_add]
   apply IntervalIntegrable.add
   apply h₁f.integrable_log_abs_f.const_mul
   apply (IntervalIntegrable.abs h₁f.integrable_log_abs_f).const_mul
