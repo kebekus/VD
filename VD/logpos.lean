@@ -89,6 +89,36 @@ theorem Real.logpos_mul_nat {n : ℕ} {a : ℝ} :
   rw [logpos_eq_log_of_nat]
   exact logpos_mul
 
+theorem Real.logpos_sum'' {α : Type} [Fintype α] (f : α → ℝ) :
+    log⁺ (∑ t, f t) ≤ log (Fintype.card α) + ∑ t, log⁺ (f t) := by
+  -- Trivial case: empty sum
+  by_cases hs : (Fintype.card α) = 0
+  · simp [hs, Fin.isEmpty', logpos, Fintype.card_eq_zero_iff.mp hs]
+  -- Nontrivial case:
+  -- Obtain maximal element…
+  have nonEmpty : Nonempty α := by
+    apply Fintype.card_pos_iff.mp
+    exact Nat.zero_lt_of_ne_zero hs
+  obtain ⟨t_max, ht_max⟩ := Finite.exists_max (fun t ↦ |f t|)
+  -- …then calculate
+  calc log⁺ (∑ t, f t)
+  _ = log⁺ |∑ t, f t| := by
+    rw [Real.logpos_abs]
+  _ ≤ log⁺ (∑ t, |f t|) := by
+    apply monotoneOn_logpos (by simp) (by simp [Finset.sum_nonneg])
+    simp [Finset.abs_sum_le_sum_abs]
+  _ ≤ log⁺ (∑ t : α, |f t_max|) := by
+    apply monotoneOn_logpos (by simp [Finset.sum_nonneg]) (by simp [Finset.sum_nonneg]; positivity)
+    exact Finset.sum_le_sum fun i a ↦ ht_max i
+  _ = log⁺ (n * |f t_max|) := by
+    simp [Finset.sum_const]
+  _ ≤ log n + log⁺ |f t_max| := Real.logpos_mul_nat
+  _ ≤ log n + ∑ t, log⁺ (f t) := by
+    apply add_le_add (by rfl)
+    rw [logpos_abs]
+    exact Finset.single_le_sum (fun _ _ ↦ logpos_nonneg) (Finset.mem_univ t_max)
+  sorry
+
 theorem Real.logpos_sum {n : ℕ} (f : Fin n → ℝ) :
     log⁺ (∑ t, f t) ≤ log n + ∑ t, log⁺ (f t) := by
   -- Trivial case: empty sum
