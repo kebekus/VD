@@ -1,5 +1,6 @@
-import VD.ToMathlib.meromorphicAt
 import VD.ToMathlib.analyticAt
+import VD.ToMathlib.meromorphicAt
+import VD.ToMathlib.poslog
 import VD.cauchyRiemann
 import VD.codiscreteWithin
 import VD.divisor
@@ -18,7 +19,6 @@ import VD.leftovers.bilinear
 import VD.leftovers.diffOp
 import VD.leftovers.holomorphic
 import VD.leftovers.holomorphic_zero
-import VD.logpos
 import VD.mathlibAddOn
 import VD.meromorphicAt
 import VD.meromorphicOn

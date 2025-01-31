@@ -1,9 +1,9 @@
 import Mathlib.Analysis.Analytic.Meromorphic
 import Mathlib.MeasureTheory.Integral.CircleIntegral
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
+import VD.ToMathlib.poslog
 import VD.divisor
 import VD.intervalIntegrability
-import VD.logpos
 import VD.meromorphicAt
 import VD.meromorphicOn_divisor
 import VD.specialFunctions_CircleIntegral_affine
@@ -142,14 +142,14 @@ theorem MeromorphicOn.integrable_log_abs_f
     exact h₁f.integrable_log_abs_f₀ h
 
 
-theorem MeromorphicOn.integrable_logpos_abs_f
+theorem MeromorphicOn.integrable_poslog_abs_f
   {f : ℂ → ℂ}
   {r : ℝ}
   -- WARNING: Not optimal. It suffices to be meromorphic on the Sphere
   (h₁f : MeromorphicOn f (Metric.closedBall (0 : ℂ) |r|)) :
-  IntervalIntegrable (fun z ↦ logpos ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
+  IntervalIntegrable (fun z ↦ poslog ‖f (circleMap 0 r z)‖) MeasureTheory.volume 0 (2 * π) := by
 
-  simp_rw [logpos_eq_half_mul_log_add_log_abs, mul_add]
+  simp_rw [poslog_eq_half_mul_log_add_log_abs, mul_add]
   apply IntervalIntegrable.add
   apply h₁f.integrable_log_abs_f.const_mul
   apply (IntervalIntegrable.abs h₁f.integrable_log_abs_f).const_mul
