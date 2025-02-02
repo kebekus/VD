@@ -48,3 +48,28 @@ theorem MeromorphicOn.clopen_of_order_eq_top {U : Set 𝕜} (h₁f : Meromorphic
     · exact h₂t'.sdiff isClosed_singleton
     · apply (Set.mem_diff w).1
       exact ⟨hw, Set.mem_singleton_iff.not.1 (Subtype.coe_ne_coe.2 h₁w)⟩
+
+theorem MeromorphicOn.exists_order_ne_top_iff_all_order_ne_top {U : Set 𝕜} (hf : MeromorphicOn f U)
+    (hU : IsConnected U) :
+    (∃ u : U, (hf u u.2).order ≠ ⊤) ↔ (∀ u : U, (hf u u.2).order ≠ ⊤) := by
+  constructor
+  · intro h₂f
+    have := isPreconnected_iff_preconnectedSpace.1 hU.isPreconnected
+    rcases isClopen_iff.1 hf.clopen_of_order_eq_top with h | h
+    · intro u
+      have : u ∉ (∅ : Set U) := by exact fun a => a
+      rw [← h] at this
+      tauto
+    · obtain ⟨u, hU⟩ := h₂f
+      have : u ∈ Set.univ := by trivial
+      rw [← h] at this
+      tauto
+  · intro h₂f
+    obtain ⟨v, hv⟩ := hU.nonempty
+    use ⟨v, hv⟩, h₂f ⟨v, hv⟩
+
+theorem MeromorphicOn.order_ne_top_of_order_ne_top {U : Set 𝕜} {x y : U} (hf : MeromorphicOn f U)
+    (hU : IsPreconnected U) (hx : (hf x x.2).order ≠ ⊤) :
+    (hf y y.2).order ≠ ⊤ :=
+  (hf.exists_order_ne_top_iff_all_order_ne_top ⟨Set.nonempty_of_mem (Subtype.coe_prop x), hU⟩).1
+    (by use x) y

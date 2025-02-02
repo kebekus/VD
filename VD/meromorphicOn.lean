@@ -8,37 +8,6 @@ import VD.ToMathlib.meromorphicOn
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
-theorem MeromorphicOn.order_ne_top'
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  (h₁f : MeromorphicOn f U)
-  (hU : IsConnected U) :
-  (∃ u : U, (h₁f u u.2).order ≠ ⊤) ↔ (∀ u : U, (h₁f u u.2).order ≠ ⊤) := by
-
-  constructor
-  · intro h₂f
-    let A := h₁f.clopen_of_order_eq_top
-    have : PreconnectedSpace U := by
-      apply isPreconnected_iff_preconnectedSpace.mp
-      exact IsConnected.isPreconnected hU
-    rw [isClopen_iff] at A
-    rcases A with h|h
-    · intro u
-      have : u ∉ (∅ : Set U) := by exact fun a => a
-      rw [← h] at this
-      simp at this
-      tauto
-    · obtain ⟨u, hU⟩ := h₂f
-      have A : u ∈ Set.univ := by trivial
-      rw [← h] at A
-      simp at A
-      tauto
-  · intro h₂f
-    let A := hU.nonempty
-    obtain ⟨v, hv⟩ := A
-    use ⟨v, hv⟩
-    exact h₂f ⟨v, hv⟩
-
 
 theorem StronglyMeromorphicOn.order_ne_top
   {f : ℂ → ℂ}
@@ -48,7 +17,7 @@ theorem StronglyMeromorphicOn.order_ne_top
   (h₂f : ∃ u : U, f u ≠ 0) :
   ∀ u : U, (h₁f u u.2).meromorphicAt.order ≠ ⊤ := by
 
-  rw [← h₁f.meromorphicOn.order_ne_top' hU]
+  rw [← h₁f.meromorphicOn.exists_order_ne_top_iff_all_order_ne_top hU]
   obtain ⟨u, hu⟩ := h₂f
   use u
   rw [← (h₁f u u.2).order_eq_zero_iff] at hu
@@ -81,7 +50,7 @@ theorem MeromorphicOn.nonvanish_of_order_ne_top
       exact hCon y (interior_subset h₁y)
     · simp [h₁v]
 
-  let A := h₁f.order_ne_top' h₁U
+  let A := h₁f.exists_order_ne_top_iff_all_order_ne_top h₁U
   rw [← not_iff_not] at A
   push_neg at A
   have B := A.2 this
