@@ -1,5 +1,7 @@
 import Mathlib.MeasureTheory.Integral.CircleIntegral
+import Mathlib.MeasureTheory.Integral.IntervalAverage
 import Mathlib.MeasureTheory.Integral.Periodic
+import VD.codiscreteWithin
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
@@ -138,3 +140,44 @@ theorem integrabl_congr_negRadius
   rw [X]
   simp
   rw [add_comm]
+
+theorem ae_of_restrVol_le_codiscreteWithin {U : Set ℝ} (hU : MeasurableSet U) :
+    (MeasureTheory.ae (volume.restrict U)) ≤ (Filter.codiscreteWithin U) := by
+  intro s hs
+  have := discreteTopology_of_codiscreteWithin hs
+  rw [mem_ae_iff, Measure.restrict_apply' hU]
+  apply Set.Countable.measure_zero (TopologicalSpace.separableSpace_iff_countable.1
+    TopologicalSpace.SecondCountableTopology.to_separableSpace)
+
+
+theorem intervalIntegrable_congr_codiscreteWithin
+    {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
+    IntervalIntegrable f₁ MeasureTheory.volume a b →
+      IntervalIntegrable f₂ MeasureTheory.volume a b := by
+  intro hf₁
+  apply IntervalIntegrable.congr hf₁
+  rw [Filter.eventuallyEq_iff_exists_mem] at *
+  obtain ⟨s, h₁s, h₂s⟩ := hf
+  use s, ae_of_restrVol_le_codiscreteWithin measurableSet_uIoc h₁s, h₂s
+
+theorem circleIntegrable_congr_codiscreteWithin
+    {r : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
+    IntervalIntegrable f₁ MeasureTheory.volume a b →
+      IntervalIntegrable f₂ MeasureTheory.volume a b := by
+  intro hf₁
+  apply IntervalIntegrable.congr hf₁
+  rw [Filter.eventuallyEq_iff_exists_mem] at *
+  obtain ⟨s, h₁s, h₂s⟩ := hf
+  use s, ae_of_restrVol_le_codiscreteWithin measurableSet_uIoc h₁s, h₂s
+
+theorem intervalIntegral_congr_codiscreteWithin
+    {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
+  ∫ (x : ℝ) in a..b, f₁ x = ∫ (x : ℝ) in a..b, f₂ x := by
+  apply intervalIntegral.integral_congr_ae
+  sorry
+
+theorem intervalAverage_congr_codiscreteWithin
+    {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
+  ⨍ (x : ℝ) in a..b, f₁ x = ⨍ (x : ℝ) in a..b, f₂ x := by
+  rw [interval_average_eq, intervalIntegral_congr_codiscreteWithin hf,
+    ← interval_average_eq]
