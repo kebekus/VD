@@ -82,4 +82,4 @@ theorem AnalyticAt.localIdentity (hf : AnalyticAt 𝕜 f z₀) (hg : AnalyticAt 
 /-- The leading coefficient in the power series expansion of f around z₀, or
   zero if f vanishes identically near z₀. -/
 noncomputable def AnalyticAt.leadCoeff (hf : AnalyticAt 𝕜 f z₀) : E :=
-  if h : hf.order = ⊤ then 0 else ((hf.order_neq_top_iff.1 h).choose z₀)
+  if h : hf.order = ⊤ then 0 else ((hf.order_ne_top_iff.1 h).choose z₀)
