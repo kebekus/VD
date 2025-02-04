@@ -84,23 +84,9 @@ theorem MeromorphicAt.order_inv
   hf.order = -hf.inv.order := by
 
   by_cases h₂f : hf.order = ⊤
-  · simp [h₂f]
-    have : hf.inv.order = ⊤ := by
-      rw [hf.inv.order_eq_top_iff]
-      rw [eventually_nhdsWithin_iff]
-      rw [eventually_nhds_iff]
-
-      rw [hf.order_eq_top_iff] at h₂f
-      rw [eventually_nhdsWithin_iff] at h₂f
-      rw [eventually_nhds_iff] at h₂f
-      obtain ⟨t, h₁t, h₂t, h₃t⟩ := h₂f
-      use t
-      constructor
-      · intro y h₁y h₂y
-        simp
-        rw [h₁t y h₁y h₂y]
-      · exact ⟨h₂t, h₃t⟩
-    rw [this]
+  · rw [h₂f, ← LinearOrderedAddCommGroupWithTop.neg_top, neg_eq_iff_eq_neg, neg_neg, eq_comm]
+    rw [MeromorphicAt.order_eq_top_iff] at *
+    filter_upwards [h₂f]
     simp
 
   · have : hf.order = hf.order.untop' 0 := by
