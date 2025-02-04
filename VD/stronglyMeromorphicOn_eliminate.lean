@@ -531,7 +531,7 @@ theorem StronglyMeromorphicOn.decompose_log
       ext u
       simp; tauto
 
-    rw [codiscreteWithin_congr this]
+    rw [codiscreteWithin_congr_inter this]
     exact A
 
   · intro z hz

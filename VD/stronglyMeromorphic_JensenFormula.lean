@@ -141,7 +141,7 @@ theorem jensen₀
         simp [t₀] at C
         rcases C with C₁|C₂
         · assumption
-        · let B := h₁f.meromorphicOn.exists_order_ne_top_iff_all_order_ne_top h₁U
+        · let B := h₁f.meromorphicOn.exists_order_ne_top_iff_forall h₁U
           let C := fun q ↦ B.1 q ⟨(circleMap 0 R a), t₀⟩
           rw [C₂] at C
           have : ∃ u : (Metric.closedBall (0 : ℂ) R), (h₁f u u.2).meromorphicAt.order ≠ ⊤ := by

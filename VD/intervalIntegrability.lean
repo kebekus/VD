@@ -160,6 +160,7 @@ theorem intervalIntegrable_congr_codiscreteWithin
   obtain ⟨s, h₁s, h₂s⟩ := hf
   use s, ae_of_restrVol_le_codiscreteWithin measurableSet_uIoc h₁s, h₂s
 
+/-
 theorem circleIntegrable_congr_codiscreteWithin
     {r : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
     IntervalIntegrable f₁ MeasureTheory.volume a b →
@@ -169,6 +170,7 @@ theorem circleIntegrable_congr_codiscreteWithin
   rw [Filter.eventuallyEq_iff_exists_mem] at *
   obtain ⟨s, h₁s, h₂s⟩ := hf
   use s, ae_of_restrVol_le_codiscreteWithin measurableSet_uIoc h₁s, h₂s
+
 
 theorem intervalIntegral_congr_codiscreteWithin
     {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
@@ -181,3 +183,4 @@ theorem intervalAverage_congr_codiscreteWithin
   ⨍ (x : ℝ) in a..b, f₁ x = ⨍ (x : ℝ) in a..b, f₂ x := by
   rw [interval_average_eq, intervalIntegral_congr_codiscreteWithin hf,
     ← interval_average_eq]
+-/

@@ -1,4 +1,4 @@
-import VD.ToMathlib.meromorphicAt
+import VD.ToMathlib.analyticAt
 import VD.divisor
 
 open scoped Interval Topology
