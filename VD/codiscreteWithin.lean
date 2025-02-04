@@ -18,3 +18,13 @@ theorem discreteTopology_of_codiscreteWithin
   intro x hx
   rw [← Filter.mem_iff_inf_principal_compl, (by ext z; simp; tauto : s ∪ Uᶜ = (U \ s)ᶜ)]
   simp_all only [h x, Set.compl_union, compl_compl, Set.mem_inter_iff, Set.mem_compl_iff]
+
+theorem Filter.codiscreteWithin.mono {X : Type u_1} [TopologicalSpace X] {U₁ U₂ : Set X}
+    (hU : U₁ ⊆ U₂) :
+    (Filter.codiscreteWithin U₁) ≤ (Filter.codiscreteWithin U₂) := by
+  intro s hs
+  simp_rw [mem_codiscreteWithin, disjoint_principal_right] at hs ⊢
+  intro x hx
+  apply mem_of_superset (hs x (hU hx))
+  rw [Set.compl_subset_compl]
+  exact fun y hy ↦ ⟨hU hy.1, hy.2⟩
