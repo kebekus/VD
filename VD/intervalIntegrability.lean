@@ -167,6 +167,7 @@ theorem intervalIntegrable_congr_codiscreteWithin
     use s, ae_of_restrVol_le_codiscreteWithin measurableSet_Ioc h₁s, h₂s
 
 -- TODO: Show that preimage of codiscrete is codiscrete
+/-
 theorem yy {c : ℂ} {R : ℝ} :
     Filter.map (circleMap c R) (Filter.codiscrete ℝ) ≤ (Filter.codiscreteWithin (Metric.sphere c R)) := by
   intro s hs
@@ -180,7 +181,9 @@ theorem yy {c : ℂ} {R : ℝ} :
   let h₂y := hs y hy
 
   sorry
+-/
 
+/-
 theorem circleIntegrable_congr_codiscreteWithin
     {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c R)] f₂) :
     CircleIntegrable f₁ c R → CircleIntegrable f₂ c R := by
@@ -188,6 +191,7 @@ theorem circleIntegrable_congr_codiscreteWithin
   rw [Filter.eventuallyEq_iff_exists_mem]
   use (circleMap c R)⁻¹' {z | f₁ z = f₂ z}, Filter.codiscreteWithin.mono (U₁ := Ι 0 (2 * π))
     (by simp) (yy hf), (by tauto)
+-/
 
 /-
 theorem intervalIntegral_congr_codiscreteWithin
