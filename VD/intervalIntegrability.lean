@@ -167,7 +167,7 @@ theorem intervalIntegrable_congr_codiscreteWithin
     use s, ae_of_restrVol_le_codiscreteWithin measurableSet_Ioc h₁s, h₂s
 
 -- TODO: Show that preimage of codiscrete is codiscrete
-/-
+
 theorem yy {c : ℂ} {R : ℝ} :
     Filter.map (circleMap c R) (Filter.codiscrete ℝ) ≤ (Filter.codiscreteWithin (Metric.sphere c R)) := by
   intro s hs
@@ -179,11 +179,8 @@ theorem yy {c : ℂ} {R : ℝ} :
   let y := circleMap c R x
   have hy : y ∈ Metric.sphere c R := by sorry
   let h₂y := hs y hy
-
   sorry
--/
 
-/-
 theorem circleIntegrable_congr_codiscreteWithin
     {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c R)] f₂) :
     CircleIntegrable f₁ c R → CircleIntegrable f₂ c R := by
@@ -191,9 +188,9 @@ theorem circleIntegrable_congr_codiscreteWithin
   rw [Filter.eventuallyEq_iff_exists_mem]
   use (circleMap c R)⁻¹' {z | f₁ z = f₂ z}, Filter.codiscreteWithin.mono (U₁ := Ι 0 (2 * π))
     (by simp) (yy hf), (by tauto)
--/
 
-/-
+
+
 theorem intervalIntegral_congr_codiscreteWithin
     {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
   ∫ (x : ℝ) in a..b, f₁ x = ∫ (x : ℝ) in a..b, f₂ x := by
@@ -205,4 +202,10 @@ theorem intervalAverage_congr_codiscreteWithin
   ⨍ (x : ℝ) in a..b, f₁ x = ⨍ (x : ℝ) in a..b, f₂ x := by
   rw [interval_average_eq, intervalIntegral_congr_codiscreteWithin hf,
     ← interval_average_eq]
--/
+  sorry
+
+theorem circleIntegral_congr_codiscreteWithin
+    {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c R)] f₂) :
+  (∮ z in C(c, R), f₁ z) = (∮ z in C(c, R), f₂ z) := by
+  apply intervalIntegral.integral_congr_ae
+  sorry
