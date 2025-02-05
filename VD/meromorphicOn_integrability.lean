@@ -1,15 +1,7 @@
-import Mathlib.Analysis.Analytic.Meromorphic
 import Mathlib.Analysis.SpecialFunctions.Log.PosLog
 import Mathlib.MeasureTheory.Integral.CircleIntegral
-import Mathlib.MeasureTheory.Integral.IntervalIntegral
-import VD.divisor
-import VD.intervalIntegrability
-import VD.meromorphicAt
-import VD.meromorphicOn_divisor
 import VD.specialFunctions_CircleIntegral_affine
-import VD.stronglyMeromorphicOn
 import VD.stronglyMeromorphicOn_eliminate
-import VD.mathlibAddOn
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral

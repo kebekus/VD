@@ -1,4 +1,4 @@
-import Mathlib.Analysis.Analytic.Meromorphic
+import Mathlib.Analysis.Meromorphic.Basic
 import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Add
 import Mathlib.Analysis.SpecialFunctions.Exp

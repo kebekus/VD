@@ -1,4 +1,4 @@
-import Mathlib.Analysis.Analytic.Meromorphic
+import Mathlib.Analysis.Meromorphic.Basic
 import Mathlib.Algebra.Order.AddGroupWithTop
 import VD.mathlibAddOn
 import VD.meromorphicAt

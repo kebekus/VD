@@ -1,13 +1,5 @@
-import Mathlib.Analysis.Analytic.Meromorphic
-import VD.ToMathlib.analyticAt
 import VD.codiscreteWithin
-import VD.divisor
-import VD.meromorphicAt
-import VD.meromorphicOn
-import VD.meromorphicOn_divisor
-import VD.stronglyMeromorphicOn
 import VD.stronglyMeromorphicOn_ratlPolynomial
-import VD.mathlibAddOn
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral

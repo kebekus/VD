@@ -1,4 +1,5 @@
 import Mathlib.Analysis.Analytic.IsolatedZeros
+import Mathlib.Analysis.Analytic.Order
 
 open Topology
 

@@ -1,5 +1,5 @@
 import Init.Classical
-import Mathlib.Analysis.Analytic.Meromorphic
+import Mathlib.Analysis.Meromorphic.Basic
 import Mathlib.Topology.ContinuousOn
 import Mathlib.Analysis.Analytic.IsolatedZeros
 import VD.leftovers.holomorphic
