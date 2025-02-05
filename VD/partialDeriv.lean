@@ -129,14 +129,12 @@ theorem partialDeriv_add₂_contDiffAt
   obtain ⟨f₂', u₂, hu₂, _, hf₂'⟩ := contDiffAt_one_iff.1 h₂
 
   apply Filter.eventuallyEq_iff_exists_mem.2
-  use u₁ ∩ u₂
-  constructor
-  · exact Filter.inter_mem hu₁ hu₂
-  · intro x hx
-    simp
-    apply partialDeriv_add₂_differentiableAt 𝕜
-    exact (hf₁' x (Set.mem_of_mem_inter_left hx)).differentiableAt
-    exact (hf₂' x (Set.mem_of_mem_inter_right hx)).differentiableAt
+  use u₁ ∩ u₂, Filter.inter_mem hu₁ hu₂
+  intro x hx
+  simp
+  apply partialDeriv_add₂_differentiableAt 𝕜
+  exact (hf₁' x hx.1).differentiableAt
+  exact (hf₂' x hx.2).differentiableAt
 
 
 theorem partialDeriv_sub₂ {f₁ f₂ : E → F} (h₁ : Differentiable 𝕜 f₁) (h₂ : Differentiable 𝕜 f₂) : ∀ v : E, partialDeriv 𝕜 v (f₁ - f₂) = (partialDeriv 𝕜 v f₁) - (partialDeriv 𝕜 v f₂) := by

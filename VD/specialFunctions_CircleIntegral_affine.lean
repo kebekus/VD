@@ -4,7 +4,6 @@ import VD.specialFunctions_Integral_log_sin
 import VD.harmonicAt_examples
 import VD.harmonicAt_meanValue
 import VD.intervalIntegrability
-import VD.periodic_integrability
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
@@ -210,7 +209,7 @@ lemma int''₁ : -- Integrability of log ‖circleMap 0 1 x - 1‖ for arbitrary
   ∀ (t₁ t₂ : ℝ), IntervalIntegrable (fun x ↦ log ‖circleMap 0 1 x - 1‖) volume t₁ t₂ := by
   intro t₁ t₂
 
-  apply periodic_integrability4 (T := 2 * π) (t := 0)
+  apply Function.Periodic.intervalIntegrable₀ (T := 2 * π)
   --
   have : (fun x => log ‖circleMap 0 1 x - 1‖) = (fun x => log ‖x - 1‖) ∘ (circleMap 0 1) := rfl
   rw [this]
@@ -219,7 +218,6 @@ lemma int''₁ : -- Integrability of log ‖circleMap 0 1 x - 1‖ for arbitrary
   --
   exact two_pi_pos
   --
-  rw [zero_add]
   exact int'₁
 
 lemma int₁ :

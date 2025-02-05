@@ -1,13 +1,5 @@
-import Mathlib.Analysis.Analytic.Meromorphic
-import VD.analyticAt
 import VD.codiscreteWithin
-import VD.divisor
-import VD.meromorphicAt
-import VD.meromorphicOn
-import VD.meromorphicOn_divisor
-import VD.stronglyMeromorphicOn
 import VD.stronglyMeromorphicOn_ratlPolynomial
-import VD.mathlibAddOn
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
@@ -180,9 +172,7 @@ theorem MeromorphicOn.decompose₂
     apply Finset.analyticAt_prod
     intro p hp
     apply AnalyticAt.zpow
-    apply AnalyticAt.sub
-    apply analyticAt_id
-    apply analyticAt_const
+    fun_prop
     by_contra hCon
     rw [sub_eq_zero] at hCon
     have : p.1 = u := by
@@ -227,15 +217,13 @@ theorem MeromorphicOn.decompose₂
         · rwa [hv]
         · let A := h₂g₀ ⟨v₁, hv⟩
           rw [h₄g] at A
-          rw [← analyticAt_of_mul_analytic] at A
+          rw [mul_comm, ← analyticAt_of_mul_analytic] at A
           simp at A
           exact A
           --
           simp
           apply AnalyticAt.zpow
-          apply AnalyticAt.sub
-          apply analyticAt_id
-          apply analyticAt_const
+          fun_prop
           by_contra hCon
           rw [sub_eq_zero] at hCon
 
@@ -535,7 +523,7 @@ theorem StronglyMeromorphicOn.decompose_log
       ext u
       simp; tauto
 
-    rw [codiscreteWithin_congr this]
+    rw [codiscreteWithin_congr_inter this]
     exact A
 
   · intro z hz

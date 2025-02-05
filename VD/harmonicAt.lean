@@ -26,26 +26,14 @@ theorem HarmonicAt_iff
     simp at h₃s₁
     obtain ⟨t₂, h₁t₂, h₂t₂⟩ := (Filter.eventuallyEq_iff_exists_mem.1 hf.2)
     obtain ⟨s₂, h₁s₂, h₂s₂, h₃s₂⟩ := mem_nhds_iff.1 h₁t₂
-    let s := s₁ ∩ s₂
-    use s
-    constructor
-    · exact IsOpen.inter h₁s₁ h₂s₂
-    · constructor
-      · exact Set.mem_inter h₂s₁ h₃s₂
-      · constructor
-        · exact h₃s₁.mono Set.inter_subset_left
-        · intro z hz
-          exact h₂t₂ (h₁s₂ hz.2)
+    use s₁ ∩ s₂, h₁s₁.inter h₂s₂, ⟨h₂s₁, h₃s₂⟩, h₃s₁.mono Set.inter_subset_left
+    exact fun z hz ↦ h₂t₂ (h₁s₂ hz.2)
   · intro hyp
     obtain ⟨s, h₁s, h₂s, h₁f, h₂f⟩ := hyp
     constructor
-    · apply h₁f.contDiffAt
-      apply (IsOpen.mem_nhds_iff h₁s).2 h₂s
+    · apply h₁f.contDiffAt (h₁s.mem_nhds_iff.2 h₂s)
     · apply Filter.eventuallyEq_iff_exists_mem.2
-      use s
-      constructor
-      · apply (IsOpen.mem_nhds_iff h₁s).2 h₂s
-      · exact h₂f
+      use s, h₁s.mem_nhds_iff.2 h₂s, h₂f
 
 theorem HarmonicAt_isOpen
   (f : ℂ → F) :
@@ -68,15 +56,8 @@ theorem HarmonicAt_isOpen
 
 theorem HarmonicAt_eventuallyEq {f₁ f₂ : ℂ → F} {x : ℂ} (h : f₁ =ᶠ[nhds x] f₂) : HarmonicAt f₁ x ↔ HarmonicAt f₂ x := by
   constructor
-  · intro h₁
-    constructor
-    · exact ContDiffAt.congr_of_eventuallyEq h₁.1 (Filter.EventuallyEq.symm h)
-    · exact Filter.EventuallyEq.trans (laplace_eventuallyEq' (Filter.EventuallyEq.symm h)) h₁.2
-  · intro h₁
-    constructor
-    · exact ContDiffAt.congr_of_eventuallyEq h₁.1 h
-    · exact Filter.EventuallyEq.trans (laplace_eventuallyEq' h) h₁.2
-
+  · exact fun h₁ ↦ ⟨h₁.1.congr_of_eventuallyEq h.symm, (laplace_eventuallyEq' h.symm).trans h₁.2⟩
+  · exact fun h₁ ↦ ⟨h₁.1.congr_of_eventuallyEq h, (laplace_eventuallyEq' h).trans h₁.2⟩
 
 theorem HarmonicOn_of_locally_HarmonicOn {f : ℂ → F} {s : Set ℂ} (h : ∀ x ∈ s, ∃ (u : Set ℂ), IsOpen u ∧ x ∈ u ∧ HarmonicOn f (s ∩ u)) :
   HarmonicOn f s := by
@@ -85,7 +66,7 @@ theorem HarmonicOn_of_locally_HarmonicOn {f : ℂ → F} {s : Set ℂ} (h : ∀ 
     intro x xHyp
     obtain ⟨u, uHyp⟩ := h x xHyp
     use u
-    exact ⟨ uHyp.1, ⟨uHyp.2.1, uHyp.2.2.1⟩⟩
+    exact ⟨uHyp.1, ⟨uHyp.2.1, uHyp.2.2.1⟩⟩
   · intro x xHyp
     obtain ⟨u, uHyp⟩ := h x xHyp
     exact (uHyp.2.2.2) x ⟨xHyp, uHyp.2.1⟩
@@ -96,41 +77,26 @@ theorem HarmonicOn_congr {f₁ f₂ : ℂ → F} {s : Set ℂ} (hs : IsOpen s) (
   constructor
   · intro h₁
     constructor
-    · apply ContDiffOn.congr h₁.1
-      intro x hx
-      rw [eq_comm]
-      exact hf₁₂ x hx
+    · exact h₁.1.congr (fun x hx ↦ (hf₁₂ x hx).symm)
     · intro z hz
       have : f₁ =ᶠ[nhds z] f₂ := by
         unfold Filter.EventuallyEq
         unfold Filter.Eventually
         simp
         refine mem_nhds_iff.mpr ?_
-        use s
-        constructor
-        · exact hf₁₂
-        · constructor
-          · exact hs
-          · exact hz
+        use s, hf₁₂, hs, hz
       rw [← laplace_eventuallyEq this]
       exact h₁.2 z hz
   · intro h₁
     constructor
-    · apply ContDiffOn.congr h₁.1
-      intro x hx
-      exact hf₁₂ x hx
+    · exact h₁.1.congr (fun x hx ↦ hf₁₂ x hx)
     · intro z hz
       have : f₁ =ᶠ[nhds z] f₂ := by
         unfold Filter.EventuallyEq
         unfold Filter.Eventually
         simp
         refine mem_nhds_iff.mpr ?_
-        use s
-        constructor
-        · exact hf₁₂
-        · constructor
-          · exact hs
-          · exact hz
+        use s, hf₁₂, hs, hz
       rw [laplace_eventuallyEq this]
       exact h₁.2 z hz
 
@@ -145,15 +111,12 @@ theorem harmonic_add_harmonic_is_harmonic {f₁ f₂ : ℂ → F} (h₁ : Harmon
     rw [h₁.2 z, h₂.2 z]
     simp
 
-
 theorem harmonicOn_add_harmonicOn_is_harmonicOn {f₁ f₂ : ℂ → F} {s : Set ℂ} (hs : IsOpen s) (h₁ : HarmonicOn f₁ s) (h₂ : HarmonicOn f₂ s) :
   HarmonicOn (f₁ + f₂) s := by
   constructor
-  · exact ContDiffOn.add h₁.1 h₂.1
+  · exact h₁.1.add h₂.1
   · intro z hz
-    rw [laplace_add_ContDiffOn hs h₁.1 h₂.1 z hz]
-    rw [h₁.2 z hz, h₂.2 z hz]
-    simp
+    simp [laplace_add_ContDiffOn hs h₁.1 h₂.1 z hz, h₁.2 z hz, h₂.2 z hz]
 
 
 theorem harmonicAt_add_harmonicAt_is_harmonicAt
@@ -163,9 +126,9 @@ theorem harmonicAt_add_harmonicAt_is_harmonicAt
   (h₂ : HarmonicAt f₂ x) :
   HarmonicAt (f₁ + f₂) x := by
   constructor
-  · exact ContDiffAt.add h₁.1 h₂.1
-  · apply Filter.EventuallyEq.trans (laplace_add_ContDiffAt' h₁.1 h₂.1)
-    apply Filter.EventuallyEq.trans (Filter.EventuallyEq.add h₁.2 h₂.2)
+  · exact h₁.1.add h₂.1
+  · apply (laplace_add_ContDiffAt' h₁.1 h₂.1).trans
+    apply (h₁.2.add h₂.2).trans
     simp
     rfl
 
@@ -173,7 +136,7 @@ theorem harmonicAt_add_harmonicAt_is_harmonicAt
 theorem harmonic_smul_const_is_harmonic {f : ℂ → F} {c : ℝ} (h : Harmonic f) :
   Harmonic (c • f) := by
   constructor
-  · exact ContDiff.const_smul c h.1
+  · exact h.1.const_smul c
   · rw [laplace_smul]
     dsimp
     intro z
@@ -188,9 +151,9 @@ theorem harmonicAt_smul_const_is_harmonicAt
   (h : HarmonicAt f x) :
   HarmonicAt (c • f) x := by
   constructor
-  · exact ContDiffAt.const_smul c h.1
+  · exact h.1.const_smul c
   · rw [laplace_smul]
-    have A := Filter.EventuallyEq.const_smul h.2 c
+    have A := h.2.const_smul c
     simp at A
     assumption
 
@@ -220,24 +183,20 @@ theorem harmonic_comp_CLM_is_harmonic {f : ℂ → F₁} {l : F₁ →L[ℝ] G} 
 
   constructor
   · -- Continuous differentiability
-    apply ContDiff.comp
-    exact ContinuousLinearMap.contDiff l
-    exact h.1
+    exact ContDiff.comp l.contDiff h.1
   · rw [laplace_compCLM]
     simp
     intro z
     rw [h.2 z]
     simp
-    exact ContDiff.restrict_scalars ℝ h.1
+    exact h.1.restrict_scalars ℝ
 
 
 theorem harmonicOn_comp_CLM_is_harmonicOn {f : ℂ → F₁} {s : Set ℂ} {l : F₁ →L[ℝ] G} (hs : IsOpen s) (h : HarmonicOn f s) :
   HarmonicOn (l ∘ f) s := by
-
   constructor
   · -- Continuous differentiability
-    apply ContDiffOn.continuousLinearMap_comp
-    exact h.1
+    apply h.1.continuousLinearMap_comp
   · -- Vanishing of Laplace
     intro z zHyp
     rw [laplace_compCLMAt]
@@ -245,9 +204,7 @@ theorem harmonicOn_comp_CLM_is_harmonicOn {f : ℂ → F₁} {s : Set ℂ} {l : 
     rw [h.2 z]
     simp
     assumption
-    apply ContDiffOn.contDiffAt h.1
-    exact IsOpen.mem_nhds hs zHyp
-
+    apply h.1.contDiffAt (hs.mem_nhds zHyp)
 
 theorem harmonicAt_comp_CLM_is_harmonicAt
   {f : ℂ → F₁}
@@ -266,20 +223,14 @@ theorem harmonicAt_comp_CLM_is_harmonicAt
     obtain ⟨t, h₁t, h₂t⟩ := Filter.eventuallyEq_iff_exists_mem.1 h.2
     obtain ⟨u, h₁u, h₂u, h₃u⟩ := mem_nhds_iff.1 h₁t
     apply Filter.eventuallyEq_iff_exists_mem.2
-    use s ∩ u
-    constructor
-    · apply IsOpen.mem_nhds
-      exact IsOpen.inter h₂s h₂u
-      constructor
-      · exact h₃s
-      · exact h₃u
-    · intro x xHyp
-      rw [laplace_compCLMAt]
-      simp
-      rw [h₂t]
-      simp
-      exact h₁u xHyp.2
-      apply (h₂r.mono h₁s).contDiffAt (IsOpen.mem_nhds h₂s xHyp.1)
+    use s ∩ u, (h₂s.inter h₂u).mem_nhds ⟨h₃s, h₃u⟩
+    intro x xHyp
+    rw [laplace_compCLMAt]
+    simp
+    rw [h₂t]
+    simp
+    exact h₁u xHyp.2
+    apply (h₂r.mono h₁s).contDiffAt (h₂s.mem_nhds xHyp.1)
 
 
 theorem harmonic_iff_comp_CLE_is_harmonic {f : ℂ → F₁} {l : F₁ ≃L[ℝ] G₁} :
@@ -290,7 +241,6 @@ theorem harmonic_iff_comp_CLE_is_harmonic {f : ℂ → F₁} {l : F₁ ≃L[ℝ]
     rw [this]
     exact harmonic_comp_CLM_is_harmonic
   · have : f = (l.symm : G₁ →L[ℝ] F₁) ∘ l ∘ f := by
-      funext z
       unfold Function.comp
       simp
     nth_rewrite 2 [this]
@@ -308,7 +258,6 @@ theorem harmonicAt_iff_comp_CLE_is_harmonicAt
     rw [this]
     exact harmonicAt_comp_CLM_is_harmonicAt
   · have : f = (l.symm : G₁ →L[ℝ] F₁) ∘ l ∘ f := by
-      funext z
       unfold Function.comp
       simp
     nth_rewrite 2 [this]
@@ -323,7 +272,6 @@ theorem harmonicOn_iff_comp_CLE_is_harmonicOn {f : ℂ → F₁} {s : Set ℂ} {
     rw [this]
     exact harmonicOn_comp_CLM_is_harmonicOn hs
   · have : f = (l.symm : G₁ →L[ℝ] F₁) ∘ l ∘ f := by
-      funext z
       unfold Function.comp
       simp
     nth_rewrite 2 [this]

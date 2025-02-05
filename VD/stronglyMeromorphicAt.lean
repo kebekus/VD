@@ -1,6 +1,5 @@
-import Mathlib.Analysis.Analytic.Meromorphic
+import Mathlib.Analysis.Meromorphic.Basic
 import Mathlib.Algebra.Order.AddGroupWithTop
-import VD.analyticAt
 import VD.mathlibAddOn
 import VD.meromorphicAt
 
@@ -73,12 +72,7 @@ theorem StronglyMeromorphicAt.meromorphicAt
     exact analyticAt_const
   · obtain ⟨n, g, h₁g, _, h₃g⟩ := h
     rw [meromorphicAt_congr' h₃g]
-    apply MeromorphicAt.smul
-    apply MeromorphicAt.zpow
-    apply MeromorphicAt.sub
-    apply MeromorphicAt.id
-    apply MeromorphicAt.const
-    exact AnalyticAt.meromorphicAt h₁g
+    fun_prop
 
 
 /- Strongly MeromorphicAt of non-negative order is analytic -/
@@ -104,12 +98,9 @@ theorem StronglyMeromorphicAt.analytic
         · exact h₂g
         · exact Filter.EventuallyEq.filter_mono h₃g nhdsWithin_le_nhds
     rw [this] at h₂f
-    apply AnalyticAt.smul
+    apply AnalyticAt.smul'
     nth_rw 1 [← Int.toNat_of_nonneg (WithTop.coe_nonneg.mp h₂f)]
-    apply AnalyticAt.pow
-    apply AnalyticAt.sub
-    apply analyticAt_id -- Warning: want apply AnalyticAt.id
-    apply analyticAt_const -- Warning: want AnalyticAt.const
+    fun_prop
     exact h₁g
 
 
@@ -435,12 +426,7 @@ theorem StronglyMeromorphicAt.eliminate
 
   let g₁ := (fun z ↦ (z-z₀) ^ (-h₁f.meromorphicAt.order.untop h₂f)) * f
   let g₁₁ := fun z ↦ (z-z₀) ^ (-h₁f.meromorphicAt.order.untop h₂f)
-  have h₁g₁₁ : MeromorphicAt g₁₁ z₀ := by
-    apply MeromorphicAt.zpow
-    apply AnalyticAt.meromorphicAt
-    apply AnalyticAt.sub
-    apply analyticAt_id
-    exact analyticAt_const
+  have h₁g₁₁ : MeromorphicAt g₁₁ z₀ := by fun_prop
   have h₂g₁₁ : h₁g₁₁.order = - h₁f.meromorphicAt.order.untop h₂f := by
     rw [← WithTop.LinearOrderedAddCommGroup.coe_neg]
     rw [h₁g₁₁.order_eq_int_iff]

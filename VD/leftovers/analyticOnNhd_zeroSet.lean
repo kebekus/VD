@@ -1,7 +1,7 @@
 import Mathlib.Analysis.Analytic.Constructions
 import Mathlib.Analysis.Analytic.IsolatedZeros
 import Mathlib.Analysis.Complex.Basic
-import VD.analyticAt
+import VD.ToMathlib.analyticAt
 
 
 noncomputable def AnalyticOnNhd.order
@@ -455,7 +455,7 @@ theorem AnalyticOnNhdCompact.eliminateZeros₁
           rw [C] at hx
           simp at hx
         simp [A]
-        exact AnalyticAt.zero_if_order_toNat_eq_zero (h₁f x x.2) this
+        exact (h₁f x x.2).apply_eq_zero_of_order_toNat_ne_zero this
       rw [finprod_eq_prod_of_mulSupport_subset φ hφ]
       rw [inter z]
       rfl

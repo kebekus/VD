@@ -1,6 +1,4 @@
 import VD.ToMathlib.analyticAt
-import VD.ToMathlib.log
-import VD.analyticAt
 import VD.cauchyRiemann
 import VD.codiscreteWithin
 import VD.divisor
@@ -19,14 +17,12 @@ import VD.leftovers.bilinear
 import VD.leftovers.diffOp
 import VD.leftovers.holomorphic
 import VD.leftovers.holomorphic_zero
-import VD.logpos
 import VD.mathlibAddOn
 import VD.meromorphicAt
 import VD.meromorphicOn
 import VD.meromorphicOn_divisor
 import VD.meromorphicOn_integrability
 import VD.partialDeriv
-import VD.periodic_integrability
 import VD.specialFunctions_CircleIntegral_affine
 import VD.specialFunctions_Integral_log_sin
 import VD.stronglyMeromorphicAt

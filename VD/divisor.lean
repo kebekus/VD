@@ -1,7 +1,4 @@
 import Mathlib.Analysis.SpecialFunctions.Integrals
-import Mathlib.Analysis.SpecialFunctions.Log.NegMulLog
-import Mathlib.Analysis.Convex.SpecificFunctions.Deriv
-import VD.analyticAt
 import VD.mathlibAddOn
 
 open Interval Topology

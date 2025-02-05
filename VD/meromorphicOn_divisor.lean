@@ -1,9 +1,5 @@
-import Mathlib.Analysis.Analytic.Meromorphic
-import VD.analyticAt
 import VD.divisor
-import VD.meromorphicAt
 import VD.meromorphicOn
-import VD.stronglyMeromorphicOn
 
 
 open scoped Interval Topology

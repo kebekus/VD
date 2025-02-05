@@ -1,7 +1,7 @@
-import Mathlib.Analysis.Analytic.Meromorphic
+import Mathlib.Analysis.Meromorphic.Basic
 import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Analysis.Calculus.FDeriv.Add
-import VD.analyticAt
+import Mathlib.Analysis.SpecialFunctions.Exp
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
 variable {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
@@ -22,19 +22,13 @@ variable {R : Type*} [Semiring R] [Module R F] [SMulCommClass 𝕜 R F] [Continu
 
 @[fun_prop]
 theorem Differentiable.const_smul' (h : Differentiable 𝕜 f) (c : R) :
-    Differentiable 𝕜 (c • f) := by
-  have : c • f = fun x ↦ c • f x := rfl
-  rw [this]
-  exact Differentiable.const_smul h c
+    Differentiable 𝕜 (c • f) := Differentiable.const_smul h c
 
 
 -- Mathlib.Analysis.Calculus.ContDiff.Basic
 
 theorem ContDiff.const_smul' {f : E → F} (c : R) (hf : ContDiff 𝕜 n f) :
-    ContDiff 𝕜 n (c • f) := by
-  have : c • f = fun x ↦ c • f x := rfl
-  rw [this]
-  exact ContDiff.const_smul c hf
+    ContDiff 𝕜 n (c • f) := ContDiff.const_smul c hf
 
 
 

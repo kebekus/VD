@@ -1,4 +1,4 @@
-import VD.analyticAt
+import Mathlib.Analysis.Analytic.Order
 import VD.divisor
 
 open scoped Interval Topology
