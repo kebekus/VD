@@ -12,7 +12,7 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*} [NormedAddCom
 theorem yy {x : 𝕜} {f : 𝕜 → E}
     (hf : AnalyticAt 𝕜 f x)
     (h₂f : ¬Filter.EventuallyConst f (𝓝 x)) :
-    Filter.map f (𝓝[≠] x) ≤ (𝓝[≠] f x) := by
+    (𝓝[≠] x).map f ≤ (𝓝[≠] f x) := by
   intro s hs
   simp only [mem_map]
   have : insert (f x) s ∈ 𝓝 (f x) := by
@@ -20,10 +20,10 @@ theorem yy {x : 𝕜} {f : 𝕜 → E}
     obtain ⟨u, h₁u, h₂u, h₃u⟩ := mem_nhdsWithin.1 hs
     use u
     tauto
-  have : ∀ᶠ (z : 𝕜) in 𝓝 x, f z ∈ s.insert (f x) := by
+  have : ∀ᶠ (z : 𝕜) in 𝓝 x, f z ∈ insert (f x) s := by
     filter_upwards [hf.continuousAt.preimage_mem_nhds this]
     tauto
-  have : ∀ᶠ (z : 𝕜) in 𝓝[≠] x, f z ∈ s.insert (f x) := by
+  have : ∀ᶠ (z : 𝕜) in 𝓝[≠] x, f z ∈ insert (f x) s := by
     rw [eventually_nhdsWithin_iff]
     filter_upwards [this]
     intro a
@@ -45,15 +45,17 @@ theorem yy {x : 𝕜} {f : 𝕜 → E}
   fun_prop
 
 theorem zz {f : 𝕜 → E} (hf : AnalyticOnNhd 𝕜 f ⊤) :
-    Filter.map f (Filter.codiscrete 𝕜) ≤ (Filter.codiscreteWithin ⊤) := by
+    Filter.map f (Filter.codiscrete 𝕜) ≤ (Filter.codiscrete E) := by
   intro s hs
   simp only [mem_map]
   rw [mem_codiscrete]
   intro x
   rw [disjoint_principal_right, compl_compl]
-  simp_rw [mem_codiscreteWithin, disjoint_principal_right] at hs
+  simp_rw [mem_codiscrete, disjoint_principal_right] at hs
+  simp at hs
   let y := f x
   have hy : y ∈ (⊤ : Set E) := by sorry
-  let h₂y := hs y hy
+  let h₂y := hs y
+
   let ZZ := yy hf h₂y
   sorry
