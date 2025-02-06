@@ -15,14 +15,12 @@ theorem analyticAt_of_smul_analytic {f : 𝕜 → 𝕜} (h₁f : AnalyticAt 𝕜
   · exact fun a ↦ h₁f.smul a
   · intro hprod
     have : g =ᶠ[𝓝 z₀] (f⁻¹ • f) • g := by
-      apply Filter.eventually_iff_exists_mem.mpr
-      use f⁻¹' {0}ᶜ, h₁f.continuousAt.preimage_mem_nhds (compl_singleton_mem_nhds_iff.mpr h₂f)
+      filter_upwards [h₁f.continuousAt.preimage_mem_nhds (compl_singleton_mem_nhds_iff.mpr h₂f)]
       intro y hy
       rw [Set.preimage_compl, Set.mem_compl_iff, Set.mem_preimage, Set.mem_singleton_iff] at hy
       simp [hy]
-    rw [analyticAt_congr this]
-    rw [smul_assoc]
-    have : AnalyticAt 𝕜 f⁻¹ z₀ := AnalyticAt.inv h₁f h₂f
+    rw [analyticAt_congr this, smul_assoc]
+    have := h₁f.inv h₂f
     fun_prop
 
 /- A function is analytic at a point iff it is analytic after scalar
