@@ -6,39 +6,43 @@ open Topology
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜] {E : Type*} [NormedAddCommGroup E]
   [NormedSpace 𝕜 E] {s : E} {p q : FormalMultilinearSeries 𝕜 𝕜 E} {f g : 𝕜 → E} {n : ℕ} {z z₀ : 𝕜}
 
+variable {𝕝 : Type*} [NontriviallyNormedField 𝕝] [NormedAlgebra 𝕜 𝕝]
+
+variable {F : Type*} [NormedAddCommGroup F] [NormedSpace 𝕜 F] [NormedSpace 𝕝 F] [IsScalarTower 𝕜 𝕝 F]
 
 /- A function is analytic at a point iff it is analytic after scalar
   multiplication with a non-vanishing analytic function. -/
-theorem analyticAt_of_smul_analytic {f : 𝕜 → 𝕜} (h₁f : AnalyticAt 𝕜 f z₀) (h₂f : f z₀ ≠ 0) :
+theorem analyticAt_of_smul_analytic [NormedSpace 𝕝 E] [IsScalarTower 𝕜 𝕝 E] {f : 𝕜 → 𝕝}
+    (h₁f : AnalyticAt 𝕜 f z₀) (h₂f : f z₀ ≠ 0) :
     AnalyticAt 𝕜 g z₀ ↔ AnalyticAt 𝕜 (f • g) z₀ := by
   constructor
   · exact fun a ↦ h₁f.smul a
   · intro hprod
-    have : g =ᶠ[𝓝 z₀] (f⁻¹ • f) • g := by
-      filter_upwards [h₁f.continuousAt.preimage_mem_nhds (compl_singleton_mem_nhds_iff.mpr h₂f)]
+    rw [analyticAt_congr (g := (f⁻¹ • f) • g), smul_assoc]
+    have := h₁f.inv h₂f
+    fun_prop
+    · filter_upwards [h₁f.continuousAt.preimage_mem_nhds (compl_singleton_mem_nhds_iff.2 h₂f)]
       intro y hy
       rw [Set.preimage_compl, Set.mem_compl_iff, Set.mem_preimage, Set.mem_singleton_iff] at hy
       simp [hy]
-    rw [analyticAt_congr this, smul_assoc]
-    have := h₁f.inv h₂f
-    fun_prop
 
 /- A function is analytic at a point iff it is analytic after scalar
   multiplication with a non-vanishing analytic function. -/
-theorem analyticAt_of_smul_analytic' {f : 𝕜 → 𝕜} (h₁f : AnalyticAt 𝕜 f z₀) (h₂f : f z₀ ≠ 0) :
+theorem analyticAt_of_smul_analytic' [NormedSpace 𝕝 E] [IsScalarTower 𝕜 𝕝 E] {f : 𝕜 → 𝕝}
+    (h₁f : AnalyticAt 𝕜 f z₀) (h₂f : f z₀ ≠ 0) :
     AnalyticAt 𝕜 g z₀ ↔ AnalyticAt 𝕜 (fun z ↦ f z • g z) z₀ :=
   analyticAt_of_smul_analytic h₁f h₂f
 
 /- A function is analytic at a point iff it is analytic after multiplication
   with a non-vanishing analytic function. -/
-theorem analyticAt_of_mul_analytic {f g : 𝕜 → 𝕜} (h₁f : AnalyticAt 𝕜 f z₀) (h₂f : f z₀ ≠ 0) :
+theorem analyticAt_of_mul_analytic {f g : 𝕜 → 𝕝} (h₁f : AnalyticAt 𝕜 f z₀) (h₂f : f z₀ ≠ 0) :
     AnalyticAt 𝕜 g z₀ ↔ AnalyticAt 𝕜 (f * g) z₀ := by
   rw [← smul_eq_mul]
   exact analyticAt_of_smul_analytic h₁f h₂f
 
 /- A function is analytic at a point iff it is analytic after multiplication
   with a non-vanishing analytic function. -/
-theorem analyticAt_of_mul_analytic' {f g : 𝕜 → 𝕜} (h₁f : AnalyticAt 𝕜 f z₀) (h₂f : f z₀ ≠ 0) :
+theorem analyticAt_of_mul_analytic' {f g : 𝕜 → 𝕝} (h₁f : AnalyticAt 𝕜 f z₀) (h₂f : f z₀ ≠ 0) :
     AnalyticAt 𝕜 g z₀ ↔ AnalyticAt 𝕜 (fun z ↦ f z * g z) z₀ := by
   exact analyticAt_of_mul_analytic h₁f h₂f
 
