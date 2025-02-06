@@ -1,5 +1,12 @@
 import Mathlib.Topology.DiscreteSubset
 
+--
+theorem Set.compl_diff {α : Type u} {s t : Set α} : (t \ s)ᶜ = s ∪ tᶜ := by
+  ext z
+  simp
+  tauto
+--
+
 theorem codiscreteWithin_congr_inter
     {X : Type u_1} [TopologicalSpace X]
     {S T U : Set X}
@@ -16,7 +23,7 @@ theorem discreteTopology_of_codiscreteWithin
   rw [(by simp : ((sᶜ ∩ U) : Set X) = ((s ∪ Uᶜ)ᶜ : Set X)), discreteTopology_subtype_iff]
   simp_rw [mem_codiscreteWithin, Filter.disjoint_principal_right] at h
   intro x hx
-  rw [← Filter.mem_iff_inf_principal_compl, (by ext z; simp; tauto : s ∪ Uᶜ = (U \ s)ᶜ)]
+  rw [← Filter.mem_iff_inf_principal_compl, ← Set.compl_diff]
   simp_all only [h x, Set.compl_union, compl_compl, Set.mem_inter_iff, Set.mem_compl_iff]
 
 theorem Filter.codiscreteWithin.mono {X : Type u_1} [TopologicalSpace X] {U₁ U₂ : Set X}
