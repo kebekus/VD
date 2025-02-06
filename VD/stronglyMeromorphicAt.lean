@@ -83,26 +83,20 @@ theorem StronglyMeromorphicAt.analytic
   (h₂f : 0 ≤ h₁f.meromorphicAt.order):
   AnalyticAt ℂ f z₀ := by
   let h₁f' := h₁f
-  rcases h₁f' with h|h
+  rcases h₁f' with h | h
   · rw [analyticAt_congr h]
     exact analyticAt_const
   · obtain ⟨n, g, h₁g, h₂g, h₃g⟩ := h
     rw [analyticAt_congr h₃g]
-
     have : h₁f.meromorphicAt.order = n := by
       rw [MeromorphicAt.order_eq_int_iff]
-      use g
-      constructor
-      · exact h₁g
-      · constructor
-        · exact h₂g
-        · exact Filter.EventuallyEq.filter_mono h₃g nhdsWithin_le_nhds
+      use g, h₁g
+      exact ⟨h₂g, Filter.EventuallyEq.filter_mono h₃g nhdsWithin_le_nhds⟩
     rw [this] at h₂f
     apply AnalyticAt.smul'
     nth_rw 1 [← Int.toNat_of_nonneg (WithTop.coe_nonneg.mp h₂f)]
     fun_prop
     exact h₁g
-
 
 /- Analytic functions are strongly meromorphic -/
 theorem AnalyticAt.stronglyMeromorphicAt
@@ -114,14 +108,12 @@ theorem AnalyticAt.stronglyMeromorphicAt
   · rw [AnalyticAt.order_eq_top_iff] at h₂f
     tauto
   · have : h₁f.order ≠ ⊤ := h₂f
-    rw [← ENat.coe_toNat_eq_self] at this
-    rw [eq_comm, AnalyticAt.order_eq_nat_iff] at this
+    rw [← ENat.coe_toNat_eq_self, eq_comm, AnalyticAt.order_eq_nat_iff] at this
     right
     use h₁f.order.toNat
     obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
     use g
     tauto
-
 
 /- Strong meromorphic depends only on germ -/
 theorem stronglyMeromorphicAt_congr
@@ -132,21 +124,14 @@ theorem stronglyMeromorphicAt_congr
   unfold StronglyMeromorphicAt
   constructor
   · intro h
-    rcases h with h|h
+    rcases h with h | h
     · left
-      exact Filter.EventuallyEq.rw h (fun x => Eq (g x)) (id (Filter.EventuallyEq.symm hfg))
+      exact hfg.symm.trans h
     · obtain ⟨n, h, h₁h, h₂h, h₃h⟩ := h
       right
-      use n
-      use h
-      constructor
-      · assumption
-      · constructor
-        · assumption
-        · apply Filter.EventuallyEq.trans hfg.symm
-          assumption
+      use n, h, h₁h, h₂h, hfg.symm.trans h₃h
   · intro h
-    rcases h with h|h
+    rcases h with h | h
     · left
       exact Filter.EventuallyEq.rw h (fun x => Eq (f x)) hfg
     · obtain ⟨n, h, h₁h, h₂h, h₃h⟩ := h
@@ -368,23 +353,15 @@ theorem StronglyMeromorphicAt.makeStronglyMeromorphic_id
     unfold MeromorphicAt.makeStronglyMeromorphicAt
     simp
     have h₀f := hf
-    rcases hf with h₁f|h₁f
-    · have A : f =ᶠ[𝓝[≠] z₀] 0 := by
-        apply Filter.EventuallyEq.filter_mono h₁f
-        exact nhdsWithin_le_nhds
-      let B := (MeromorphicAt.order_eq_top_iff h₀f.meromorphicAt).2 A
-      simp [B]
+    rcases hf with h₁f | h₁f
+    · simp [(h₀f.meromorphicAt.order_eq_top_iff).2 (h₁f.filter_mono nhdsWithin_le_nhds)]
       exact Filter.EventuallyEq.eq_of_nhds h₁f
     · obtain ⟨n, g, h₁g, h₂g, h₃g⟩ := h₁f
       rw [Filter.EventuallyEq.eq_of_nhds h₃g]
       have : h₀f.meromorphicAt.order = n := by
         rw [MeromorphicAt.order_eq_int_iff (StronglyMeromorphicAt.meromorphicAt h₀f) n]
-        use g
-        constructor
-        · assumption
-        · constructor
-          · assumption
-          · exact eventually_nhdsWithin_of_eventually_nhds h₃g
+        use g, h₁g, h₂g
+        exact eventually_nhdsWithin_of_eventually_nhds h₃g
       by_cases h₃f : h₀f.meromorphicAt.order = 0
       · simp [h₃f]
         have hn : n = (0 : ℤ) := by
@@ -392,19 +369,13 @@ theorem StronglyMeromorphicAt.makeStronglyMeromorphic_id
           exact WithTop.coe_eq_zero.mp (id (Eq.symm this))
         simp_rw [hn]
         simp
-        let t₀ : h₀f.meromorphicAt.order = (0 : ℤ) := by
-          exact h₃f
-        let A := (h₀f.meromorphicAt.order_eq_int_iff 0).1 t₀
+        let A := (h₀f.meromorphicAt.order_eq_int_iff 0).1 h₃f
         have : g =ᶠ[𝓝 z₀] (Classical.choose A) := by
-          obtain ⟨h₀, h₁, h₂⟩  := Classical.choose_spec A
+          obtain ⟨h₀, h₁, h₂⟩ := Classical.choose_spec A
           apply h₁g.localIdentity h₀
           rw [hn] at h₃g
-          simp at h₃g
-          simp at h₂
-          have h₄g : f =ᶠ[𝓝[≠] z₀] g := by
-            apply Filter.EventuallyEq.filter_mono h₃g
-            exact nhdsWithin_le_nhds
-          exact Filter.EventuallyEq.trans (Filter.EventuallyEq.symm h₄g) h₂
+          simp at h₃g h₂
+          exact (Filter.EventuallyEq.symm (h₃g.filter_mono nhdsWithin_le_nhds)).trans h₂
         exact Filter.EventuallyEq.eq_of_nhds this
       · simp [h₃f]
         left
