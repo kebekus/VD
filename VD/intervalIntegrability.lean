@@ -157,24 +157,21 @@ theorem intervalIntegrable_congr_codiscreteWithin
       IntervalIntegrable f₂ MeasureTheory.volume a b := by
   constructor
   · intro hf₁
-    apply IntervalIntegrable.congr hf₁
+    apply hf₁.congr
     rw [Filter.eventuallyEq_iff_exists_mem] at *
     obtain ⟨s, h₁s, h₂s⟩ := hf
     use s, ae_of_restrVol_le_codiscreteWithin measurableSet_Ioc h₁s, h₂s
   · rw [eventuallyEq_comm] at hf
     intro hf₁
-    apply IntervalIntegrable.congr hf₁
+    apply hf₁.congr
     rw [Filter.eventuallyEq_iff_exists_mem] at *
     obtain ⟨s, h₁s, h₂s⟩ := hf
     use s, ae_of_restrVol_le_codiscreteWithin measurableSet_Ioc h₁s, h₂s
 
--- TODO: Show that preimage of codiscrete is codiscrete
-
-
 open Complex in
 /-- The circleMap is real analytic. -/
 theorem analyticOnNhd_circleMap {c : ℂ} {R : ℝ} :
-    AnalyticOnNhd ℝ (circleMap c R) ⊤ := by
+    AnalyticOnNhd ℝ (circleMap c R) Set.univ := by
   intro z hz
   unfold circleMap
   apply analyticAt_const.add
@@ -182,23 +179,24 @@ theorem analyticOnNhd_circleMap {c : ℂ} {R : ℝ} :
   rw [(by rfl : (fun θ ↦ exp (↑θ * I) : ℝ → ℂ) = cexp ∘ (fun θ ↦ (↑θ * I) : ℝ → ℂ))]
   apply analyticAt_cexp.restrictScalars.comp ((ofRealCLM.analyticAt z).mul (by fun_prop))
 
-
-theorem yy {c : ℂ} {R : ℝ} :
-    Filter.map (circleMap c R) (Filter.codiscrete ℝ) ≤ (Filter.codiscreteWithin (Metric.sphere c R)) := by
+theorem circleMap_preimg_codiscrete {c : ℂ} {R : ℝ} (hR : R ≠ 0) :
+    Filter.map (circleMap c R) (Filter.codiscrete ℝ) ≤ (Filter.codiscreteWithin (Metric.sphere c |R|)) := by
   intro s hs
-  apply AnalyticOnNhd.preimg_codiscrete
-  · exact analyticOnNhd_circleMap
-  · sorry
+  apply analyticOnNhd_circleMap.preimg_codiscrete
+  · intro x hx
+    by_contra hCon
+    obtain ⟨a, ha⟩ := eventuallyConst_iff_exists_eventuallyEq.1 hCon
+    have := ha.deriv.eq_of_nhds
+    simp [hR] at this
+  · rwa [Set.image_univ, range_circleMap]
 
 theorem circleIntegrable_congr_codiscreteWithin
-    {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c R)] f₂) :
+    {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c |R|)] f₂) (hR : R ≠ 0) :
     CircleIntegrable f₁ c R → CircleIntegrable f₂ c R := by
   apply (intervalIntegrable_congr_codiscreteWithin _).1
   rw [Filter.eventuallyEq_iff_exists_mem]
-  use (circleMap c R)⁻¹' {z | f₁ z = f₂ z}, Filter.codiscreteWithin.mono (U₁ := Ι 0 (2 * π))
-    (by simp) (yy hf), (by tauto)
-
-
+  use (circleMap c R)⁻¹' {z | f₁ z = f₂ z}, Filter.codiscreteWithin.mono
+    (by simp) (circleMap_preimg_codiscrete hR hf), (by tauto)
 
 theorem intervalIntegral_congr_codiscreteWithin
     {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
@@ -211,7 +209,6 @@ theorem intervalAverage_congr_codiscreteWithin
   ⨍ (x : ℝ) in a..b, f₁ x = ⨍ (x : ℝ) in a..b, f₂ x := by
   rw [interval_average_eq, intervalIntegral_congr_codiscreteWithin hf,
     ← interval_average_eq]
-  sorry
 
 theorem circleIntegral_congr_codiscreteWithin
     {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c R)] f₂) :
