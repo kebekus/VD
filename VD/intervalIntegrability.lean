@@ -1,6 +1,8 @@
+import Mathlib.Analysis.Analytic.Linear
 import Mathlib.MeasureTheory.Integral.CircleIntegral
 import Mathlib.MeasureTheory.Integral.IntervalAverage
 import Mathlib.MeasureTheory.Integral.Periodic
+import VD.analyticAt_preimgCodiscrete
 import VD.codiscreteWithin
 
 open scoped Interval Topology
@@ -107,7 +109,7 @@ theorem integrability_congr_negRadius
 
   intro h
   simp_rw [circleMap_neg]
-  have t₀ : Function.Periodic (fun (θ : ℝ) ↦ f (circleMap 0   r  θ)) (2 * π) := by
+  have t₀ : Function.Periodic (fun (θ : ℝ) ↦ f (circleMap 0 r θ)) (2 * π) := by
     intro x
     simp
     congr 1
@@ -168,18 +170,25 @@ theorem intervalIntegrable_congr_codiscreteWithin
 
 -- TODO: Show that preimage of codiscrete is codiscrete
 
+
+open Complex in
+/-- The circleMap is real analytic. -/
+theorem analyticOnNhd_circleMap {c : ℂ} {R : ℝ} :
+    AnalyticOnNhd ℝ (circleMap c R) ⊤ := by
+  intro z hz
+  unfold circleMap
+  apply analyticAt_const.add
+  apply analyticAt_const.mul
+  rw [(by rfl : (fun θ ↦ exp (↑θ * I) : ℝ → ℂ) = cexp ∘ (fun θ ↦ (↑θ * I) : ℝ → ℂ))]
+  apply analyticAt_cexp.restrictScalars.comp ((ofRealCLM.analyticAt z).mul (by fun_prop))
+
+
 theorem yy {c : ℂ} {R : ℝ} :
     Filter.map (circleMap c R) (Filter.codiscrete ℝ) ≤ (Filter.codiscreteWithin (Metric.sphere c R)) := by
   intro s hs
-  simp only [mem_map]
-  rw [mem_codiscrete]
-  intro x
-  rw [disjoint_principal_right, compl_compl]
-  simp_rw [mem_codiscreteWithin, disjoint_principal_right] at hs
-  let y := circleMap c R x
-  have hy : y ∈ Metric.sphere c R := by sorry
-  let h₂y := hs y hy
-  sorry
+  apply AnalyticOnNhd.preimg_codiscrete
+  · exact analyticOnNhd_circleMap
+  · sorry
 
 theorem circleIntegrable_congr_codiscreteWithin
     {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c R)] f₂) :
