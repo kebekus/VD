@@ -202,7 +202,15 @@ theorem intervalIntegral_congr_codiscreteWithin
     {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
   ∫ (x : ℝ) in a..b, f₁ x = ∫ (x : ℝ) in a..b, f₂ x := by
   apply intervalIntegral.integral_congr_ae
-  sorry
+  have := discreteTopology_of_codiscreteWithin hf
+  rw [Filter.Eventually, mem_ae_iff]
+  apply Set.Countable.measure_zero
+  have x : ({x | (fun x ↦ f₁ x = f₂ x) x}ᶜ ∩ Ι a b) = {x | x ∈ Ι a b → f₁ x = f₂ x}ᶜ := by
+    ext x
+    simp only [Set.mem_inter_iff, Set.mem_compl_iff, Set.mem_setOf_eq, Classical.not_imp]
+    tauto
+  rw [← x]
+  apply TopologicalSpace.separableSpace_iff_countable.1 TopologicalSpace.SecondCountableTopology.to_separableSpace
 
 theorem intervalAverage_congr_codiscreteWithin
     {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
