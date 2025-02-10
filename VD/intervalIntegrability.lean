@@ -198,19 +198,17 @@ theorem circleIntegrable_congr_codiscreteWithin
   use (circleMap c R)⁻¹' {z | f₁ z = f₂ z}, Filter.codiscreteWithin.mono
     (by simp) (circleMap_preimg_codiscrete hR hf), (by tauto)
 
+theorem intervalIntegral.integral_congr_ae_restict
+    {a b : ℝ} {f g : ℝ → E} {μ : Measure ℝ}
+    [NormedAddCommGroup E] [NormedSpace ℝ E]
+    (h : f =ᵐ[μ.restrict (Ι a b)] g) :
+    ∫ x in a..b, f x ∂μ = ∫ x in a..b, g x ∂μ :=
+  intervalIntegral.integral_congr_ae (ae_imp_of_ae_restrict h)
+
 theorem intervalIntegral_congr_codiscreteWithin
     {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
-  ∫ (x : ℝ) in a..b, f₁ x = ∫ (x : ℝ) in a..b, f₂ x := by
-  apply intervalIntegral.integral_congr_ae
-  have := discreteTopology_of_codiscreteWithin hf
-  rw [Filter.Eventually, mem_ae_iff]
-  apply Set.Countable.measure_zero
-  have x : ({x | (fun x ↦ f₁ x = f₂ x) x}ᶜ ∩ Ι a b) = {x | x ∈ Ι a b → f₁ x = f₂ x}ᶜ := by
-    ext x
-    simp only [Set.mem_inter_iff, Set.mem_compl_iff, Set.mem_setOf_eq, Classical.not_imp]
-    tauto
-  rw [← x]
-  apply TopologicalSpace.separableSpace_iff_countable.1 TopologicalSpace.SecondCountableTopology.to_separableSpace
+    ∫ (x : ℝ) in a..b, f₁ x = ∫ (x : ℝ) in a..b, f₂ x :=
+  integral_congr_ae_restict (ae_of_restrVol_le_codiscreteWithin measurableSet_uIoc hf)
 
 theorem intervalAverage_congr_codiscreteWithin
     {a b : ℝ} {f₁ f₂ : ℝ → ℝ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Ι a b)] f₂) :
@@ -219,7 +217,10 @@ theorem intervalAverage_congr_codiscreteWithin
     ← interval_average_eq]
 
 theorem circleIntegral_congr_codiscreteWithin
-    {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c R)] f₂) :
-  (∮ z in C(c, R), f₁ z) = (∮ z in C(c, R), f₂ z) := by
-  apply intervalIntegral.integral_congr_ae
-  sorry
+    {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ} (hf : f₁ =ᶠ[Filter.codiscreteWithin (Metric.sphere c |R|)] f₂) (hR : R ≠ 0) :
+    (∮ z in C(c, R), f₁ z) = (∮ z in C(c, R), f₂ z) := by
+  apply integral_congr_ae_restict
+  apply ae_of_restrVol_le_codiscreteWithin measurableSet_uIoc
+  simp only [deriv_circleMap, smul_eq_mul, mul_eq_mul_left_iff, mul_eq_zero,
+    circleMap_eq_center_iff, hR, Complex.I_ne_zero, or_self, or_false]
+  exact Filter.codiscreteWithin.mono (by tauto) (circleMap_preimg_codiscrete hR hf)
