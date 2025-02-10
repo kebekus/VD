@@ -1,6 +1,6 @@
 import Mathlib.Analysis.Analytic.IsolatedZeros
 import Mathlib.Order.Filter.EventuallyConst
-import VD.codiscreteWithin
+import VD.ToMathlib.codiscreteWithin
 
 open Filter Topology Set
 

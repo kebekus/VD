@@ -1,4 +1,4 @@
-import VD.codiscreteWithin
+import VD.ToMathlib.codiscreteWithin
 import VD.stronglyMeromorphicOn_ratlPolynomial
 
 open scoped Interval Topology
