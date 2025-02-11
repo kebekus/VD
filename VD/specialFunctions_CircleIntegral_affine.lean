@@ -509,7 +509,7 @@ lemma intervalIntegrable_logAbs_circleMap_sub_const
 
   have hU : Metric.sphere (0 : ℂ) |r| ⊆ ⊤ := by
     exact fun ⦃a⦄ a => trivial
-  let A := integrability_congr_changeDiscrete hU this
+  let A := integrability_congr_changeDiscrete hU hr this
 
   have : (fun z => log ‖z - a‖) ∘ circleMap 0 r = (fun z => log ‖circleMap 0 r z - a‖) := by
     exact rfl

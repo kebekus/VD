@@ -1,6 +1,7 @@
 import VD.ToMathlib.analyticAt
 import VD.ToMathlib.analyticAt_preimgCodiscrete
 import VD.ToMathlib.codiscreteWithin
+import VD.ToMathlib.intervalIntegrability
 import VD.cauchyRiemann
 import VD.divisor
 import VD.firstMain

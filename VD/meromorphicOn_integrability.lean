@@ -43,7 +43,7 @@ theorem MeromorphicOn.integrable_log_abs_f₀
       rw [abs_of_pos hr]
       apply Metric.sphere_subset_closedBall
 
-    rw [integrability_congr_changeDiscrete this h₃g]
+    rw [integrability_congr_changeDiscrete this (ne_of_lt hr).symm h₃g]
 
     apply IntervalIntegrable.add
     --
@@ -100,7 +100,7 @@ theorem MeromorphicOn.integrable_log_abs_f₀
       rfl
     rw [t₀]
     clear t₀
-    rw [integrability_congr_changeDiscrete hU this]
+    rw [integrability_congr_changeDiscrete hU (ne_of_lt hr).symm this]
 
     have : ∀ x ∈ Metric.closedBall 0 r, F x = 0 := by
       intro x hx
