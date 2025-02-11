@@ -6,20 +6,36 @@ open Topology
 
 variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {E : Type u_2} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
-/- Strongly MeromorphicAt -/
 def MeromorphicNFAt (f : 𝕜 → E) (x : 𝕜) :=
   (f =ᶠ[𝓝 x] 0) ∨ (∃ (n : ℤ), ∃ g : 𝕜 → E, (AnalyticAt 𝕜 g x) ∧ (g x ≠ 0) ∧ (f =ᶠ[𝓝 x] (· - x) ^ n • g ))
 
-/- Strongly MeromorphicAt is Meromorphic -/
 theorem MeromorphicNFAt.meromorphicAt {f : 𝕜 → E} {x : 𝕜} (hf : MeromorphicNFAt f x) :
-  MeromorphicAt f x := by
+    MeromorphicAt f x := by
   rcases hf with h | h
   · exact (meromorphicAt_congr' h).2 analyticAt_const.meromorphicAt
   · obtain ⟨n, g, h₁g, _, h₃g⟩ := h
     rw [meromorphicAt_congr' h₃g]
     fun_prop
 
-/- Analytic functions are strongly meromorphic -/
+theorem meromorphicNFAt_congr {f g : 𝕜 → E} {x : 𝕜} (hfg : f =ᶠ[𝓝 x] g) :
+    MeromorphicNFAt f x ↔ MeromorphicNFAt g x := by
+  unfold MeromorphicNFAt
+  constructor
+  · intro h
+    rcases h with h | h
+    · left
+      exact hfg.symm.trans h
+    · obtain ⟨n, h, h₁h, h₂h, h₃h⟩ := h
+      right
+      use n, h, h₁h, h₂h, hfg.symm.trans h₃h
+  · intro h
+    rcases h with h | h
+    · left
+      exact hfg.trans h
+    · obtain ⟨n, h, h₁h, h₂h, h₃h⟩ := h
+      right
+      use n, h, h₁h, h₂h, hfg.trans h₃h
+
 theorem AnalyticAt.MeromorphicNFAt {f : 𝕜 → E} {x : 𝕜} (hf : AnalyticAt 𝕜 f x) :
   MeromorphicNFAt f x := by
   by_cases h₂f : hf.order = ⊤
@@ -33,6 +49,7 @@ theorem AnalyticAt.MeromorphicNFAt {f : 𝕜 → E} {x : 𝕜} (hf : AnalyticAt 
     use g
     simp [h₁g, h₂g]
     tauto
+
 
 /- Strongly MeromorphicAt of non-negative order is analytic -/
 theorem MeromorphicNFAt.analyticAt {f : 𝕜 → E} {x : 𝕜} (h₁f : MeromorphicNFAt f x)
@@ -103,35 +120,6 @@ lemma MeromorphicNFAt_of_mul_analytic'
 
 
 
-/- Strong meromorphic depends only on germ -/
-theorem MeromorphicNFAt_congr
-  {f g : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hfg : f =ᶠ[𝓝 z₀] g) :
-  MeromorphicNFAt f z₀ ↔ MeromorphicNFAt g z₀ := by
-  unfold MeromorphicNFAt
-  constructor
-  · intro h
-    rcases h with h | h
-    · left
-      exact hfg.symm.trans h
-    · obtain ⟨n, h, h₁h, h₂h, h₃h⟩ := h
-      right
-      use n, h, h₁h, h₂h, hfg.symm.trans h₃h
-  · intro h
-    rcases h with h | h
-    · left
-      exact Filter.EventuallyEq.rw h (fun x => Eq (f x)) hfg
-    · obtain ⟨n, h, h₁h, h₂h, h₃h⟩ := h
-      right
-      use n
-      use h
-      constructor
-      · assumption
-      · constructor
-        · assumption
-        · apply Filter.EventuallyEq.trans hfg
-          assumption
 
 /- A function is strongly meromorphic at a point iff it is strongly meromorphic
    after multiplication with a non-vanishing analytic function
@@ -145,25 +133,14 @@ theorem MeromorphicNFAt_of_mul_analytic
   constructor
   · apply MeromorphicNFAt_of_mul_analytic' h₁g h₂g
   · intro hprod
-    let g' := fun z ↦ (g z)⁻¹
-    have h₁g' := h₁g.inv h₂g
-    have h₂g' : g' z₀ ≠ 0 := by
-      exact inv_ne_zero h₂g
-
-    let B := MeromorphicNFAt_of_mul_analytic' h₁g' h₂g' (f := f * g) hprod
-    have : f =ᶠ[𝓝 z₀] f * g * fun x => (g x)⁻¹ := by
-      unfold Filter.EventuallyEq
-      apply Filter.eventually_iff_exists_mem.mpr
-      use g⁻¹' {0}ᶜ
-      constructor
-      · apply ContinuousAt.preimage_mem_nhds
-        exact AnalyticAt.continuousAt h₁g
-        exact compl_singleton_mem_nhds_iff.mpr h₂g
-      · intro y hy
-        simp at hy
-        simp [hy]
-    rwa [MeromorphicNFAt_congr this]
-
+    have : f =ᶠ[𝓝 z₀] f * g * g⁻¹ := by
+      filter_upwards [h₁g.continuousAt.preimage_mem_nhds (compl_singleton_mem_nhds_iff.mpr h₂g)]
+      intro y hy
+      rw [Set.preimage_compl, Set.mem_compl_iff, Set.mem_preimage,
+        Set.mem_singleton_iff] at hy
+      simp [hy]
+    rw [meromorphicNFAt_congr this]
+    exact MeromorphicNFAt_of_mul_analytic' (h₁g.inv h₂g) (inv_ne_zero h₂g) (f := f * g) hprod
 
 theorem MeromorphicNFAt.order_eq_zero_iff
   {f : ℂ → ℂ}
