@@ -9,7 +9,7 @@ theorem MeromorphicOn.decompose₁
   {U : Set ℂ}
   {z₀ : ℂ}
   (h₁f : MeromorphicOn f U)
-  (h₂f : StronglyMeromorphicAt f z₀)
+  (h₂f : MeromorphicNFAt f z₀)
   (h₃f : h₂f.meromorphicAt.order ≠ ⊤)
   (hz₀ : z₀ ∈ U) :
   ∃ g : ℂ → ℂ, (MeromorphicOn g U)
@@ -58,9 +58,9 @@ theorem MeromorphicOn.decompose₁
     simp
     ring
 
-  let g := (h₁g₁ z₀ hz₀).makeStronglyMeromorphicAt
-  have h₂g : StronglyMeromorphicAt g z₀ := by
-    exact StronglyMeromorphicAt_of_makeStronglyMeromorphic (h₁g₁ z₀ hz₀)
+  let g := (h₁g₁ z₀ hz₀).makeMeromorphicNFAt
+  have h₂g : MeromorphicNFAt g z₀ := by
+    exact MeromorphicNFAt_of_makeStronglyMeromorphic (h₁g₁ z₀ hz₀)
   have h₁g : MeromorphicOn g U := by
     intro z hz
     by_cases h₁z : z = z₀
@@ -85,7 +85,7 @@ theorem MeromorphicOn.decompose₁
     rw [← A]
     rw [h₂g₁]
   have h₄g : AnalyticAt ℂ g z₀ := by
-    apply h₂g.analytic
+    apply h₂g.analyticAt
     rw [h₃g]
 
   use g
@@ -109,7 +109,7 @@ theorem MeromorphicOn.decompose₁
               unfold g₁
               rw [h₂h₁]
               simp
-            have h₄g₁ : StronglyMeromorphicAt g₁ z₀ := by
+            have h₄g₁ : MeromorphicNFAt g₁ z₀ := by
               rwa [h₃g₁]
             let A := h₄g₁.makeStronglyMeromorphic_id
             unfold g
@@ -192,8 +192,8 @@ theorem MeromorphicOn.decompose₂
     rw [← this] at hu
     simp [hp] at hu
 
-  have h₅g₀ : StronglyMeromorphicAt g₀ u := by
-    rw [stronglyMeromorphicAt_of_mul_analytic h₀ h₁]
+  have h₅g₀ : MeromorphicNFAt g₀ u := by
+    rw [MeromorphicNFAt_of_mul_analytic h₀ h₁]
     rw [← h₄g₀]
     exact hf u u.2
 
@@ -378,7 +378,7 @@ theorem MeromorphicOn.decompose₃'
         funext z
         by_cases hz : z ∈ U
         · apply Filter.EventuallyEq.eq_of_nhds
-          apply StronglyMeromorphicAt.localIdentity (h₁f z hz) (t₀ z hz)
+          apply MeromorphicNFAt.localIdentity (h₁f z hz) (t₀ z hz)
           have h₅g : g =ᶠ[𝓝[≠] z] g' := makeStronglyMeromorphicOn_changeDiscrete h₁g' hz
           have Y' : (g' * ∏ᶠ (u : ℂ), fun z => (z - u) ^ (h₁f.meromorphicOn.divisor u)) =ᶠ[𝓝[≠] z] g * ∏ᶠ (u : ℂ), fun z => (z - u) ^ (h₁f.meromorphicOn.divisor u) := by
             apply Filter.EventuallyEq.symm

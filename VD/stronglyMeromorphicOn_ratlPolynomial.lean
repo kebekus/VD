@@ -46,7 +46,7 @@ theorem stronglyMeromorphicOn_ratlPolynomial₂
         let A := Finset.not_mem_erase u P
         tauto
       · exact Filter.Eventually.of_forall (congrFun rfl)
-  · apply AnalyticAt.stronglyMeromorphicAt
+  · apply AnalyticAt.MeromorphicNFAt
     exact analyticAt_ratlPolynomial₁ d P (z := z) h₂z
 
 

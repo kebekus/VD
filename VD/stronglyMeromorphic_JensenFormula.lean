@@ -23,7 +23,7 @@ theorem jensen₀
   have h'₂f : ∃ u : (Metric.closedBall (0 : ℂ) R), f u ≠ 0 := by
     use ⟨0, Metric.mem_closedBall_self hR.le⟩
 
-  have h'₁f : StronglyMeromorphicAt f 0 := by
+  have h'₁f : MeromorphicNFAt f 0 := by
     apply h₁f
     simpa using hR.le
 
@@ -371,7 +371,7 @@ theorem jensen
   (hR : 0 < R)
   (f : ℂ → ℂ)
   (h₁f : MeromorphicOn f (Metric.closedBall 0 R))
-  (h₁f' : StronglyMeromorphicAt f 0)
+  (h₁f' : MeromorphicNFAt f 0)
   (h₂f : f 0 ≠ 0) :
   log ‖f 0‖ = -∑ᶠ s, (h₁f.divisor s) * log (R * ‖s‖⁻¹) + (2 * π)⁻¹ * ∫ (x : ℝ) in (0)..(2 * π), log ‖f (circleMap 0 R x)‖ := by
 
@@ -385,7 +385,7 @@ theorem jensen
     simp [this]
     intro h₁R
 
-    let A := StronglyMeromorphicAt.makeStronglyMeromorphic_id h₁f'
+    let A := MeromorphicNFAt.makeStronglyMeromorphic_id h₁f'
     simp_rw [A]
   rw [← this]
   rw [← this] at h₂f

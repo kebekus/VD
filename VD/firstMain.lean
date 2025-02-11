@@ -223,7 +223,7 @@ noncomputable def MeromorphicOn.T_infty
 theorem Nevanlinna_firstMain₁
   {f : ℂ → ℂ}
   (h₁f : MeromorphicOn f ⊤)
-  (h₂f : StronglyMeromorphicAt f 0)
+  (h₂f : MeromorphicNFAt f 0)
   (h₃f : f 0 ≠ 0) :
   (fun _ ↦ log ‖f 0‖) + h₁f.inv.T_infty = h₁f.T_infty := by
 

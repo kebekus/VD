@@ -1,28 +1,69 @@
 import Mathlib.Analysis.Meromorphic.Basic
-import Mathlib.Algebra.Order.AddGroupWithTop
-import VD.mathlibAddOn
 import VD.meromorphicAt
 
 
 open Topology
 
+variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {E : Type u_2} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
 /- Strongly MeromorphicAt -/
-def StronglyMeromorphicAt
-  (f : ℂ → ℂ)
-  (z₀ : ℂ) :=
-  (f =ᶠ[𝓝 z₀] 0) ∨ (∃ (n : ℤ), ∃ g : ℂ → ℂ, (AnalyticAt ℂ g z₀) ∧ (g z₀ ≠ 0) ∧ (f =ᶠ[𝓝 z₀] fun z ↦ (z - z₀) ^ n • g z))
+def MeromorphicNFAt (f : 𝕜 → E) (x : 𝕜) :=
+  (f =ᶠ[𝓝 x] 0) ∨ (∃ (n : ℤ), ∃ g : 𝕜 → E, (AnalyticAt 𝕜 g x) ∧ (g x ≠ 0) ∧ (f =ᶠ[𝓝 x] (· - x) ^ n • g ))
+
+/- Strongly MeromorphicAt is Meromorphic -/
+theorem MeromorphicNFAt.meromorphicAt {f : 𝕜 → E} {x : 𝕜} (hf : MeromorphicNFAt f x) :
+  MeromorphicAt f x := by
+  rcases hf with h | h
+  · exact (meromorphicAt_congr' h).2 analyticAt_const.meromorphicAt
+  · obtain ⟨n, g, h₁g, _, h₃g⟩ := h
+    rw [meromorphicAt_congr' h₃g]
+    fun_prop
+
+/- Analytic functions are strongly meromorphic -/
+theorem AnalyticAt.MeromorphicNFAt {f : 𝕜 → E} {x : 𝕜} (hf : AnalyticAt 𝕜 f x) :
+  MeromorphicNFAt f x := by
+  by_cases h₂f : hf.order = ⊤
+  · rw [AnalyticAt.order_eq_top_iff] at h₂f
+    tauto
+  · have : hf.order ≠ ⊤ := h₂f
+    rw [← ENat.coe_toNat_eq_self, eq_comm, AnalyticAt.order_eq_nat_iff] at this
+    right
+    use hf.order.toNat
+    obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
+    use g
+    simp [h₁g, h₂g]
+    tauto
+
+/- Strongly MeromorphicAt of non-negative order is analytic -/
+theorem MeromorphicNFAt.analyticAt {f : 𝕜 → E} {x : 𝕜} (h₁f : MeromorphicNFAt f x)
+    (h₂f : 0 ≤ h₁f.meromorphicAt.order) :
+    AnalyticAt 𝕜 f x := by
+  let h₁f' := h₁f
+  rcases h₁f' with h | h
+  · rw [analyticAt_congr h]
+    exact analyticAt_const
+  · obtain ⟨n, g, h₁g, h₂g, h₃g⟩ := h
+    rw [analyticAt_congr h₃g]
+    have : h₁f.meromorphicAt.order = n := by
+      rw [MeromorphicAt.order_eq_int_iff]
+      use g, h₁g
+      exact ⟨h₂g, Filter.EventuallyEq.filter_mono h₃g nhdsWithin_le_nhds⟩
+    rw [this] at h₂f
+    apply AnalyticAt.smul _ h₁g
+    nth_rw 1 [← Int.toNat_of_nonneg (WithTop.coe_nonneg.mp h₂f)]
+    exact AnalyticAt.zpow_nonneg (by fun_prop) (Int.ofNat_zero_le n.toNat)
 
 
-lemma stronglyMeromorphicAt_of_mul_analytic'
-  {f g : ℂ → ℂ}
-  {z₀ : ℂ}
-  (h₁g : AnalyticAt ℂ g z₀)
+lemma MeromorphicNFAt_of_mul_analytic'
+  {f : 𝕜 → 𝕜}
+  {g : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
+  (h₁g : AnalyticAt 𝕜 g z₀)
   (h₂g : g z₀ ≠ 0) :
-  StronglyMeromorphicAt f z₀ → StronglyMeromorphicAt (f * g) z₀ := by
+  MeromorphicNFAt f z₀ → MeromorphicNFAt (f • g) z₀ := by
 
   intro hf
-  --unfold StronglyMeromorphicAt at hf
+  --unfold MeromorphicNFAt at hf
   rcases hf with h₁f|h₁f
   · left
     rw [Filter.EventuallyEq, eventually_nhds_iff] at h₁f
@@ -60,68 +101,15 @@ lemma stronglyMeromorphicAt_of_mul_analytic'
         · exact ht.2
 
 
-/- Strongly MeromorphicAt is Meromorphic -/
-theorem StronglyMeromorphicAt.meromorphicAt
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf : StronglyMeromorphicAt f z₀) :
-  MeromorphicAt f z₀ := by
-  rcases hf with h|h
-  · use 0; simp
-    rw [analyticAt_congr h]
-    exact analyticAt_const
-  · obtain ⟨n, g, h₁g, _, h₃g⟩ := h
-    rw [meromorphicAt_congr' h₃g]
-    fun_prop
 
-
-/- Strongly MeromorphicAt of non-negative order is analytic -/
-theorem StronglyMeromorphicAt.analytic
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (h₁f : StronglyMeromorphicAt f z₀)
-  (h₂f : 0 ≤ h₁f.meromorphicAt.order):
-  AnalyticAt ℂ f z₀ := by
-  let h₁f' := h₁f
-  rcases h₁f' with h | h
-  · rw [analyticAt_congr h]
-    exact analyticAt_const
-  · obtain ⟨n, g, h₁g, h₂g, h₃g⟩ := h
-    rw [analyticAt_congr h₃g]
-    have : h₁f.meromorphicAt.order = n := by
-      rw [MeromorphicAt.order_eq_int_iff]
-      use g, h₁g
-      exact ⟨h₂g, Filter.EventuallyEq.filter_mono h₃g nhdsWithin_le_nhds⟩
-    rw [this] at h₂f
-    apply AnalyticAt.smul'
-    nth_rw 1 [← Int.toNat_of_nonneg (WithTop.coe_nonneg.mp h₂f)]
-    fun_prop
-    exact h₁g
-
-/- Analytic functions are strongly meromorphic -/
-theorem AnalyticAt.stronglyMeromorphicAt
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (h₁f : AnalyticAt ℂ f z₀) :
-  StronglyMeromorphicAt f z₀ := by
-  by_cases h₂f : h₁f.order = ⊤
-  · rw [AnalyticAt.order_eq_top_iff] at h₂f
-    tauto
-  · have : h₁f.order ≠ ⊤ := h₂f
-    rw [← ENat.coe_toNat_eq_self, eq_comm, AnalyticAt.order_eq_nat_iff] at this
-    right
-    use h₁f.order.toNat
-    obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
-    use g
-    tauto
 
 /- Strong meromorphic depends only on germ -/
-theorem stronglyMeromorphicAt_congr
+theorem MeromorphicNFAt_congr
   {f g : ℂ → ℂ}
   {z₀ : ℂ}
   (hfg : f =ᶠ[𝓝 z₀] g) :
-  StronglyMeromorphicAt f z₀ ↔ StronglyMeromorphicAt g z₀ := by
-  unfold StronglyMeromorphicAt
+  MeromorphicNFAt f z₀ ↔ MeromorphicNFAt g z₀ := by
+  unfold MeromorphicNFAt
   constructor
   · intro h
     rcases h with h | h
@@ -148,21 +136,21 @@ theorem stronglyMeromorphicAt_congr
 /- A function is strongly meromorphic at a point iff it is strongly meromorphic
    after multiplication with a non-vanishing analytic function
 -/
-theorem stronglyMeromorphicAt_of_mul_analytic
+theorem MeromorphicNFAt_of_mul_analytic
   {f g : ℂ → ℂ}
   {z₀ : ℂ}
   (h₁g : AnalyticAt ℂ g z₀)
   (h₂g : g z₀ ≠ 0) :
-  StronglyMeromorphicAt f z₀ ↔ StronglyMeromorphicAt (f * g) z₀ := by
+  MeromorphicNFAt f z₀ ↔ MeromorphicNFAt (f * g) z₀ := by
   constructor
-  · apply stronglyMeromorphicAt_of_mul_analytic' h₁g h₂g
+  · apply MeromorphicNFAt_of_mul_analytic' h₁g h₂g
   · intro hprod
     let g' := fun z ↦ (g z)⁻¹
     have h₁g' := h₁g.inv h₂g
     have h₂g' : g' z₀ ≠ 0 := by
       exact inv_ne_zero h₂g
 
-    let B := stronglyMeromorphicAt_of_mul_analytic' h₁g' h₂g' (f := f * g) hprod
+    let B := MeromorphicNFAt_of_mul_analytic' h₁g' h₂g' (f := f * g) hprod
     have : f =ᶠ[𝓝 z₀] f * g * fun x => (g x)⁻¹ := by
       unfold Filter.EventuallyEq
       apply Filter.eventually_iff_exists_mem.mpr
@@ -174,17 +162,17 @@ theorem stronglyMeromorphicAt_of_mul_analytic
       · intro y hy
         simp at hy
         simp [hy]
-    rwa [stronglyMeromorphicAt_congr this]
+    rwa [MeromorphicNFAt_congr this]
 
 
-theorem StronglyMeromorphicAt.order_eq_zero_iff
+theorem MeromorphicNFAt.order_eq_zero_iff
   {f : ℂ → ℂ}
   {z₀ : ℂ}
-  (hf : StronglyMeromorphicAt f z₀) :
+  (hf : MeromorphicNFAt f z₀) :
   hf.meromorphicAt.order = 0 ↔ f z₀ ≠ 0 := by
   constructor
   · intro h₁f
-    let A := hf.analytic (le_of_eq (id (Eq.symm h₁f)))
+    let A := hf.analyticAt (le_of_eq (id (Eq.symm h₁f)))
     apply A.order_eq_zero_iff.1
     let B := A.meromorphicAt_order
     rw [h₁f] at B
@@ -223,11 +211,11 @@ theorem StronglyMeromorphicAt.order_eq_zero_iff
       exact this
 
 
-theorem StronglyMeromorphicAt.localIdentity
+theorem MeromorphicNFAt.localIdentity
   {f g : ℂ → ℂ}
   {z₀ : ℂ}
-  (hf : StronglyMeromorphicAt f z₀)
-  (hg : StronglyMeromorphicAt g z₀) :
+  (hf : MeromorphicNFAt f z₀)
+  (hg : MeromorphicNFAt g z₀) :
   f =ᶠ[𝓝[≠] z₀] g → f =ᶠ[𝓝 z₀] g := by
 
   intro h
@@ -237,8 +225,8 @@ theorem StronglyMeromorphicAt.localIdentity
 
   by_cases cs : hf.meromorphicAt.order = 0
   · rw [cs] at t₀
-    have h₁f := hf.analytic (le_of_eq (id (Eq.symm cs)))
-    have h₁g := hg.analytic (le_of_eq t₀)
+    have h₁f := hf.analyticAt (le_of_eq (id (Eq.symm cs)))
+    have h₁g := hg.analyticAt (le_of_eq t₀)
     exact h₁f.localIdentity h₁g h
   · apply Mnhds h
     let A := cs
@@ -253,7 +241,7 @@ theorem StronglyMeromorphicAt.localIdentity
 
 
 /- Make strongly MeromorphicAt -/
-noncomputable def MeromorphicAt.makeStronglyMeromorphicAt
+noncomputable def MeromorphicAt.makeMeromorphicNFAt
   {f : ℂ → ℂ}
   {z₀ : ℂ}
   (hf : MeromorphicAt f z₀) :
@@ -271,9 +259,9 @@ lemma m₁
   {f : ℂ → ℂ}
   {z₀ : ℂ}
   (hf : MeromorphicAt f z₀) :
-  ∀ z ≠ z₀, f z = hf.makeStronglyMeromorphicAt z := by
+  ∀ z ≠ z₀, f z = hf.makeMeromorphicNFAt z := by
   intro z hz
-  unfold MeromorphicAt.makeStronglyMeromorphicAt
+  unfold MeromorphicAt.makeMeromorphicNFAt
   simp [hz]
 
 
@@ -281,26 +269,26 @@ lemma m₂
   {f : ℂ → ℂ}
   {z₀ : ℂ}
   (hf : MeromorphicAt f z₀) :
-  f =ᶠ[𝓝[≠] z₀] hf.makeStronglyMeromorphicAt := by
+  f =ᶠ[𝓝[≠] z₀] hf.makeMeromorphicNFAt := by
   apply eventually_nhdsWithin_of_forall
   exact fun x a => m₁ hf x a
 
 
-theorem StronglyMeromorphicAt_of_makeStronglyMeromorphic
+theorem MeromorphicNFAt_of_makeStronglyMeromorphic
   {f : ℂ → ℂ}
   {z₀ : ℂ}
   (hf : MeromorphicAt f z₀) :
-  StronglyMeromorphicAt hf.makeStronglyMeromorphicAt z₀ := by
+  MeromorphicNFAt hf.makeMeromorphicNFAt z₀ := by
 
   by_cases h₂f : hf.order = ⊤
-  · have : hf.makeStronglyMeromorphicAt =ᶠ[𝓝 z₀] 0 := by
+  · have : hf.makeMeromorphicNFAt =ᶠ[𝓝 z₀] 0 := by
       apply Mnhds
       · apply Filter.EventuallyEq.trans (Filter.EventuallyEq.symm (m₂ hf))
         exact (MeromorphicAt.order_eq_top_iff hf).1 h₂f
-      · unfold MeromorphicAt.makeStronglyMeromorphicAt
+      · unfold MeromorphicAt.makeMeromorphicNFAt
         simp [h₂f]
 
-    apply AnalyticAt.stronglyMeromorphicAt
+    apply AnalyticAt.MeromorphicNFAt
     rw [analyticAt_congr this]
     apply analyticAt_const
   · let n := hf.order.untop h₂f
@@ -318,7 +306,7 @@ theorem StronglyMeromorphicAt_of_makeStronglyMeromorphic
       · apply Mnhds
         · apply Filter.EventuallyEq.trans (Filter.EventuallyEq.symm (m₂ hf))
           exact h₃g
-        · unfold MeromorphicAt.makeStronglyMeromorphicAt
+        · unfold MeromorphicAt.makeMeromorphicNFAt
           simp
           by_cases h₃f : hf.order = (0 : ℤ)
           · let h₄f := (hf.order_eq_int_iff 0).1 h₃f
@@ -341,16 +329,16 @@ theorem StronglyMeromorphicAt_of_makeStronglyMeromorphic
             rwa [WithTop.untop_eq_iff h₂f]
 
 
-theorem StronglyMeromorphicAt.makeStronglyMeromorphic_id
+theorem MeromorphicNFAt.makeStronglyMeromorphic_id
   {f : ℂ → ℂ}
   {z₀ : ℂ}
-  (hf : StronglyMeromorphicAt f z₀) :
-  f = hf.meromorphicAt.makeStronglyMeromorphicAt := by
+  (hf : MeromorphicNFAt f z₀) :
+  f = hf.meromorphicAt.makeMeromorphicNFAt := by
 
   funext z
   by_cases hz : z = z₀
   · rw [hz]
-    unfold MeromorphicAt.makeStronglyMeromorphicAt
+    unfold MeromorphicAt.makeMeromorphicNFAt
     simp
     have h₀f := hf
     rcases hf with h₁f | h₁f
@@ -359,7 +347,7 @@ theorem StronglyMeromorphicAt.makeStronglyMeromorphic_id
     · obtain ⟨n, g, h₁g, h₂g, h₃g⟩ := h₁f
       rw [Filter.EventuallyEq.eq_of_nhds h₃g]
       have : h₀f.meromorphicAt.order = n := by
-        rw [MeromorphicAt.order_eq_int_iff (StronglyMeromorphicAt.meromorphicAt h₀f) n]
+        rw [MeromorphicAt.order_eq_int_iff (MeromorphicNFAt.meromorphicAt h₀f) n]
         use g, h₁g, h₂g
         exact eventually_nhdsWithin_of_eventually_nhds h₃g
       by_cases h₃f : h₀f.meromorphicAt.order = 0
@@ -383,13 +371,13 @@ theorem StronglyMeromorphicAt.makeStronglyMeromorphic_id
         by_contra hn
         rw [hn] at this
         tauto
-  · exact m₁ (StronglyMeromorphicAt.meromorphicAt hf) z hz
+  · exact m₁ (MeromorphicNFAt.meromorphicAt hf) z hz
 
 
-theorem StronglyMeromorphicAt.eliminate
+theorem MeromorphicNFAt.eliminate
   {f : ℂ → ℂ}
   {z₀ : ℂ}
-  (h₁f : StronglyMeromorphicAt f z₀)
+  (h₁f : MeromorphicNFAt f z₀)
   (h₂f : h₁f.meromorphicAt.order ≠ ⊤) :
   ∃ g : ℂ → ℂ, (AnalyticAt ℂ g z₀)
     ∧ (g z₀ ≠ 0)
@@ -415,15 +403,15 @@ theorem StronglyMeromorphicAt.eliminate
     simp
     rw [add_comm]
     rw [LinearOrderedAddCommGroupWithTop.add_neg_cancel_of_ne_top h₂f]
-  let g := h₁g₁.makeStronglyMeromorphicAt
+  let g := h₁g₁.makeMeromorphicNFAt
   use g
-  have h₁g : StronglyMeromorphicAt g z₀ := by
-    exact StronglyMeromorphicAt_of_makeStronglyMeromorphic h₁g₁
+  have h₁g : MeromorphicNFAt g z₀ := by
+    exact MeromorphicNFAt_of_makeStronglyMeromorphic h₁g₁
   have h₂g : h₁g.meromorphicAt.order = 0 := by
     rw [← h₁g₁.order_congr (m₂ h₁g₁)]
     exact h₂g₁
   constructor
-  · apply analytic
+  · apply analyticAt
     · rw [h₂g]
     · exact h₁g
   · constructor
@@ -432,7 +420,7 @@ theorem StronglyMeromorphicAt.eliminate
       by_cases hz : z = z₀
       · by_cases hOrd : h₁f.meromorphicAt.order.untop h₂f = 0
         · simp [hOrd]
-          have : StronglyMeromorphicAt g₁ z₀ := by
+          have : MeromorphicNFAt g₁ z₀ := by
             unfold g₁
             simp [hOrd]
             have : (fun z => 1) * f = f := by
