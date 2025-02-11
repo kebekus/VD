@@ -11,7 +11,7 @@ open Topology
 def StronglyMeromorphicAt
   (f : ℂ → ℂ)
   (z₀ : ℂ) :=
-  (∀ᶠ (z : ℂ) in nhds z₀, f z = 0) ∨ (∃ (n : ℤ), ∃ g : ℂ → ℂ, (AnalyticAt ℂ g z₀) ∧ (g z₀ ≠ 0) ∧ (∀ᶠ (z : ℂ) in nhds z₀, f z = (z - z₀) ^ n • g z))
+  (f =ᶠ[𝓝 z₀] 0) ∨ (∃ (n : ℤ), ∃ g : ℂ → ℂ, (AnalyticAt ℂ g z₀) ∧ (g z₀ ≠ 0) ∧ (f =ᶠ[𝓝 z₀] fun z ↦ (z - z₀) ^ n • g z))
 
 
 lemma stronglyMeromorphicAt_of_mul_analytic'
@@ -25,9 +25,9 @@ lemma stronglyMeromorphicAt_of_mul_analytic'
   --unfold StronglyMeromorphicAt at hf
   rcases hf with h₁f|h₁f
   · left
-    rw [eventually_nhds_iff] at h₁f
+    rw [Filter.EventuallyEq, eventually_nhds_iff] at h₁f
     obtain ⟨t, ht⟩ := h₁f
-    rw [eventually_nhds_iff]
+    rw [Filter.EventuallyEq, eventually_nhds_iff]
     use t
     constructor
     · intro y hy
@@ -46,9 +46,9 @@ lemma stronglyMeromorphicAt_of_mul_analytic'
     · constructor
       · simp
         exact ⟨h₂g, h₂g_f⟩
-      · rw [eventually_nhds_iff] at h₃g_f
+      · rw [Filter.EventuallyEq, eventually_nhds_iff] at h₃g_f
         obtain ⟨t, ht⟩ := h₃g_f
-        rw [eventually_nhds_iff]
+        rw [Filter.EventuallyEq, eventually_nhds_iff]
         use t
         constructor
         · intro y hy
