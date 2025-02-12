@@ -1,6 +1,6 @@
 import Mathlib.Analysis.Meromorphic.Basic
 import VD.meromorphicAt
-
+import VD.ToMathlib.analyticAt
 
 open Topology
 
@@ -8,6 +8,69 @@ variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {E : Type u_2} [Normed
 
 def MeromorphicNFAt (f : 𝕜 → E) (x : 𝕜) :=
   (f =ᶠ[𝓝 x] 0) ∨ (∃ (n : ℤ), ∃ g : 𝕜 → E, (AnalyticAt 𝕜 g x) ∧ (g x ≠ 0) ∧ (f =ᶠ[𝓝 x] (· - x) ^ n • g ))
+
+theorem meromorphicNFAt_def {f : 𝕜 → E} {x : 𝕜} :
+    MeromorphicNFAt f x ↔  (f =ᶠ[𝓝 x] 0) ∨
+    (∃ (n : ℤ), ∃ g : 𝕜 → E, (AnalyticAt 𝕜 g x) ∧ (g x ≠ 0) ∧ (f =ᶠ[𝓝 x] (· - x) ^ n • g )) := by
+  rfl
+
+theorem MeromorphicAt.meromorphicNFAt_iff {f : 𝕜 → E} {x : 𝕜} (hf : MeromorphicAt f x) :
+    MeromorphicNFAt f x ↔ (AnalyticAt 𝕜 f x) ∨ (hf.order < 0 ∧ f x = 0) := by
+  constructor
+  · intro h₁f
+    rcases h₁f with h | h
+    · left
+      exact (analyticAt_congr h).2 analyticAt_const
+    · obtain ⟨n, g, h₁g, h₂g, h₃g⟩ := h
+      have : hf.order = n := by
+        rw [hf.order_eq_int_iff]
+        use g, h₁g, h₂g
+        exact eventually_nhdsWithin_of_eventually_nhds h₃g
+      by_cases hn : 0 ≤ n
+      · left
+        rw [analyticAt_congr h₃g]
+        exact (AnalyticAt.zpow_nonneg (by fun_prop) hn).smul h₁g
+      · right
+        constructor
+        · rw [this]
+          exact WithTop.coe_lt_zero.2 (not_le.1 hn)
+        · simp only [h₃g.eq_of_nhds, true_or, Pi.smul_apply', Pi.pow_apply, sub_self, smul_eq_zero, zero_zpow n (ne_of_not_le hn).symm]
+  · intro h₁f
+    rcases h₁f with h | ⟨h₁, h₂⟩
+    · by_cases h₂f : h.order = ⊤
+      · rw [AnalyticAt.order_eq_top_iff] at h₂f
+        tauto
+      · right
+        have : h.order ≠ ⊤ := h₂f
+        rw [← ENat.coe_toNat_eq_self, eq_comm, AnalyticAt.order_eq_nat_iff] at this
+        use h.order.toNat
+        obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
+        use g
+        simp only [h₁g, ne_eq, h₂g, not_false_eq_true, zpow_natCast, true_and]
+        tauto
+    · right
+      have : hf.order = hf.order.untop' 0 := by
+        refine Eq.symm (untop'_of_ne_top ?_)
+        exact LT.lt.ne_top h₁
+      obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untop' 0)).1 this
+      use (hf.order.untop' 0), g, h₁g, h₂g
+      rw [eventually_nhdsWithin_iff] at h₃g
+      filter_upwards [h₃g]
+      intro z hz
+      by_cases h₁z : z = x
+      · rw [h₁z]
+        simp [h₂]
+        refine Eq.symm (smul_eq_zero_of_left ?_ (g x))
+        refine zero_zpow (WithTop.untop' 0 hf.order) ?_
+        by_contra hCon
+        simp at hCon
+        rcases hCon with h | h
+        · rw [h] at h₁
+          simp at h₁
+        · rw [h] at h₁
+          simp at h₁
+      · exact hz h₁z
+
 
 theorem MeromorphicNFAt.meromorphicAt {f : 𝕜 → E} {x : 𝕜} (hf : MeromorphicNFAt f x) :
     MeromorphicAt f x := by
