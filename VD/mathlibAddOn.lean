@@ -41,16 +41,11 @@ lemma Mnhds
   (h₁ : f =ᶠ[𝓝[≠] z₀] g)
   (h₂ : f z₀ = g z₀) :
   f =ᶠ[𝓝 z₀] g := by
-  apply eventually_nhds_iff.2
-  obtain ⟨t, h₁t, h₂t⟩ := eventually_nhds_iff.1 (eventually_nhdsWithin_iff.1 h₁)
-  use t
-  constructor
-  · intro y hy
-    by_cases h₂y : y ∈ ({z₀}ᶜ : Set ℂ)
-    · exact h₁t y hy h₂y
-    · simp at h₂y
-      rwa [h₂y]
-  · exact h₂t
+  filter_upwards [eventually_nhdsWithin_iff.1 h₁]
+  intro x hx
+  by_cases h₂x : x = z₀
+  · simp [h₂x, h₂]
+  · tauto
 
 -- unclear where this should go
 
