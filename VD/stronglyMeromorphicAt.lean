@@ -1,11 +1,31 @@
+
+/-
+Copyright (c) 2024 Stefan Kebekus. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Stefan Kebekus
+-/
 import Mathlib.Analysis.Meromorphic.Basic
 import VD.meromorphicAt
-import VD.ToMathlib.analyticAt
+
+/-!
+# Normal form of meromorphic functions and continuous extension
+
+If a function `f` is meromorphic on `U` and if `g` differs from `f` only along a
+set that is codiscrete within `U`, then `g` is likewise meromorphic. The set of
+meromorphic functions is therefore huge, and `=ᶠ[codiscreteWithinU]` defines an
+equivalence relation.
+
+This file implments continuous extension to provide an API that allows picking
+the 'unique best' representative of any given equivalence class.
+-/
 
 open Topology
 
 variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {E : Type u_2} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
+/-!
+# Normal form of meromorphic functions at a given point
+-/
 def MeromorphicNFAt (f : 𝕜 → E) (x : 𝕜) :=
   (f =ᶠ[𝓝 x] 0) ∨ (∃ (n : ℤ), ∃ g : 𝕜 → E, (AnalyticAt 𝕜 g x) ∧ (g x ≠ 0) ∧ (f =ᶠ[𝓝 x] (· - x) ^ n • g ))
 
@@ -99,25 +119,8 @@ theorem MeromorphicNFAt.analyticAt {f : 𝕜 → E} {x : 𝕜} (h₁f : Meromorp
   rw [h₃f.meromorphicNFAt_iff] at h₁f
   rcases h₁f with h | h
   · exact h
-  · have : h₃f.order < 0 := by tauto
-
-    sorry
-
-
-  let h₁f' := h₁f
-  rcases h₁f' with h | h
-  · rw [analyticAt_congr h]
-    exact analyticAt_const
-  · obtain ⟨n, g, h₁g, h₂g, h₃g⟩ := h
-    rw [analyticAt_congr h₃g]
-    have : h₁f.meromorphicAt.order = n := by
-      rw [MeromorphicAt.order_eq_int_iff]
-      use g, h₁g
-      exact ⟨h₂g, Filter.EventuallyEq.filter_mono h₃g nhdsWithin_le_nhds⟩
-    rw [this] at h₂f
-    apply AnalyticAt.smul _ h₁g
-    nth_rw 1 [← Int.toNat_of_nonneg (WithTop.coe_nonneg.mp h₂f)]
-    exact AnalyticAt.zpow_nonneg (by fun_prop) (Int.ofNat_zero_le n.toNat)
+  · by_contra h'
+    exact lt_irrefl 0 (lt_of_le_of_lt h₂f h.1)
 
 
 lemma MeromorphicNFAt_of_mul_analytic'
