@@ -19,8 +19,7 @@ theorem MeromorphicAt.meromorphicNFAt_iff {f : 𝕜 → E} {x : 𝕜} (hf : Mero
   constructor
   · intro h₁f
     rcases h₁f with h | h
-    · left
-      exact (analyticAt_congr h).2 analyticAt_const
+    · simp [(analyticAt_congr h).2 analyticAt_const]
     · obtain ⟨n, g, h₁g, h₂g, h₃g⟩ := h
       have : hf.order = n := by
         rw [hf.order_eq_int_iff]
@@ -29,46 +28,34 @@ theorem MeromorphicAt.meromorphicNFAt_iff {f : 𝕜 → E} {x : 𝕜} (hf : Mero
       by_cases hn : 0 ≤ n
       · left
         rw [analyticAt_congr h₃g]
-        exact (AnalyticAt.zpow_nonneg (by fun_prop) hn).smul h₁g
-      · right
-        constructor
-        · rw [this]
-          exact WithTop.coe_lt_zero.2 (not_le.1 hn)
-        · simp only [h₃g.eq_of_nhds, true_or, Pi.smul_apply', Pi.pow_apply, sub_self, smul_eq_zero, zero_zpow n (ne_of_not_le hn).symm]
+        apply (AnalyticAt.zpow_nonneg (by fun_prop) hn).smul h₁g
+      · simp [this, WithTop.coe_lt_zero.2 (not_le.1 hn), h₃g.eq_of_nhds,
+          zero_zpow n (ne_of_not_le hn).symm]
   · intro h₁f
     rcases h₁f with h | ⟨h₁, h₂⟩
     · by_cases h₂f : h.order = ⊤
       · rw [AnalyticAt.order_eq_top_iff] at h₂f
         tauto
       · right
+        use h.order.toNat
         have : h.order ≠ ⊤ := h₂f
         rw [← ENat.coe_toNat_eq_self, eq_comm, AnalyticAt.order_eq_nat_iff] at this
-        use h.order.toNat
         obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
-        use g
-        simp only [h₁g, ne_eq, h₂g, not_false_eq_true, zpow_natCast, true_and]
-        tauto
+        use g, h₁g, h₂g
+        simpa [ne_eq, not_false_eq_true, zpow_natCast, true_and]
     · right
-      have : hf.order = hf.order.untop' 0 := by
-        refine Eq.symm (untop'_of_ne_top ?_)
-        exact LT.lt.ne_top h₁
-      obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untop' 0)).1 this
+      obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untop' 0)).1
+        (untop'_of_ne_top (LT.lt.ne_top h₁)).symm
       use (hf.order.untop' 0), g, h₁g, h₂g
-      rw [eventually_nhdsWithin_iff] at h₃g
-      filter_upwards [h₃g]
+      filter_upwards [eventually_nhdsWithin_iff.1 h₃g]
       intro z hz
       by_cases h₁z : z = x
-      · rw [h₁z]
-        simp [h₂]
-        refine Eq.symm (smul_eq_zero_of_left ?_ (g x))
-        refine zero_zpow (WithTop.untop' 0 hf.order) ?_
+      · simp [h₁z, h₂]
+        apply (smul_eq_zero_of_left (zero_zpow (WithTop.untop' 0 hf.order) _) (g x)).symm
         by_contra hCon
-        simp at hCon
+        rw [WithTop.untop'_eq_self_iff, WithTop.coe_zero] at hCon
         rcases hCon with h | h
-        · rw [h] at h₁
-          simp at h₁
-        · rw [h] at h₁
-          simp at h₁
+        <;> simp [h] at h₁
       · exact hz h₁z
 
 
@@ -101,23 +88,22 @@ theorem meromorphicNFAt_congr {f g : 𝕜 → E} {x : 𝕜} (hfg : f =ᶠ[𝓝 x
 
 theorem AnalyticAt.MeromorphicNFAt {f : 𝕜 → E} {x : 𝕜} (hf : AnalyticAt 𝕜 f x) :
   MeromorphicNFAt f x := by
-  by_cases h₂f : hf.order = ⊤
-  · rw [AnalyticAt.order_eq_top_iff] at h₂f
-    tauto
-  · have : hf.order ≠ ⊤ := h₂f
-    rw [← ENat.coe_toNat_eq_self, eq_comm, AnalyticAt.order_eq_nat_iff] at this
-    right
-    use hf.order.toNat
-    obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
-    use g
-    simp [h₁g, h₂g]
-    tauto
+  simp [hf.meromorphicAt.meromorphicNFAt_iff, hf]
 
 
 /- Strongly MeromorphicAt of non-negative order is analytic -/
 theorem MeromorphicNFAt.analyticAt {f : 𝕜 → E} {x : 𝕜} (h₁f : MeromorphicNFAt f x)
     (h₂f : 0 ≤ h₁f.meromorphicAt.order) :
     AnalyticAt 𝕜 f x := by
+  have h₃f := h₁f.meromorphicAt
+  rw [h₃f.meromorphicNFAt_iff] at h₁f
+  rcases h₁f with h | h
+  · exact h
+  · have : h₃f.order < 0 := by tauto
+
+    sorry
+
+
   let h₁f' := h₁f
   rcases h₁f' with h | h
   · rw [analyticAt_congr h]
