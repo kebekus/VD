@@ -3,7 +3,7 @@ Copyright (c) 2025 Stefan Kebekus. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stefan Kebekus
 -/
-import Mathlib.Analysis.Meromorphic.Basic
+import Mathlib.Analysis.Meromorphic.Order
 import VD.meromorphicAt
 import VD.mathlibAddOn
 
@@ -20,6 +20,9 @@ the 'unique best' representative of any given equivalence class, where 'best'
 means that the representative can locally near any point `x` be written 'in
 normal form', as `f =ᶠ[𝓝 x] fun z ↦ (z - x) ^ n • g` where `g` is analytic and
 does not vanish at `x`.
+
+TODO: Establish further properties of meromorphic functions in normal form, such
+as a local identity theorem. Establish the analogous notion `MeromorphicNFOn`.
 -/
 
 open Topology
@@ -175,16 +178,16 @@ theorem MeromorphicAt.MeromorphicNFAt_of_toNF (hf : MeromorphicAt f x) :
     MeromorphicNFAt hf.toNF x := by
   by_cases h₂f : hf.order = ⊤
   · have : hf.toNF =ᶠ[𝓝 x] 0 := by
-      apply Mnhds
+      apply eventuallyEq_nhdsWithin_of_eventuallyEq_nhds
       · exact hf.toNF_id_on_punct_nhd.symm.trans (hf.order_eq_top_iff.1 h₂f)
       · simp [h₂f, MeromorphicAt.toNF]
     apply AnalyticAt.MeromorphicNFAt
     rw [analyticAt_congr this]
     exact analyticAt_const
-  · obtain ⟨g, h₁g, h₂g, h₃g⟩ := hf.order_ne_top_iff.1 h₂f
+  · obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untop' 0)).1 (untop'_of_ne_top h₂f).symm
     right
     use WithTop.untop' 0 hf.order, g, h₁g, h₂g
-    apply Mnhds
+    apply eventuallyEq_nhdsWithin_of_eventuallyEq_nhds
     · exact hf.toNF_id_on_punct_nhd.symm.trans h₃g
     · unfold MeromorphicAt.toNF
       simp only [WithTop.coe_zero, ne_eq, Function.update_self, Pi.smul_apply', Pi.pow_apply,

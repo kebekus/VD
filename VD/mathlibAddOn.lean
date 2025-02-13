@@ -34,7 +34,7 @@ theorem ContDiff.const_smul' {f : E → F} (c : R) (hf : ContDiff 𝕜 n f) :
 
 open Topology Filter
 
-lemma Mnhds
+lemma eventuallyEq_nhdsWithin_of_eventuallyEq_nhds
   {α τ : Type*}
   {f g : τ → α} [TopologicalSpace τ]
   {z₀ : τ}

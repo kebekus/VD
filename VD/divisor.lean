@@ -68,7 +68,7 @@ theorem Divisor.closedSupport
   · have A := D.locallyFiniteInU x h₁x
     simp [A]
     simp at hx
-    let B := Mnhds A hx
+    let B := eventuallyEq_nhdsWithin_of_eventuallyEq_nhds A hx
     simpa
   · rw [eventually_iff_exists_mem]
     use Uᶜ
