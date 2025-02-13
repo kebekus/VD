@@ -33,8 +33,8 @@ theorem MeromorphicAt.order_pow (hf : MeromorphicAt f z₀) {n : ℕ} :
 -- TODO: `order_inv`
 
 
-theorem MeromorphicAt.order_ne_top_iff {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
-    hf.order ≠ ⊤ ↔ ∃ (g : ℂ → ℂ), AnalyticAt ℂ g z₀ ∧ g z₀ ≠ 0 ∧ f =ᶠ[𝓝[≠] z₀] fun z ↦ (z - z₀) ^ (hf.order.untop' 0) • g z :=
+theorem MeromorphicAt.order_ne_top_iff {f : 𝕜 → E} {z₀ : 𝕜} (hf : MeromorphicAt f z₀) :
+    hf.order ≠ ⊤ ↔ ∃ (g : 𝕜 → E), AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧ f =ᶠ[𝓝[≠] z₀] fun z ↦ (z - z₀) ^ (hf.order.untop' 0) • g z :=
   ⟨fun h ↦ (hf.order_eq_int_iff (hf.order.untop' 0)).1 (untop'_of_ne_top h).symm,
     fun h ↦ Option.ne_none_iff_exists'.2 ⟨hf.order.untop' 0, (hf.order_eq_int_iff (hf.order.untop' 0)).2 h⟩⟩
 

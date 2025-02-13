@@ -35,9 +35,9 @@ theorem ContDiff.const_smul' {f : E → F} (c : R) (hf : ContDiff 𝕜 n f) :
 open Topology Filter
 
 lemma Mnhds
-  {α : Type}
-  {f g : ℂ → α}
-  {z₀ : ℂ}
+  {α τ : Type*}
+  {f g : τ → α} [TopologicalSpace τ]
+  {z₀ : τ}
   (h₁ : f =ᶠ[𝓝[≠] z₀] g)
   (h₂ : f z₀ = g z₀) :
   f =ᶠ[𝓝 z₀] g := by
