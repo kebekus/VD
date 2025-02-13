@@ -1,4 +1,3 @@
-
 /-
 Copyright (c) 2025 Stefan Kebekus. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
@@ -26,7 +25,7 @@ does not vanish at `x`.
 open Topology
 
 variable
-  {𝕜 : Type*} [NontriviallyNormedField 𝕜][DecidableEq 𝕜]
+  {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
   {f : 𝕜 → E}
   {x : 𝕜}
@@ -79,7 +78,7 @@ theorem MeromorphicAt.meromorphicNFAt_iff (hf : MeromorphicAt f x) :
         rw [← ENat.coe_toNat_eq_self, eq_comm, AnalyticAt.order_eq_nat_iff] at this
         obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
         use g, h₁g, h₂g
-        simpa [ne_eq, not_false_eq_true, zpow_natCast, true_and]
+        simpa
     · right
       obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untop' 0)).1
         (untop'_of_ne_top (LT.lt.ne_top h₁)).symm
@@ -87,7 +86,7 @@ theorem MeromorphicAt.meromorphicNFAt_iff (hf : MeromorphicAt f x) :
       filter_upwards [eventually_nhdsWithin_iff.1 h₃g]
       intro z hz
       by_cases h₁z : z = x
-      · simp [h₁z, h₂]
+      · simp only [h₁z, h₂, Pi.smul_apply', Pi.pow_apply, sub_self]
         apply (smul_eq_zero_of_left (zero_zpow (WithTop.untop' 0 hf.order) _) (g x)).symm
         by_contra hCon
         rw [WithTop.untop'_eq_self_iff, WithTop.coe_zero] at hCon
@@ -142,7 +141,7 @@ theorem MeromorphicNFAt.analyticAt (h₁f : MeromorphicNFAt f x)
 
 /-- Analytic functions are meromorphic in normal form. -/
 theorem AnalyticAt.MeromorphicNFAt (hf : AnalyticAt 𝕜 f x) :
-  MeromorphicNFAt f x := by
+    MeromorphicNFAt f x := by
   simp [hf.meromorphicAt.meromorphicNFAt_iff, hf]
 
 /-!
@@ -152,6 +151,7 @@ theorem AnalyticAt.MeromorphicNFAt (hf : AnalyticAt 𝕜 f x) :
 /- Convert a meromorphic function to normal form at `x` by changing its value. -/
 noncomputable def MeromorphicAt.toNF (hf : MeromorphicAt f x) :
     𝕜 → E := by
+  classical -- do not complain about decidability issues in Function.update
   apply Function.update f x
   by_cases h₁f : hf.order = (0 : ℤ)
   · rw [hf.order_eq_int_iff] at h₁f
@@ -183,30 +183,25 @@ theorem MeromorphicAt.MeromorphicNFAt_of_toNF (hf : MeromorphicAt f x) :
     exact analyticAt_const
   · obtain ⟨g, h₁g, h₂g, h₃g⟩ := hf.order_ne_top_iff.1 h₂f
     right
-    use WithTop.untop' 0 hf.order
-    use g
-    constructor
-    · assumption
-    · constructor
-      · assumption
-      · apply Mnhds
-        · exact hf.toNF_id_on_punct_nhd.symm.trans h₃g
-        · unfold MeromorphicAt.toNF
-          simp
-          by_cases h₃f : hf.order = (0 : ℤ)
-          · simp [n, h₃f]
-            let h₄f := (hf.order_eq_int_iff 0).1 h₃f
-            obtain ⟨h₁G, h₂G, h₃G⟩  := Classical.choose_spec h₄f
-            simp at h₃G
-            have hn : WithTop.untop' 0 hf.order = 0 := by simp [h₃f]
-            rw [hn] at *
-            have : g =ᶠ[𝓝 x] (Classical.choose h₄f) := by
-              apply h₁g.localIdentity h₁G
-              --exact Filter.EventuallyEq.trans (Filter.EventuallyEq.symm h₃g) h₃G
-              sorry
-            rw [Filter.EventuallyEq.eq_of_nhds this]
-          · have : hf.order ≠ 0 := h₃f
-            simp [this]
-            rw [zero_zpow (WithTop.untop' 0 hf.order)]
-            simp
-            rwa [WithTop.untop_eq_iff h₂f]
+    use WithTop.untop' 0 hf.order, g, h₁g, h₂g
+    apply Mnhds
+    · exact hf.toNF_id_on_punct_nhd.symm.trans h₃g
+    · unfold MeromorphicAt.toNF
+      simp only [WithTop.coe_zero, ne_eq, Function.update_self, Pi.smul_apply', Pi.pow_apply,
+        sub_self]
+      by_cases h₃f : hf.order = (0 : ℤ)
+      · simp only [h₃f, WithTop.coe_zero, ↓reduceDIte, WithTop.untop_zero', zpow_zero, one_smul]
+        obtain ⟨h₁G, h₂G, h₃G⟩  := Classical.choose_spec ((hf.order_eq_int_iff 0).1 h₃f)
+        simp only [zpow_zero, ne_eq, one_smul] at h₃G
+        apply Filter.EventuallyEq.eq_of_nhds
+        apply h₁G.localIdentity h₁g
+        filter_upwards [h₃g, h₃G]
+        intro a h₁a h₂a
+        simp only [h₃f, WithTop.coe_zero, WithTop.untop_zero', zpow_zero, one_smul] at h₁a
+        rw [← h₁a, ← h₂a]
+      · have : hf.order ≠ 0 := h₃f
+        rw [zero_zpow (WithTop.untop' 0 hf.order)]
+        simp only [this, ↓reduceDIte, zero_smul]
+        by_contra hCon
+        simp only [WithTop.untop'_eq_self_iff, WithTop.coe_zero] at hCon
+        tauto
