@@ -148,7 +148,7 @@ theorem stronglyMeromorphicOn_of_makeStronglyMeromorphicOn
   StronglyMeromorphicOn hf.makeStronglyMeromorphicOn U := by
   intro z hz
   let A := makeStronglyMeromorphicOn_changeDiscrete' hf hz
-  rw [MeromorphicNFAt_congr A]
+  rw [meromorphicNFAt_congr A]
   exact MeromorphicNFAt_of_makeStronglyMeromorphic (hf z hz)
 
 
