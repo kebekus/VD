@@ -60,7 +60,7 @@ theorem circleIntegrable_congr_codiscreteWithin
   apply (intervalIntegrable_congr_codiscreteWithin _).1
   rw [Filter.eventuallyEq_iff_exists_mem]
   use (circleMap c R)⁻¹' {z | f₁ z = f₂ z}, Filter.codiscreteWithin.mono
-    (by simp) (circleMap_preimg_codiscrete hR hf), (by tauto)
+    (by simp only [Set.subset_univ]) (circleMap_preimg_codiscrete hR hf), (by tauto)
 
 theorem intervalIntegral.integral_congr_ae_restict
     {a b : ℝ} {f g : ℝ → E} {μ : Measure ℝ}
