@@ -163,15 +163,13 @@ noncomputable def MeromorphicAt.toNF (hf : MeromorphicAt f x) :
 
 /- Conversion to normal form at `x` by changes the value only at x. -/
 lemma MeromorphicAt.toNF_id_on_complement (hf : MeromorphicAt f x) :
-    Set.EqOn f hf.toNF {x}ᶜ := by
-  intro z hz
-  simp_all [MeromorphicAt.toNF]
+    Set.EqOn f hf.toNF {x}ᶜ :=
+  fun _ _ ↦ by simp_all [MeromorphicAt.toNF]
 
 /- Conversion to normal form at `x` by changes the value only at x. -/
 lemma MeromorphicAt.toNF_id_on_punct_nhd (hf : MeromorphicAt f x) :
-    f =ᶠ[𝓝[≠] x] hf.toNF := by
-  apply eventually_nhdsWithin_of_forall
-  exact fun _ hz ↦ hf.toNF_id_on_complement hz
+    f =ᶠ[𝓝[≠] x] hf.toNF :=
+  eventually_nhdsWithin_of_forall (fun _ hz ↦ hf.toNF_id_on_complement hz)
 
 /- After conversion to normal form at `x`, the function has normal form. -/
 theorem MeromorphicAt.MeromorphicNFAt_of_toNF (hf : MeromorphicAt f x) :

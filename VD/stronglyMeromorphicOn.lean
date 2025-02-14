@@ -115,7 +115,7 @@ theorem makeStronglyMeromorphicOn_changeDiscrete'
   (hf : MeromorphicOn f U)
   (hz₀ : z₀ ∈ U) :
   hf.makeStronglyMeromorphicOn =ᶠ[𝓝 z₀] (hf z₀ hz₀).makeMeromorphicNFAt := by
-  apply Mnhds
+  apply eventuallyEq_nhdsWithin_of_eventuallyEq_nhds
   · apply Filter.EventuallyEq.trans (makeStronglyMeromorphicOn_changeDiscrete hf hz₀)
     exact m₂ (hf z₀ hz₀)
   · rw [MeromorphicOn.makeStronglyMeromorphicOn]
