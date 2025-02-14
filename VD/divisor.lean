@@ -1,58 +1,37 @@
 import Mathlib.Analysis.SpecialFunctions.Integrals
 import VD.mathlibAddOn
+import VD.ToMathlib.codiscreteWithin
 
 open Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
 
-structure Divisor
-  (U : Set ℂ)
+structure Divisor (U : Set ℂ)
   where
   toFun : ℂ → ℤ
   supportInU : toFun.support ⊆ U
-  locallyFiniteInU : ∀ x ∈ U, toFun =ᶠ[𝓝[≠] x] 0
+  supportDiscreteWithinU : toFun =ᶠ[Filter.codiscreteWithin U] 0
 
-instance
-  (U : Set ℂ) :
-  CoeFun (Divisor U) (fun _ ↦ ℂ → ℤ) where
+instance (U : Set ℂ) : CoeFun (Divisor U) (fun _ ↦ ℂ → ℤ)
+  where
   coe := Divisor.toFun
 
 attribute [coe] Divisor.toFun
 
 
-
 theorem Divisor.discreteSupport
   {U : Set ℂ}
-  (hU : IsClosed U)
   (D : Divisor U) :
   DiscreteTopology D.toFun.support := by
-  apply discreteTopology_subtype_iff.mpr
-  intro x hx
-  apply inf_principal_eq_bot.mpr
-  by_cases h₁x : x ∈ U
-  · let A := D.locallyFiniteInU x h₁x
-    refine mem_nhdsWithin.mpr ?_
-    rw [eventuallyEq_nhdsWithin_iff] at A
-    obtain ⟨U, h₁U, h₂U, h₃U⟩ := eventually_nhds_iff.1 A
-    use U
+  have : Function.support D = {x | D x = 0}ᶜ ∩ U := by
+    ext x
     constructor
-    · exact h₂U
-    · constructor
-      · exact h₃U
-      · intro y hy
-        let C := h₁U y hy.1 hy.2
-        tauto
-  · refine mem_nhdsWithin.mpr ?_
-    use Uᶜ
-    constructor
-    · simpa
-    · constructor
-      · tauto
-      · intro y _
-        let A := D.supportInU
-        simp at A
-        simp
-        exact False.elim (h₁x (A x hx))
+    · exact fun hx ↦ ⟨by tauto, D.supportInU hx⟩
+    · intro hx
+      rw [Set.mem_inter_iff, Set.mem_compl_iff, Set.mem_setOf_eq] at hx
+      tauto
+  rw [this]
+  exact discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinU)
 
 
 theorem Divisor.closedSupport
@@ -60,7 +39,6 @@ theorem Divisor.closedSupport
   (hU : IsClosed U)
   (D : Divisor U) :
   IsClosed D.toFun.support := by
-
   rw [← isOpen_compl_iff]
   rw [isOpen_iff_eventually]
   intro x hx
@@ -88,17 +66,3 @@ theorem Divisor.finiteSupport
   · apply IsCompact.of_isClosed_subset hU (D.closedSupport hU.isClosed)
     exact D.supportInU
   · exact D.discreteSupport hU.isClosed
-
-
-theorem Divisor.codiscreteWithin
-  {U : Set ℂ}
-  (D : Divisor U) :
-  D.toFun.supportᶜ ∈ Filter.codiscreteWithin U := by
-
-  simp_rw [mem_codiscreteWithin, disjoint_principal_right]
-  intro x hx
-  obtain ⟨s, hs⟩ := Filter.eventuallyEq_iff_exists_mem.1 (D.locallyFiniteInU x hx)
-  apply Filter.mem_of_superset hs.1
-  intro y hy
-  simp [hy]
-  tauto
