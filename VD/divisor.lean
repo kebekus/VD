@@ -43,11 +43,22 @@ theorem Divisor.closedSupport
   rw [isOpen_iff_eventually]
   intro x hx
   by_cases h₁x : x ∈ U
-  · have A := D.locallyFiniteInU x h₁x
-    simp [A]
-    simp at hx
-    let B := eventuallyEq_nhdsWithin_of_eventuallyEq_nhds A hx
-    simpa
+  · have Z₁ := D.supportDiscreteWithinU
+    rw [Filter.EventuallyEq, Filter.Eventually] at Z₁
+    rw [mem_codiscreteWithin] at Z₁
+    have Z₂ := Z₁ x h₁x
+    rw [Filter.disjoint_principal_right] at Z₂
+    filter_upwards [eventually_nhdsWithin_iff.1 Z₂]
+    intro a ha
+    by_cases h₂a : a = x
+    · simp [hx, h₂a]
+    · have W := ha h₂a
+      simp at W
+      by_cases h₃a : a ∈ U
+      · tauto
+      · have := D.supportInU
+        by_contra hCon
+        tauto
   · rw [eventually_iff_exists_mem]
     use Uᶜ
     constructor
@@ -65,4 +76,4 @@ theorem Divisor.finiteSupport
   apply IsCompact.finite
   · apply IsCompact.of_isClosed_subset hU (D.closedSupport hU.isClosed)
     exact D.supportInU
-  · exact D.discreteSupport hU.isClosed
+  · exact D.discreteSupport

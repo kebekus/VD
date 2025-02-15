@@ -1,5 +1,6 @@
 import VD.divisor
 import VD.meromorphicOn
+import VD.ToMathlib.analyticAt_preimgCodiscrete
 
 
 open scoped Interval Topology
@@ -25,54 +26,46 @@ noncomputable def MeromorphicOn.divisor
     by_contra h₂z
     simp [h₂z] at hz
 
-  locallyFiniteInU := by
+  supportDiscreteWithinU := by
+    have A₁ := hf.eventually_codiscreteWithin_analyticAt
+    let U' := { x ∈ U | AnalyticAt ℂ f x}
+    have A₂ : U' ⊆ U := fun x hx ↦ hx.1
+    have A₃ : AnalyticOnNhd ℂ f U' := fun x hx ↦ hx.2
+    rw [Filter.EventuallyEq, Filter.Eventually]
+    rw [mem_codiscreteWithin]
     intro z hz
-
-    apply eventually_nhdsWithin_iff.2
-    rw [eventually_nhds_iff]
-
-    rcases MeromorphicAt.eventually_eq_zero_or_eventually_ne_zero (hf z hz) with h|h
-    · rw [eventually_nhdsWithin_iff] at h
-      rw [eventually_nhds_iff] at h
-      obtain ⟨N, h₁N, h₂N, h₃N⟩ := h
-      use N
-      constructor
-      · intro y h₁y h₂y
-        by_cases h₃y : y ∈ U
-        · simp [h₃y]
-          right
-          rw [MeromorphicAt.order_eq_top_iff (hf y h₃y)]
-          rw [eventually_nhdsWithin_iff]
-          rw [eventually_nhds_iff]
-          use N ∩ {z}ᶜ
-          constructor
-          · intro x h₁x _
-            exact h₁N x h₁x.1 h₁x.2
-          · constructor
-            · exact IsOpen.inter h₂N isOpen_compl_singleton
-            · exact Set.mem_inter h₁y h₂y
-        · simp [h₃y]
-      · tauto
-
-    · let A := (hf z hz).eventually_analyticAt
-      let B := Filter.eventually_and.2 ⟨h, A⟩
-      rw [eventually_nhdsWithin_iff, eventually_nhds_iff] at B
-      obtain ⟨N, h₁N, h₂N, h₃N⟩ := B
-      use N
-      constructor
-      · intro y h₁y h₂y
-        by_cases h₃y : y ∈ U
-        · simp [h₃y]
-          left
-          rw [(h₁N y h₁y h₂y).2.meromorphicAt_order]
-          let D := (h₁N y h₁y h₂y).2.order_eq_zero_iff.2
-          let C := (h₁N y h₁y h₂y).1
-          let E := D C
-          rw [E]
-          simp
-        · simp [h₃y]
-      · tauto
-
+    rw [Filter.disjoint_principal_right]
+    simp
+    have A := (hf z hz).eventually_analyticAt
+    rcases MeromorphicAt.eventually_eq_zero_or_eventually_ne_zero (hf z hz) with h | h
+    · have C := hf.isClopen_setOf_order_eq_top
+      have D := (hf z hz).order_eq_top_iff.2 h
+      rw [← eventually_eventually_nhdsWithin] at h
+      have h' : ∀ᶠ (y : ℂ) in 𝓝[≠] z, ∀ᶠ (x : ℂ) in 𝓝 y, f x = 0:= by
+        simp_rw [eventually_nhdsWithin_iff] at h
+        simp_rw [eventually_nhdsWithin_iff]
+        filter_upwards [h]
+        intro a h₁a h₂a
+        have h₃a : ∀ᶠ (y : ℂ) in 𝓝 a, y ≠ z := by
+          exact ContinuousAt.eventually_ne (fun ⦃U⦄ a ↦ a) h₂a
+        filter_upwards [h₁a h₂a, h₃a]
+        intro b h₁b h₂b
+        tauto
+      filter_upwards [h, h', A]
+      intro a h₁a h₂a h₃a
+      simp
+      intro h₄a h₅a
+      rw [MeromorphicAt.order_eq_top_iff]
+      exact eventually_nhdsWithin_of_eventually_nhds h₂a
+    · filter_upwards [h, A]
+      intro a h₁a h₂a
+      simp
+      intro h₃a
+      let D := h₂a.order_eq_zero_iff.2 h₁a
+      have : (hf a h₃a).order = 0 := by
+        rw [AnalyticAt.meromorphicAt_order h₂a, D]
+        simp
+      tauto
 
 theorem MeromorphicOn.divisor_def₁
   {f : ℂ → ℂ}

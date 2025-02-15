@@ -82,7 +82,7 @@ noncomputable def MeromorphicOn.makeStronglyMeromorphicOn
   ℂ → ℂ := by
   intro z
   by_cases hz : z ∈ U
-  · exact (hf z hz).makeMeromorphicNFAt z
+  · exact (hf z hz).toNF z
   · exact f z
 
 
@@ -114,10 +114,10 @@ theorem makeStronglyMeromorphicOn_changeDiscrete'
   {z₀ : ℂ}
   (hf : MeromorphicOn f U)
   (hz₀ : z₀ ∈ U) :
-  hf.makeStronglyMeromorphicOn =ᶠ[𝓝 z₀] (hf z₀ hz₀).makeMeromorphicNFAt := by
+  hf.makeStronglyMeromorphicOn =ᶠ[𝓝 z₀] (hf z₀ hz₀).toNF := by
   apply eventuallyEq_nhdsWithin_of_eventuallyEq_nhds
   · apply Filter.EventuallyEq.trans (makeStronglyMeromorphicOn_changeDiscrete hf hz₀)
-    exact m₂ (hf z₀ hz₀)
+    exact MeromorphicAt.toNF_id_on_punct_nhd (hf z₀ hz₀)
   · rw [MeromorphicOn.makeStronglyMeromorphicOn]
     simp [hz₀]
 
@@ -149,7 +149,7 @@ theorem stronglyMeromorphicOn_of_makeStronglyMeromorphicOn
   intro z hz
   let A := makeStronglyMeromorphicOn_changeDiscrete' hf hz
   rw [meromorphicNFAt_congr A]
-  exact MeromorphicNFAt_of_makeStronglyMeromorphic (hf z hz)
+  exact  MeromorphicAt.MeromorphicNFAt_of_toNF (hf z hz)
 
 
 theorem makeStronglyMeromorphicOn_changeOrder
