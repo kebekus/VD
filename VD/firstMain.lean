@@ -108,7 +108,6 @@ theorem Nevanlinna_counting'₁₁
   rw [this]
   exact Nevanlinna_counting₁₁ hf (-a)
 
-
 theorem Nevanlinna_counting₀
   {f : ℂ → ℂ}
   (hf : MeromorphicOn f ⊤) :
@@ -144,7 +143,6 @@ theorem Nevanlinna_counting₀
   simp at h₁x
   rw [hx] at h₁x
   tauto
-
 
 theorem Nevanlinna_counting
   {f : ℂ → ℂ}
@@ -421,12 +419,8 @@ open Asymptotics
 
 /- The Nevanlinna height functions `T_infty` of a meromorphic function `f` and
 of `f - const` agree asymptotically, up to a constant. -/
-theorem Nevanlinna_firstMain'₂
-  {f : ℂ → ℂ}
-  {a : ℂ}
-  (hf : MeromorphicOn f ⊤) :
-  |(hf.T_infty) - ((hf.sub (MeromorphicOn.const a)).T_infty)| =O[Filter.atTop] (1 : ℝ → ℝ) := by
-
+theorem Nevanlinna_firstMain'₂ {f : ℂ → ℂ} {a : ℂ} (hf : MeromorphicOn f ⊤) :
+    |(hf.T_infty) - ((hf.sub (MeromorphicOn.const a)).T_infty)| =O[Filter.atTop] (1 : ℝ → ℝ) := by
   rw [Asymptotics.isBigO_iff']
   use posLog ‖a‖ + log 2
   constructor

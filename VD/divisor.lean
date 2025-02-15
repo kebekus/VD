@@ -60,20 +60,12 @@ theorem Divisor.closedSupport
         by_contra hCon
         tauto
   · rw [eventually_iff_exists_mem]
-    use Uᶜ
-    constructor
-    · exact IsClosed.compl_mem_nhds hU h₁x
-    · intro y hy
-      simp
-      exact Function.nmem_support.mp fun a => hy (D.supportInU a)
+    use Uᶜ, hU.compl_mem_nhds h₁x
+    intro y hy
+    simp
+    exact Function.nmem_support.mp fun a => hy (D.supportInU a)
 
 
-theorem Divisor.finiteSupport
-  {U : Set ℂ}
-  (hU : IsCompact U)
-  (D : Divisor U) :
-  Set.Finite D.toFun.support := by
-  apply IsCompact.finite
-  · apply IsCompact.of_isClosed_subset hU (D.closedSupport hU.isClosed)
-    exact D.supportInU
-  · exact D.discreteSupport
+theorem Divisor.finiteSupport {U : Set ℂ} (hU : IsCompact U) (D : Divisor U) :
+    Set.Finite D.toFun.support :=
+  (hU.of_isClosed_subset (D.closedSupport hU.isClosed) D.supportInU).finite D.discreteSupport
