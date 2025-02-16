@@ -5,23 +5,22 @@ import VD.ToMathlib.codiscreteWithin
 open Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
+variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜]
 
-structure Divisor (U : Set ℂ)
+structure Divisor (U : Set 𝕜)
   where
-  toFun : ℂ → ℤ
+  toFun : 𝕜 → ℤ
   supportInU : toFun.support ⊆ U
   supportDiscreteWithinU : toFun =ᶠ[Filter.codiscreteWithin U] 0
 
-instance (U : Set ℂ) : CoeFun (Divisor U) (fun _ ↦ ℂ → ℤ)
+instance (U : Set 𝕜) : CoeFun (Divisor U) (fun _ ↦ 𝕜 → ℤ)
   where
   coe := Divisor.toFun
 
 attribute [coe] Divisor.toFun
 
 
-theorem Divisor.discreteSupport
-  {U : Set ℂ}
-  (D : Divisor U) :
+theorem Divisor.discreteSupport {U : Set 𝕜} (D : Divisor U) :
   DiscreteTopology D.toFun.support := by
   have : Function.support D = {x | D x = 0}ᶜ ∩ U := by
     ext x
@@ -35,9 +34,9 @@ theorem Divisor.discreteSupport
 
 
 theorem Divisor.closedSupport
-  {U : Set ℂ}
-  (hU : IsClosed U)
-  (D : Divisor U) :
+  {U : Set 𝕜}
+  (D : Divisor U)
+  (hU : IsClosed U) :
   IsClosed D.toFun.support := by
   rw [← isOpen_compl_iff]
   rw [isOpen_iff_eventually]
