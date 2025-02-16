@@ -5,6 +5,8 @@ open Topology
 
 variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {E : Type u_2} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
+-- TODO: MeromorphicNF is an open property
+-- TODO: MeromorphicNF is a codiscrete property
 
 lemma MeromorphicNFAt_of_mul_analytic'
   {f : 𝕜 → 𝕜}

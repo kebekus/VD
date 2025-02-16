@@ -14,7 +14,6 @@ import VD.holomorphic_examples
 import VD.holomorphic_primitive
 import VD.intervalIntegrability
 import VD.laplace
-import VD.leftovers.analyticOnNhd_divisor
 import VD.leftovers.analyticOnNhd_zeroSet
 import VD.leftovers.bilinear
 import VD.leftovers.diffOp

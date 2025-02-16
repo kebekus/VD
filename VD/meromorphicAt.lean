@@ -9,6 +9,8 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
   {f g : 𝕜 → 𝕜} {z₀ : 𝕜}
 
+-- TODO: AnalyticAt is a codiscrete property within MeromorphicAt
+-- TODO: Preimages of discrete and countable sets
 
 /-- The order multiplies by `n` when taking an analytic function to its `n`th power -/
 
