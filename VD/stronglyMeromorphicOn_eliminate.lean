@@ -496,7 +496,7 @@ theorem StronglyMeromorphicOn.decompose_log
     ∧ (fun z ↦ log ‖f z‖) =ᶠ[Filter.codiscreteWithin U] fun z ↦ log ‖g z‖ + ∑ᶠ s, (h₁f.meromorphicOn.divisor s) * log ‖z - s‖ := by
 
   have h₃f : Set.Finite (Function.support h₁f.meromorphicOn.divisor) := by
-    exact Divisor.finiteSupport h₁U (StronglyMeromorphicOn.meromorphicOn h₁f).divisor
+    exact (StronglyMeromorphicOn.meromorphicOn h₁f).divisor.finiteSupport h₁U
 
   have hSupp₁ {z : ℂ} : (fun s ↦ (h₁f.meromorphicOn.divisor s) * log ‖z - s‖).support ⊆ h₃f.toFinset := by
     intro x

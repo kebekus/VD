@@ -1,11 +1,22 @@
-import Mathlib.Analysis.SpecialFunctions.Integrals
-import VD.mathlibAddOn
+/-
+Copyright (c) 2025 Stefan Kebekus. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Stefan Kebekus
+-/
+import Mathlib.Analysis.Normed.Field.Basic
 import VD.ToMathlib.codiscreteWithin
 
-open Interval Topology
-open Real Filter MeasureTheory intervalIntegral
+/-!
+# Divisors on subsets of normed fields
 
-variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜]
+This file defines divisors, a standard book-keeping tool in complex analysis
+used to keep track of pole/vanishing orders of meromorphic objects, typically
+functions or differential forms.
+-/
+
+open Topology Filter
+
+variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {U : Set 𝕜}
 
 structure Divisor (U : Set 𝕜)
   where
@@ -20,8 +31,8 @@ instance (U : Set 𝕜) : CoeFun (Divisor U) (fun _ ↦ 𝕜 → ℤ)
 attribute [coe] Divisor.toFun
 
 
-theorem Divisor.discreteSupport {U : Set 𝕜} (D : Divisor U) :
-  DiscreteTopology D.toFun.support := by
+theorem Divisor.discreteSupport (D : Divisor U) :
+    DiscreteTopology D.toFun.support := by
   have : Function.support D = {x | D x = 0}ᶜ ∩ U := by
     ext x
     constructor
@@ -33,11 +44,8 @@ theorem Divisor.discreteSupport {U : Set 𝕜} (D : Divisor U) :
   exact discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinU)
 
 
-theorem Divisor.closedSupport
-  {U : Set 𝕜}
-  (D : Divisor U)
-  (hU : IsClosed U) :
-  IsClosed D.toFun.support := by
+theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
+    IsClosed D.toFun.support := by
   rw [← isOpen_compl_iff]
   rw [isOpen_iff_eventually]
   intro x hx
@@ -65,6 +73,6 @@ theorem Divisor.closedSupport
     exact Function.nmem_support.mp fun a => hy (D.supportInU a)
 
 
-theorem Divisor.finiteSupport {U : Set ℂ} (hU : IsCompact U) (D : Divisor U) :
+theorem Divisor.finiteSupport (D : Divisor U) (hU : IsCompact U) :
     Set.Finite D.toFun.support :=
   (hU.of_isClosed_subset (D.closedSupport hU.isClosed) D.supportInU).finite D.discreteSupport

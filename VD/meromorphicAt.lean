@@ -1,6 +1,8 @@
 import Mathlib.Analysis.Meromorphic.Order
+import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import VD.ToMathlib.analyticAt
 import VD.divisor
+import VD.mathlibAddOn
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral

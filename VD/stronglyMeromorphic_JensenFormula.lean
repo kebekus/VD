@@ -36,7 +36,7 @@ theorem jensen₀
     tauto
 
   have h₃f : Set.Finite (Function.support h₁f.meromorphicOn.divisor) := by
-    exact Divisor.finiteSupport h₂U (StronglyMeromorphicOn.meromorphicOn h₁f).divisor
+    exact (StronglyMeromorphicOn.meromorphicOn h₁f).divisor.finiteSupport h₂U
 
   have h'₃f : ∀ s ∈ h₃f.toFinset, s ≠ 0 := by
     by_contra hCon

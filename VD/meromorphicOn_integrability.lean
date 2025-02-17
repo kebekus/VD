@@ -33,7 +33,7 @@ theorem MeromorphicOn.integrable_log_abs_f₀
       repeat exact hr.ne.symm
 
     have h₃f : Set.Finite (Function.support h₁f.divisor) := by
-      exact Divisor.finiteSupport h₁U h₁f.divisor
+      exact h₁f.divisor.finiteSupport h₁U
 
     obtain ⟨g, h₁g, h₂g, h₃g⟩ := MeromorphicOn.decompose_log h₁U h₂U h₃U h₁f h₂f
     have : (fun z ↦ log ‖f (circleMap 0 r z)‖) = (fun z ↦ log ‖f z‖) ∘ (circleMap 0 r) := by
