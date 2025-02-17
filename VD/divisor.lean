@@ -63,11 +63,9 @@ theorem Divisor.discreteSupport (D : Divisor U) :
       tauto
   convert discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinU)
 
-
 theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
     IsClosed D.toFun.support := by
-  rw [← isOpen_compl_iff]
-  rw [isOpen_iff_eventually]
+  rw [← isOpen_compl_iff, isOpen_iff_eventually]
   intro x hx
   by_cases h₁x : x ∈ U
   · have Z₁ := D.supportDiscreteWithinU
@@ -87,7 +85,7 @@ theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
     use Uᶜ, hU.compl_mem_nhds h₁x
     intro y hy
     simp
-    exact Function.nmem_support.mp fun a => hy (D.supportInU a)
+    exact Function.nmem_support.mp fun a ↦ hy (D.supportInU a)
 
 theorem Divisor.finiteSupport (D : Divisor U) (hU : IsCompact U) :
     Set.Finite D.toFun.support :=
