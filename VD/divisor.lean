@@ -12,11 +12,26 @@ import VD.ToMathlib.codiscreteWithin
 This file defines divisors, a standard book-keeping tool in complex analysis
 used to keep track of pole/vanishing orders of meromorphic objects, typically
 functions or differential forms.
+
+TODO
+
+- Extensionality lemmas
+- Group structure
+- Partial ordering
+- Restriction and extension of divisors as group morphisms
+- Decomposition into positive/negative components
+- Constructions: The divisor of a meromorphic function, behavior under product
+  of meromorphic functions, behavior under addition, behavior under restriction
+- Local finiteness of the support
 -/
 
 open Topology Filter
 
 variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {U : Set 𝕜}
+
+/-!
+## Definition
+-/
 
 structure Divisor (U : Set 𝕜)
   where
@@ -30,6 +45,9 @@ instance (U : Set 𝕜) : CoeFun (Divisor U) (fun _ ↦ 𝕜 → ℤ)
 
 attribute [coe] Divisor.toFun
 
+/-!
+## Elementary properties of the support
+-/
 
 theorem Divisor.discreteSupport (D : Divisor U) :
     DiscreteTopology D.toFun.support := by
@@ -42,7 +60,6 @@ theorem Divisor.discreteSupport (D : Divisor U) :
       tauto
   rw [this]
   exact discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinU)
-
 
 theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
     IsClosed D.toFun.support := by
@@ -71,7 +88,6 @@ theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
     intro y hy
     simp
     exact Function.nmem_support.mp fun a => hy (D.supportInU a)
-
 
 theorem Divisor.finiteSupport (D : Divisor U) (hU : IsCompact U) :
     Set.Finite D.toFun.support :=
