@@ -13,7 +13,7 @@ This file defines divisors, a standard book-keeping tool in complex analysis
 used to keep track of pole/vanishing orders of meromorphic objects, typically
 functions or differential forms.
 
-TODO
+## TODOs
 
 - Extensionality lemmas
 - Group structure
@@ -23,9 +23,12 @@ TODO
 - Constructions: The divisor of a meromorphic function, behavior under product
   of meromorphic functions, behavior under addition, behavior under restriction
 - Local finiteness of the support
+- Degree
+- Nevanlinna counting functions
+- Construction: The divisor of a rational polynomial
 -/
 
-open Topology Filter
+open Filter Set Topology
 
 variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {U : Set 𝕜}
 
@@ -56,10 +59,10 @@ theorem Divisor.discreteSupport (D : Divisor U) :
     constructor
     · exact fun hx ↦ ⟨by tauto, D.supportInU hx⟩
     · intro hx
-      rw [Set.mem_inter_iff, Set.mem_compl_iff, Set.mem_setOf_eq] at hx
+      rw [mem_inter_iff, mem_compl_iff, mem_setOf_eq] at hx
       tauto
-  rw [this]
-  exact discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinU)
+  convert discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinU)
+
 
 theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
     IsClosed D.toFun.support := by
@@ -68,11 +71,8 @@ theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
   intro x hx
   by_cases h₁x : x ∈ U
   · have Z₁ := D.supportDiscreteWithinU
-    rw [Filter.EventuallyEq, Filter.Eventually] at Z₁
-    rw [mem_codiscreteWithin] at Z₁
-    have Z₂ := Z₁ x h₁x
-    rw [Filter.disjoint_principal_right] at Z₂
-    filter_upwards [eventually_nhdsWithin_iff.1 Z₂]
+    rw [EventuallyEq, Filter.Eventually, mem_codiscreteWithin] at Z₁
+    filter_upwards [eventually_nhdsWithin_iff.1 (Filter.disjoint_principal_right.1 (Z₁ x h₁x))]
     intro a ha
     by_cases h₂a : a = x
     · simp [hx, h₂a]
