@@ -49,6 +49,133 @@ instance (U : Set 𝕜) : CoeFun (Divisor U) (fun _ ↦ 𝕜 → ℤ)
 attribute [coe] Divisor.toFun
 
 /-!
+## Instances and basic extensionality
+-/
+
+instance instFunLike : FunLike (Divisor U) 𝕜 ℤ where
+  coe := fun D ↦ D.toFun
+  coe_injective' := by
+    rintro ⟨D₁, h₁D₁, h₂D₁⟩ ⟨D₂, h₁D₂, h₂D₂⟩
+    simp
+
+@[ext]
+theorem ext {D₁ D₂ : Divisor U} (h : ∀ a, D₁ a = D₂ a) : D₁ = D₂ := DFunLike.ext _ _ h
+
+lemma ne_iff {D₁ D₂ : Divisor U} : D₁ ≠ D₂ ↔ ∃ a, D₁ a ≠ D₂ a := DFunLike.ne_iff
+
+instance instZero : Zero (Divisor U) where
+  zero := ⟨fun _ ↦ 0, by simp, Eq.eventuallyEq rfl⟩
+
+@[simp, norm_cast]
+lemma coe_zero : (0 : Divisor U) = (0 : 𝕜 → ℤ) := rfl
+
+theorem zero_apply {a : 𝕜} : (0 : Divisor U) a = 0 := rfl
+
+instance instInhabited : Inhabited (Divisor U) := ⟨0⟩
+
+instance instAddCommGroup : AddCommGroup (Divisor U) where
+  add := by
+    intro D₁ D₂
+    exact {
+      toFun := D₁ + D₂
+      supportInU := by
+        intro x hx
+        simp at hx
+        by_contra h
+        sorry
+      supportDiscreteWithinU := by
+        sorry
+    }
+  add_assoc := _
+  zero := _
+  zero_add := _
+  add_zero := _
+  nsmul := _
+  neg := _
+  zsmul := _
+  neg_add_cancel := _
+  add_comm := _
+
+/-
+section Basic
+
+variable [Zero M]
+
+
+
+@[simp]
+theorem mem_support_iff {f : α →₀ M} : ∀ {a : α}, a ∈ f.support ↔ f a ≠ 0 :=
+  @(f.mem_support_toFun)
+
+@[simp, norm_cast]
+theorem fun_support_eq (f : α →₀ M) : Function.support f = f.support :=
+  Set.ext fun _x => mem_support_iff.symm
+
+theorem not_mem_support_iff {f : α →₀ M} {a} : a ∉ f.support ↔ f a = 0 :=
+  not_iff_comm.1 mem_support_iff.symm
+
+@[simp, norm_cast]
+theorem coe_eq_zero {f : α →₀ M} : (f : α → M) = 0 ↔ f = 0 := by rw [← coe_zero, DFunLike.coe_fn_eq]
+
+theorem ext_iff' {f g : α →₀ M} : f = g ↔ f.support = g.support ∧ ∀ x ∈ f.support, f x = g x :=
+  ⟨fun h => h ▸ ⟨rfl, fun _ _ => rfl⟩, fun ⟨h₁, h₂⟩ =>
+    ext fun a => by
+      classical
+      exact if h : a ∈ f.support then h₂ a h else by
+        have hf : f a = 0 := not_mem_support_iff.1 h
+        have hg : g a = 0 := by rwa [h₁, not_mem_support_iff] at h
+        rw [hf, hg]⟩
+
+@[simp]
+theorem support_eq_empty {f : α →₀ M} : f.support = ∅ ↔ f = 0 :=
+  mod_cast @Function.support_eq_empty_iff _ _ _ f
+
+theorem support_nonempty_iff {f : α →₀ M} : f.support.Nonempty ↔ f ≠ 0 := by
+  simp only [Finsupp.support_eq_empty, Finset.nonempty_iff_ne_empty, Ne]
+
+theorem card_support_eq_zero {f : α →₀ M} : #f.support = 0 ↔ f = 0 := by simp
+
+instance instDecidableEq [DecidableEq α] [DecidableEq M] : DecidableEq (α →₀ M) := fun f g =>
+  decidable_of_iff (f.support = g.support ∧ ∀ a ∈ f.support, f a = g a) ext_iff'.symm
+
+theorem finite_support (f : α →₀ M) : Set.Finite (Function.support f) :=
+  f.fun_support_eq.symm ▸ f.support.finite_toSet
+
+theorem support_subset_iff {s : Set α} {f : α →₀ M} :
+    ↑f.support ⊆ s ↔ ∀ a ∉ s, f a = 0 := by
+  simp only [Set.subset_def, mem_coe, mem_support_iff]; exact forall_congr' fun a => not_imp_comm
+
+/-- Given `Finite α`, `equivFunOnFinite` is the `Equiv` between `α →₀ β` and `α → β`.
+  (All functions on a finite type are finitely supported.) -/
+@[simps]
+def equivFunOnFinite [Finite α] : (α →₀ M) ≃ (α → M) where
+  toFun := (⇑)
+  invFun f := mk (Function.support f).toFinite.toFinset f fun _a => Set.Finite.mem_toFinset _
+  left_inv _f := ext fun _x => rfl
+  right_inv _f := rfl
+
+@[simp]
+theorem equivFunOnFinite_symm_coe {α} [Finite α] (f : α →₀ M) : equivFunOnFinite.symm f = f :=
+  equivFunOnFinite.symm_apply_apply f
+
+@[simp]
+lemma coe_equivFunOnFinite_symm {α} [Finite α] (f : α → M) : ⇑(equivFunOnFinite.symm f) = f := rfl
+
+/--
+If `α` has a unique term, the type of finitely supported functions `α →₀ β` is equivalent to `β`.
+-/
+@[simps!]
+noncomputable def _root_.Equiv.finsuppUnique {ι : Type*} [Unique ι] : (ι →₀ M) ≃ M :=
+  Finsupp.equivFunOnFinite.trans (Equiv.funUnique ι M)
+
+@[ext]
+theorem unique_ext [Unique α] {f g : α →₀ M} (h : f default = g default) : f = g :=
+  ext fun a => by rwa [Unique.eq_default a]
+
+end Basic
+
+-/
+/-!
 ## Elementary properties of the support
 -/
 
