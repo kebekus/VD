@@ -86,7 +86,10 @@ instance instAddCommGroup : AddCommGroup (Divisor U) where
       supportDiscreteWithinU := by
         sorry
     }
-  add_assoc := _
+  add_assoc := by
+    intro _ _ _
+    ext
+    apply add_assoc
   zero := _
   zero_add := _
   add_zero := _
