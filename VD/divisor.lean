@@ -59,7 +59,7 @@ instance instFunLike : FunLike (Divisor U) 𝕜 ℤ where
     simp
 
 @[ext]
-theorem ext {D₁ D₂ : Divisor U} (h : ∀ a, D₁ a = D₂ a) : D₁ = D₂ := DFunLike.ext _ _ h
+theorem ext {D₁ D₂ : Divisor U} (h : ∀ a, D₁.toFun a = D₂.toFun a) : D₁ = D₂ := DFunLike.ext _ _ h
 
 lemma ne_iff {D₁ D₂ : Divisor U} : D₁ ≠ D₂ ↔ ∃ a, D₁ a ≠ D₂ a := DFunLike.ne_iff
 
@@ -77,7 +77,7 @@ instance instAddCommGroup : AddCommGroup (Divisor U) where
   add := by
     intro D₁ D₂
     exact {
-      toFun := D₁ + D₂
+      toFun := D₁.toFun + D₂.toFun
       supportInU := by
         intro x hx
         simp at hx
@@ -90,14 +90,83 @@ instance instAddCommGroup : AddCommGroup (Divisor U) where
     intro _ _ _
     ext
     apply add_assoc
-  zero := _
-  zero_add := _
-  add_zero := _
-  nsmul := _
-  neg := _
-  zsmul := _
-  neg_add_cancel := _
-  add_comm := _
+  zero := ⟨fun _ ↦ 0, by simp, Eq.eventuallyEq rfl⟩
+  zero_add := by
+    intro _
+    ext
+    apply zero_add
+  add_zero := by
+    intro _
+    ext
+    apply add_zero
+  nsmul := by
+    intro n D
+    exact {
+      toFun := fun z ↦ n * D z
+      supportInU := by
+        intro x hx
+        simp at hx
+        exact D.supportInU hx.2
+      supportDiscreteWithinU := by
+        apply EventuallyEq.mul (f := n) (g := n) (f' := D) (g' := 0)
+        exact Eq.eventuallyEq rfl
+        exact D.supportDiscreteWithinU
+    }
+  neg := by
+    intro D
+    exact {
+      toFun := -D
+      supportInU := by
+        intro x hx
+        simp at hx
+        exact D.supportInU hx
+      supportDiscreteWithinU := by
+        apply EventuallyEq.neg (f := D) (g := 0)
+        exact D.supportDiscreteWithinU
+    }
+  zsmul := by
+    intro n D
+    exact {
+      toFun := fun z ↦ n * D z
+      supportInU := by
+        intro x hx
+        simp at hx
+        exact D.supportInU hx.2
+      supportDiscreteWithinU := by
+        sorry
+    }
+  neg_add_cancel := by
+    intros
+    ext z
+    <;> simp
+    <;> ring
+    intro D
+    ext
+    apply neg_add_cancel
+  add_comm := by
+    intro D₁ D₂
+    simp [HAdd.hAdd, instHAdd]
+    apply add_comm
+  --
+  nsmul_zero := by
+    sorry
+  nsmul_succ := by
+    intro n D
+    ext z
+    apply?
+    apply nsmul_succ
+    sorry
+  zsmul_zero' := by
+    intro D
+    ext
+    simp
+  zsmul_succ' := by
+    intro n D
+    ext
+    sorry
+  zsmul_neg' := by
+    sorry
+
 
 /-
 section Basic
