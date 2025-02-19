@@ -63,42 +63,73 @@ theorem ext {D₁ D₂ : Divisor U} (h : ∀ a, D₁.toFun a = D₂.toFun a) : D
 
 lemma ne_iff {D₁ D₂ : Divisor U} : D₁ ≠ D₂ ↔ ∃ a, D₁ a ≠ D₂ a := DFunLike.ne_iff
 
+--
+
 instance instZero : Zero (Divisor U) where
   zero := ⟨fun _ ↦ 0, by simp, Eq.eventuallyEq rfl⟩
 
-@[simp, norm_cast]
-lemma coe_zero : (0 : Divisor U) = (0 : 𝕜 → ℤ) := rfl
+@[simp]
+theorem zero_fun : (0 : Divisor U).toFun = 0 := rfl
 
-theorem zero_apply {a : 𝕜} : (0 : Divisor U) a = 0 := rfl
+lemma support_add (D₁ D₂ : Divisor U) :
+    (D₁.toFun + D₂.toFun).support ⊆ D₁.toFun.support ∪ D₂.toFun.support := by
+  intro x
+  contrapose
+  intro h₁ h₂
+  simp_all [h₁, h₂]
 
-instance instInhabited : Inhabited (Divisor U) := ⟨0⟩
-
-instance instAddCommGroup : AddCommGroup (Divisor U) where
+instance : Add (Divisor U) where
   add := by
     intro D₁ D₂
     exact {
       toFun := D₁.toFun + D₂.toFun
       supportInU := by
         intro x hx
-        simp at hx
-        by_contra h
-        sorry
+        have Z := support_add D₁ D₂ hx
+        rcases Z with h | h
+        · exact D₁.supportInU h
+        · exact D₂.supportInU h
       supportDiscreteWithinU := by
-        sorry
+        apply EventuallyEq.add (f := D₁) (g := 0) (f' := D₂) (g' := 0)
+        exact D₁.supportDiscreteWithinU
+        exact D₂.supportDiscreteWithinU
     }
+
+@[simp]
+theorem add_fun {D₁ D₂ : Divisor U} : (D₁ + D₂).toFun = D₁.toFun + D₂.toFun := rfl
+
+instance : Neg (Divisor U) where
+  neg := by
+    intro D
+    exact {
+      toFun := -D.toFun
+      supportInU := by
+        intro x hx
+        simp at hx
+        exact D.supportInU hx
+      supportDiscreteWithinU := by
+        apply EventuallyEq.neg (f := D) (g := 0)
+        exact D.supportDiscreteWithinU
+    }
+
+@[simp]
+theorem neg_fun {D : Divisor U} : (-D).toFun = -(D.toFun)  := rfl
+
+instance instAddCommGroup : AddCommGroup (Divisor U) where
+  add := (· + · )
   add_assoc := by
     intro _ _ _
     ext
-    apply add_assoc
-  zero := ⟨fun _ ↦ 0, by simp, Eq.eventuallyEq rfl⟩
+    simp [add_assoc]
+  zero := 0
   zero_add := by
     intro _
     ext
-    apply zero_add
+    simp
   add_zero := by
     intro _
     ext
-    apply add_zero
+    simp
   nsmul := by
     intro n D
     exact {
@@ -112,18 +143,7 @@ instance instAddCommGroup : AddCommGroup (Divisor U) where
         exact Eq.eventuallyEq rfl
         exact D.supportDiscreteWithinU
     }
-  neg := by
-    intro D
-    exact {
-      toFun := -D
-      supportInU := by
-        intro x hx
-        simp at hx
-        exact D.supportInU hx
-      supportDiscreteWithinU := by
-        apply EventuallyEq.neg (f := D) (g := 0)
-        exact D.supportDiscreteWithinU
-    }
+  neg := (- ·)
   zsmul := by
     intro n D
     exact {
@@ -138,24 +158,20 @@ instance instAddCommGroup : AddCommGroup (Divisor U) where
   neg_add_cancel := by
     intros
     ext z
-    <;> simp
-    <;> ring
-    intro D
-    ext
-    apply neg_add_cancel
+    simp
   add_comm := by
     intro D₁ D₂
-    simp [HAdd.hAdd, instHAdd]
-    apply add_comm
-  --
+    ext
+    simp
   nsmul_zero := by
-    sorry
+    intro D
+    ext z
+    simp
   nsmul_succ := by
     intro n D
     ext z
-    apply?
-    apply nsmul_succ
-    sorry
+    simp
+    ring
   zsmul_zero' := by
     intro D
     ext
@@ -163,8 +179,12 @@ instance instAddCommGroup : AddCommGroup (Divisor U) where
   zsmul_succ' := by
     intro n D
     ext
-    sorry
+    simp
+    ring
   zsmul_neg' := by
+    intro n D
+    ext
+    simp
     sorry
 
 
