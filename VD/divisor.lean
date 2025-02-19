@@ -13,13 +13,15 @@ This file defines divisors, a standard book-keeping tool in complex analysis
 used to keep track of pole/vanishing orders of meromorphic objects, typically
 functions or differential forms.
 
+Throughout the present file, `𝕜` denotes a nontrivially normed field, and `U` a
+subset of `𝕜`.
+
 ## TODOs
 
 - Restriction and extension of divisors as group morphisms
 - Decomposition into positive/negative components
 - Constructions: The divisor of a meromorphic function, behavior under product
   of meromorphic functions, behavior under addition, behavior under restriction
-- Local finiteness of the support
 - Degree
 - Nevanlinna counting functions
 - Construction: The divisor of a rational polynomial
@@ -33,11 +35,18 @@ variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {U : Set 𝕜}
 ## Definition
 -/
 
+/-- A divisor on `U` is a function `𝕜 → ℤ` whose support is discrete within `U`
+and entirely contained within `U`. -/
 structure Divisor (U : Set 𝕜) where
   toFun : 𝕜 → ℤ
   supportInU : toFun.support ⊆ U
   supportDiscreteWithinU : toFun =ᶠ[Filter.codiscreteWithin U] 0
 
+/-!
+## Coercion to functions and basic extensionality
+-/
+
+/-- A divisor can be coerced into a function 𝕜 → ℤ -/
 instance (U : Set 𝕜) : CoeFun (Divisor U) (fun _ ↦ 𝕜 → ℤ) where
   coe := Divisor.toFun
 
@@ -45,30 +54,34 @@ attribute [coe] Divisor.toFun
 
 noncomputable def Divisor.deg (D : Divisor U) : ℤ := ∑ᶠ z, D.toFun z
 
-
-/-!
-## Instances and basic extensionality
--/
-
-instance instFunLike : FunLike (Divisor U) 𝕜 ℤ where
+/-- Divisors are `FunLike`: the coercion from divisors to functions is injective. -/
+instance : FunLike (Divisor U) 𝕜 ℤ where
   coe := fun D ↦ D.toFun
-  coe_injective' := by
-    rintro ⟨D₁, h₁D₁, h₂D₁⟩ ⟨D₂, h₁D₂, h₂D₂⟩
-    simp
+  coe_injective' := fun ⟨_, _, _⟩ ⟨_, _, _⟩ ↦ by simp
 
+/-- Helper lemma for the `ext` tactic: two divisors are equal if their
+associated functions agree. -/
 @[ext]
 theorem ext {D₁ D₂ : Divisor U} (h : ∀ a, D₁.toFun a = D₂.toFun a) : D₁ = D₂ := DFunLike.ext _ _ h
 
 /-!
 ## Ordered group structure
+
+This section equips divisors on `U` with the standard structure of an ordered
+group, where addition and comparison of divisors are addition and pointwise
+comparison of functions.
 -/
 
-instance instZero : Zero (Divisor U) where
+/-- Divisors have a zero -/
+instance : Zero (Divisor U) where
   zero := ⟨fun _ ↦ 0, by simp, Eq.eventuallyEq rfl⟩
 
+/-- Helper lemma for the `simp` tactic: the function of the zero-divisor is the
+zero function. -/
 @[simp]
 theorem zero_fun : (0 : Divisor U).toFun = 0 := rfl
 
+/-- Divisors can be added -/
 instance : Add (Divisor U) where
   add := by
     intro D₁ D₂
@@ -87,9 +100,12 @@ instance : Add (Divisor U) where
         exact D₂.supportDiscreteWithinU
     }
 
+/-- Helper lemma for the `simp` tactic: the function of the sum of two divisors
+is the sum of the associated functions. -/
 @[simp]
-theorem add_fun {D₁ D₂ : Divisor U} : (D₁ + D₂).toFun = D₁.toFun + D₂.toFun := rfl
+lemma add_fun {D₁ D₂ : Divisor U} : (D₁ + D₂).toFun = D₁.toFun + D₂.toFun := rfl
 
+/-- Divisors have a negative -/
 instance : Neg (Divisor U) where
   neg := by
     intro D
@@ -104,10 +120,13 @@ instance : Neg (Divisor U) where
         exact D.supportDiscreteWithinU
     }
 
+/-- Helper lemma for the `simp` tactic: the function of the negative divisor
+is the negative of the associated function. -/
 @[simp]
-theorem neg_fun {D : Divisor U} : (-D).toFun = -(D.toFun) := rfl
+lemma neg_fun {D : Divisor U} : (-D).toFun = -(D.toFun) := rfl
 
-instance nsmul : SMul ℕ (Divisor U) where
+/-- Divisors have scalar multiplication with natural numbers -/
+instance : SMul ℕ (Divisor U) where
   smul := by
     intro n D
     exact {
@@ -122,10 +141,14 @@ instance nsmul : SMul ℕ (Divisor U) where
         simp [hx]
     }
 
+/-- Helper lemma for the `simp` tactic: the function of a scalar product
+(natural number)·divisor is the scalar product of the natural number with the
+associated function of the divisor. -/
 @[simp]
-theorem nsmul_fun {D : Divisor U} {n : ℕ} : (n • D).toFun = n • (D.toFun) := rfl
+lemma nsmul_fun {D : Divisor U} {n : ℕ} : (n • D).toFun = n • (D.toFun) := rfl
 
-instance zsmul : SMul ℤ (Divisor U) where
+/-- Divisors have scalar multiplication with integers -/
+instance : SMul ℤ (Divisor U) where
   smul := fun n D ↦
     {
       toFun := fun z ↦ n * D z
@@ -139,15 +162,23 @@ instance zsmul : SMul ℤ (Divisor U) where
         simp [hx]
     }
 
+/-- Helper lemma for the `simp` tactic: the function of a scalar product
+(integer)·divisor is the scalar product of the integer with the associated
+function of the divisor. -/
 @[simp]
-theorem zsmul_fun {D : Divisor U} {n : ℤ} : (n • D).toFun = n • (D.toFun) := rfl
+lemma zsmul_fun {D : Divisor U} {n : ℤ} : (n • D).toFun = n • (D.toFun) := rfl
 
+/-- Divisors have a partial ordering by pointwise comparison of the associated
+functions. -/
 instance : LE (Divisor U) where
   le := fun D₁ D₂ ↦ D₁.toFun ≤ D₂.toFun
 
+/-- Helper lemma for the `simp` tactic: a divisor is smaller than another one
+if the same relation holds with the associated functions. -/
 @[simp]
-theorem le_fun {D₁ D₂ : Divisor U} : D₁ ≤ D₂ ↔ D₁.toFun ≤ D₂.toFun := ⟨(·),(·)⟩
+lemma le_fun {D₁ D₂ : Divisor U} : D₁ ≤ D₂ ↔ D₁.toFun ≤ D₂.toFun := ⟨(·),(·)⟩
 
+/-- Divisors form an ordered commutative group -/
 instance : OrderedAddCommGroup (Divisor U) where
   add := (· + · )
   add_assoc := fun _ _ _ ↦ by ext; simp [add_assoc]
