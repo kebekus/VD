@@ -163,6 +163,7 @@ instance instAddCommGroup : AddCommGroup (Divisor U) where
     intro D₁ D₂
     ext
     simp
+    ring
   nsmul_zero := by
     intro D
     ext z
@@ -184,7 +185,7 @@ instance instAddCommGroup : AddCommGroup (Divisor U) where
   zsmul_neg' := by
     intro n D
     ext
-    simp
+    sim
     sorry
 
 
