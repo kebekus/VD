@@ -83,16 +83,16 @@ theorem MeromorphicAt.meromorphicNFAt_iff (hf : MeromorphicAt f x) :
         use g, h₁g, h₂g
         simpa
     · right
-      obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untop' 0)).1
+      obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untopD 0)).1
         (untop'_of_ne_top (LT.lt.ne_top h₁)).symm
-      use (hf.order.untop' 0), g, h₁g, h₂g
+      use (hf.order.untopD 0), g, h₁g, h₂g
       filter_upwards [eventually_nhdsWithin_iff.1 h₃g]
       intro z hz
       by_cases h₁z : z = x
       · simp only [h₁z, h₂, Pi.smul_apply', Pi.pow_apply, sub_self]
-        apply (smul_eq_zero_of_left (zero_zpow (WithTop.untop' 0 hf.order) _) (g x)).symm
+        apply (smul_eq_zero_of_left (zero_zpow (WithTop.untopD 0 hf.order) _) (g x)).symm
         by_contra hCon
-        rw [WithTop.untop'_eq_self_iff, WithTop.coe_zero] at hCon
+        rw [WithTop.untopD_eq_self_iff, WithTop.coe_zero] at hCon
         rcases hCon with h | h
         <;> simp [h] at h₁
       · exact hz h₁z
@@ -182,27 +182,27 @@ theorem MeromorphicAt.MeromorphicNFAt_of_toNF (hf : MeromorphicAt f x) :
     apply AnalyticAt.MeromorphicNFAt
     rw [analyticAt_congr this]
     exact analyticAt_const
-  · obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untop' 0)).1 (untop'_of_ne_top h₂f).symm
+  · obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untopD 0)).1 (untop'_of_ne_top h₂f).symm
     right
-    use WithTop.untop' 0 hf.order, g, h₁g, h₂g
+    use WithTop.untopD 0 hf.order, g, h₁g, h₂g
     apply eventuallyEq_nhdsWithin_of_eventuallyEq_nhds
     · exact hf.toNF_id_on_punct_nhd.symm.trans h₃g
     · unfold MeromorphicAt.toNF
       simp only [WithTop.coe_zero, ne_eq, Function.update_self, Pi.smul_apply', Pi.pow_apply,
         sub_self]
       by_cases h₃f : hf.order = (0 : ℤ)
-      · simp only [h₃f, WithTop.coe_zero, ↓reduceDIte, WithTop.untop_zero', zpow_zero, one_smul]
+      · simp only [h₃f, WithTop.coe_zero, ↓reduceDIte, WithTop.untopD_zero, zpow_zero, one_smul]
         obtain ⟨h₁G, h₂G, h₃G⟩  := Classical.choose_spec ((hf.order_eq_int_iff 0).1 h₃f)
         simp only [zpow_zero, ne_eq, one_smul] at h₃G
         apply Filter.EventuallyEq.eq_of_nhds
         apply h₁G.localIdentity h₁g
         filter_upwards [h₃g, h₃G]
         intro a h₁a h₂a
-        simp only [h₃f, WithTop.coe_zero, WithTop.untop_zero', zpow_zero, one_smul] at h₁a
+        simp only [h₃f, WithTop.coe_zero, WithTop.untopD_zero, zpow_zero, one_smul] at h₁a
         rw [← h₁a, ← h₂a]
       · have : hf.order ≠ 0 := h₃f
-        rw [zero_zpow (WithTop.untop' 0 hf.order)]
+        rw [zero_zpow (WithTop.untopD 0 hf.order)]
         simp only [this, ↓reduceDIte, zero_smul]
         by_contra hCon
-        simp only [WithTop.untop'_eq_self_iff, WithTop.coe_zero] at hCon
+        simp only [WithTop.untopD_eq_self_iff, WithTop.coe_zero] at hCon
         tauto

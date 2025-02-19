@@ -335,7 +335,7 @@ theorem MeromorphicOn.decompose₃'
     unfold d
     unfold MeromorphicOn.divisor
     simp
-    have : (h₁f u.1 u.2).meromorphicAt.order = WithTop.untop' 0 (h₁f u.1 u.2).meromorphicAt.order := by
+    have : (h₁f u.1 u.2).meromorphicAt.order = WithTop.untopD 0 (h₁f u.1 u.2).meromorphicAt.order := by
       rw [eq_comm]
       let A := h₃f u
       exact untop'_of_ne_top A

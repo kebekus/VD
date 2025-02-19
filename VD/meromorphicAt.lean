@@ -38,9 +38,9 @@ theorem MeromorphicAt.order_pow (hf : MeromorphicAt f z₀) {n : ℕ} :
 
 
 theorem MeromorphicAt.order_ne_top_iff {f : 𝕜 → E} {z₀ : 𝕜} (hf : MeromorphicAt f z₀) :
-    hf.order ≠ ⊤ ↔ ∃ (g : 𝕜 → E), AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧ f =ᶠ[𝓝[≠] z₀] fun z ↦ (z - z₀) ^ (hf.order.untop' 0) • g z :=
-  ⟨fun h ↦ (hf.order_eq_int_iff (hf.order.untop' 0)).1 (untop'_of_ne_top h).symm,
-    fun h ↦ Option.ne_none_iff_exists'.2 ⟨hf.order.untop' 0, (hf.order_eq_int_iff (hf.order.untop' 0)).2 h⟩⟩
+    hf.order ≠ ⊤ ↔ ∃ (g : 𝕜 → E), AnalyticAt 𝕜 g z₀ ∧ g z₀ ≠ 0 ∧ f =ᶠ[𝓝[≠] z₀] fun z ↦ (z - z₀) ^ (hf.order.untopD 0) • g z :=
+  ⟨fun h ↦ (hf.order_eq_int_iff (hf.order.untopD 0)).1 (untop'_of_ne_top h).symm,
+    fun h ↦ Option.ne_none_iff_exists'.2 ⟨hf.order.untopD 0, (hf.order_eq_int_iff (hf.order.untopD 0)).2 h⟩⟩
 
 /-
 theorem MeromorphicAt.order_ne_top_iff' {f : ℂ → ℂ} {z₀ : ℂ} (hf : MeromorphicAt f z₀) :
@@ -94,12 +94,12 @@ theorem MeromorphicAt.order_inv
     filter_upwards [h₂f]
     simp
 
-  · have : hf.order = hf.order.untop' 0 := by
+  · have : hf.order = hf.order.untopD 0 := by
       simp [h₂f, untop'_of_ne_top]
     rw [this]
     rw [eq_comm]
     rw [neg_eq_iff_eq_neg]
-    apply (hf.inv.order_eq_int_iff (-hf.order.untop' 0)).2
+    apply (hf.inv.order_eq_int_iff (-hf.order.untopD 0)).2
     rw [hf.order_eq_int_iff] at this
     obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
     use g⁻¹, h₁g.inv h₂g
@@ -163,8 +163,8 @@ theorem MeromorphicAt.order_add
   obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_ne_top_iff.1 h₂f₁
   obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_ne_top_iff.1 h₂f₂
 
-  let n₁ := WithTop.untop' 0 hf₁.order
-  let n₂ := WithTop.untop' 0 hf₂.order
+  let n₁ := WithTop.untopD 0 hf₁.order
+  let n₂ := WithTop.untopD 0 hf₂.order
   let n := min n₁ n₂
   have h₁n₁ : 0 ≤ n₁ - n := by
     rw [sub_nonneg]
@@ -203,7 +203,7 @@ theorem MeromorphicAt.order_add
     · simp
   rw [t₁]
   unfold n n₁ n₂
-  have : hf₁.order ⊓ hf₂.order = (WithTop.untop' 0 hf₁.order ⊓ WithTop.untop' 0 hf₂.order) := by
+  have : hf₁.order ⊓ hf₂.order = (WithTop.untopD 0 hf₁.order ⊓ WithTop.untopD 0 hf₂.order) := by
     rw [←untop'_of_ne_top (d := 0) h₂f₁, ←untop'_of_ne_top (d := 0) h₂f₂]
     simp
   rw [this]
@@ -243,11 +243,11 @@ theorem MeromorphicAt.order_add_of_ne_orders
   obtain ⟨g₁, h₁g₁, h₂g₁, h₃g₁⟩ := hf₁.order_ne_top_iff.1 h₂f₁
   obtain ⟨g₂, h₁g₂, h₂g₂, h₃g₂⟩ := hf₂.order_ne_top_iff.1 h₂f₂
 
-  let n₁ := WithTop.untop' 0 hf₁.order
-  let n₂ := WithTop.untop' 0 hf₂.order
+  let n₁ := WithTop.untopD 0 hf₁.order
+  let n₂ := WithTop.untopD 0 hf₂.order
   have hn₁₂ : n₁ ≠ n₂ := by
     unfold n₁ n₂
-    simp [WithTop.untop'_eq_untop'_iff]
+    simp [WithTop.untopD_eq_untopD_iff]
     tauto
 
   let n := min n₁ n₂
@@ -319,7 +319,7 @@ theorem MeromorphicAt.order_add_of_ne_orders
     simp
   rw [t₁]
   unfold n n₁ n₂
-  have : hf₁.order ⊓ hf₂.order = (WithTop.untop' 0 hf₁.order ⊓ WithTop.untop' 0 hf₂.order) := by
+  have : hf₁.order ⊓ hf₂.order = (WithTop.untopD 0 hf₁.order ⊓ WithTop.untopD 0 hf₂.order) := by
     rw [← untop'_of_ne_top (d := 0) h₂f₁, ← untop'_of_ne_top (d := 0) h₂f₂]
     simp
   rw [this, h₃g]

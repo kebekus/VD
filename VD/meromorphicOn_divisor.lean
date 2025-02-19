@@ -16,7 +16,7 @@ noncomputable def MeromorphicOn.divisor
   toFun := by
     intro z
     if hz : z ∈ U then
-      exact ((hf z hz).order.untop' 0 : ℤ)
+      exact ((hf z hz).order.untopD 0 : ℤ)
     else
       exact 0
 
@@ -73,7 +73,7 @@ theorem MeromorphicOn.divisor_def₁
   {z : ℂ}
   (hf : MeromorphicOn f U)
   (hz : z ∈ U) :
-  hf.divisor z = ((hf z hz).order.untop' 0 : ℤ) := by
+  hf.divisor z = ((hf z hz).order.untopD 0 : ℤ) := by
   unfold MeromorphicOn.divisor
   simp [hz]
 
@@ -88,7 +88,7 @@ theorem MeromorphicOn.divisor_def₂
   hf.divisor z = (hf z hz).order.untop h₂f := by
   unfold MeromorphicOn.divisor
   simp [hz]
-  rw [WithTop.untop'_eq_iff]
+  rw [WithTop.untopD_eq_iff]
   left
   exact Eq.symm (WithTop.coe_untop (hf z hz).order h₂f)
 
@@ -191,12 +191,12 @@ theorem MeromorphicOn.divisor_add_const₁
 
     by_cases ha: (MeromorphicAt.const a z).order = ⊤
     · simp [ha]
-    · rw [WithTop.le_untop'_iff]
+    · rw [WithTop.le_untopD_iff]
       apply AnalyticAt.meromorphicAt_order_nonneg
       exact analyticAt_const
       tauto
 
-  · rw [WithTop.le_untop'_iff]
+  · rw [WithTop.le_untopD_iff]
     let A := (hf z hz).order_add (MeromorphicAt.const a z)
     have : 0 ≤ min (hf z hz).order (MeromorphicAt.const a z).order := by
       apply le_min
@@ -239,7 +239,7 @@ theorem MeromorphicOn.divisor_add_const₂
     have t₀ : (hf z hz).order < (0 : ℤ) := by
         by_contra hCon
         simp only [not_lt] at hCon
-        rw [←WithTop.le_untop'_iff (b := 0)] at hCon
+        rw [←WithTop.le_untopD_iff (b := 0)] at hCon
         exact Lean.Omega.Int.le_lt_asymm hCon h
         tauto
     rw [← MeromorphicAt.order_add_of_ne_orders (hf z hz) (MeromorphicAt.const a z)]
@@ -288,7 +288,7 @@ theorem MeromorphicOn.divisor_add_const₃
     have t₀ : (hf z hz).order < (0 : ℤ) := by
         by_contra hCon
         simp only [not_lt] at hCon
-        rw [←WithTop.le_untop'_iff (b := 0)] at hCon
+        rw [←WithTop.le_untopD_iff (b := 0)] at hCon
         exact Lean.Omega.Int.le_lt_asymm hCon h
         tauto
     rw [← MeromorphicAt.order_add_of_ne_orders (hf z hz) (MeromorphicAt.const a z)]
@@ -346,7 +346,7 @@ theorem StronglyMeromorphicOn.analyticOnNhd
   by_cases h : (h₁f z hz).meromorphicAt.order = ⊤
   · rw [h]
     simp
-  · rw [WithTop.le_untop'_iff] at A
+  · rw [WithTop.le_untopD_iff] at A
     tauto
     tauto
   assumption
