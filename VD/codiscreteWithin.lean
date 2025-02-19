@@ -22,4 +22,25 @@ theorem codiscreteWithin_iff_locallyFiniteComplementWithinU {X : Type u_1} [Topo
 theorem codiscreteWithin_iff_locallyFiniteComplementWithinU' {X : Type u_1} [TopologicalSpace X]
     {U s : Set X} :
     (s ∈ Filter.codiscreteWithin U) ↔ ∀ z ∈ U, ∃ t ∈ 𝓝 z, Set.Finite (t ∩ (U \ s)) := by
-  sorry
+  rw [codiscreteWithin_iff_locallyFiniteComplementWithinU]
+  constructor
+  · intro h z h₁z
+    obtain ⟨t, h₁t, h₂t⟩ := h z h₁z
+    use insert z t
+    constructor
+    · exact insert_mem_nhds_iff.mpr h₁t
+    · by_cases hz : z ∈ U \ s
+      · rw [inter_comm, inter_insert_of_mem hz, inter_comm, h₂t]
+        simp
+      · rw [inter_comm, inter_insert_of_not_mem hz, inter_comm, h₂t]
+        simp
+  · intro h z h₁z
+    obtain ⟨t, h₁t, h₂t⟩ := h z h₁z
+    use t \ (U \ s)
+    constructor
+    ·
+      apply?
+      exact h₁t
+    · rw [← Set.inter_assoc, Set.inter_self]
+      exact h₂t
+    sorry
