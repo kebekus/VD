@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stefan Kebekus
 -/
 import Mathlib.Analysis.Normed.Field.Basic
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import VD.ToMathlib.codiscreteWithin
 
 /-!
@@ -18,12 +19,9 @@ subset of `𝕜`.
 
 ## TODOs
 
-- Restriction and extension of divisors as group morphisms
 - Decomposition into positive/negative components
 - Constructions: The divisor of a meromorphic function, behavior under product
   of meromorphic functions, behavior under addition, behavior under restriction
-- Degree
-- Nevanlinna counting functions
 - Construction: The divisor of a rational polynomial
 -/
 
@@ -51,8 +49,6 @@ instance (U : Set 𝕜) : CoeFun (Divisor U) (fun _ ↦ 𝕜 → ℤ) where
   coe := Divisor.toFun
 
 attribute [coe] Divisor.toFun
-
-noncomputable def Divisor.deg (D : Divisor U) : ℤ := ∑ᶠ z, D.toFun z
 
 /-- Divisors are `FunLike`: the coercion from divisors to functions is injective. -/
 instance : FunLike (Divisor U) 𝕜 ℤ where
@@ -244,3 +240,51 @@ theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
 theorem Divisor.finiteSupport (D : Divisor U) (hU : IsCompact U) :
     Set.Finite D.toFun.support :=
   (hU.of_isClosed_subset (D.closedSupport hU.isClosed) D.supportInU).finite D.discreteSupport
+
+/-!
+## Restriction
+-/
+
+noncomputable def Divisor.restrict {V : Set 𝕜} (D : Divisor U) (h : V ⊆ U) :
+    Divisor V where
+  toFun := by
+    classical
+    exact fun z ↦ if hz : z ∈ V then D z else 0
+  supportInU := by
+    intro x hx
+    simp_rw [dite_eq_ite, Function.mem_support, ne_eq, ite_eq_right_iff,
+      Classical.not_imp] at hx
+    exact hx.1
+  supportDiscreteWithinU := by
+    apply Filter.codiscreteWithin.mono h
+    filter_upwards [D.supportDiscreteWithinU]
+    intro x hx
+    simp [hx]
+
+noncomputable def Divisor.restrict_orderHom {V : Set 𝕜} (h : V ⊆ U) : Divisor U →o Divisor V where
+  toFun := fun D ↦ D.restrict h
+  monotone' := by
+    intro D₁ D₂ h₁₂
+    simp only [le_fun, Divisor.restrict]
+    intro x
+    by_cases hx : x ∈ V
+    <;> simp [hx, reduceDIte, h₁₂ x]
+
+noncomputable def Divisor.restrict_groupHom {V : Set 𝕜} (h : V ⊆ U) : Divisor U →+ Divisor V where
+  toFun := fun D ↦ D.restrict h
+  map_zero' := by
+    ext x
+    simp [Divisor.restrict]
+  map_add' := by
+    intro D₁ D₂
+    ext x
+    by_cases hx : x ∈ V
+    <;> simp [Divisor.restrict, hx]
+
+/-!
+## Derived invariants
+-/
+
+/-- The degree of a divisor is the sum of its values, or 0 if the support is
+infinite. -/
+noncomputable def Divisor.deg (D : Divisor U) : ℤ := ∑ᶠ z, D z
