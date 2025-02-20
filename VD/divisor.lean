@@ -91,13 +91,9 @@ instance : Add (Divisor U) where
         intro x
         contrapose
         intro hx
-        have h₁x : D₁ x = 0 := Function.nmem_support.mp fun a ↦ hx (D₁.supportInU a)
-        have h₂x : D₂ x = 0 := Function.nmem_support.mp fun a ↦ hx (D₂.supportInU a)
-        simp [h₁x, h₂x]
-      supportDiscreteWithinU := by
-        apply EventuallyEq.add (f := D₁) (g := 0) (f' := D₂) (g' := 0)
-        exact D₁.supportDiscreteWithinU
-        exact D₂.supportDiscreteWithinU
+        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportInU a),
+          Function.nmem_support.1 fun a ↦ hx (D₂.supportInU a)]
+      supportDiscreteWithinU := D₁.supportDiscreteWithinU.add D₂.supportDiscreteWithinU
     }
 
 /-- Helper lemma for the `simp` tactic: the function of the sum of two divisors
@@ -113,11 +109,9 @@ instance : Neg (Divisor U) where
       toFun := -D.toFun
       supportInU := by
         intro x hx
-        simp at hx
+        rw [Function.support_neg', Function.mem_support, ne_eq] at hx
         exact D.supportInU hx
-      supportDiscreteWithinU := by
-        apply EventuallyEq.neg (f := D) (g := 0)
-        exact D.supportDiscreteWithinU
+      supportDiscreteWithinU := D.supportDiscreteWithinU.neg
     }
 
 /-- Helper lemma for the `simp` tactic: the function of the negative divisor
@@ -158,7 +152,7 @@ instance : SMul ℤ (Divisor U) where
         exact D.supportInU hx.2
       supportDiscreteWithinU := by
         filter_upwards [D.supportDiscreteWithinU]
-        intro x hx
+        intro _ hx
         simp [hx]
     }
 
@@ -238,7 +232,7 @@ theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
   · rw [eventually_iff_exists_mem]
     use Uᶜ, hU.compl_mem_nhds h₁x
     intro y hy
-    simp
+    simp only [mem_compl_iff, Function.mem_support, ne_eq, Decidable.not_not]
     exact Function.nmem_support.mp fun a ↦ hy (D.supportInU a)
 
 theorem Divisor.finiteSupport (D : Divisor U) (hU : IsCompact U) :

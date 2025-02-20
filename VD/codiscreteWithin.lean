@@ -1,5 +1,5 @@
 import Mathlib.Topology.DiscreteSubset
---import VD.ToMathlib.codiscreteWithin
+import VD.ToMathlib.codiscreteWithin
 
 open Filter Set Topology
 
@@ -19,7 +19,31 @@ theorem codiscreteWithin_iff_locallyFiniteComplementWithinU {X : Type u_1} [Topo
     rw [← exists_mem_subset_iff]
     use t, h₁t, fun _ h₁x ↦ (disjoint_left.1 (disjoint_iff_inter_eq_empty.2 h₂t)) h₁x
 
-theorem codiscreteWithin_iff_locallyFiniteComplementWithinU' {X : Type u_1} [TopologicalSpace X]
+lemma xx {X : Type u_1} [TopologicalSpace X] [T1Space X]
+    {x : X} {U s : Set X} (hU : U ∈ 𝓝[≠] x) (hs : Set.Finite s) :
+    U \ s ∈ 𝓝[≠] x := by
+  rw [mem_nhdsWithin] at hU ⊢
+  obtain ⟨t, ht, h₁ts, h₂ts⟩ := hU
+  use t \ (s \ {x})
+  constructor
+  · rw [← isClosed_compl_iff]
+    rw [Set.compl_diff]
+    apply IsClosed.union
+    · apply Finite.isClosed
+      exact Finite.diff hs
+    · exact isClosed_compl_iff.mpr ht
+  · constructor
+    · simp [h₁ts]
+    · intro z hz
+      constructor
+      · apply h₂ts
+        simp [hz]
+        simp at hz
+        tauto
+      · simp at hz
+        tauto
+
+theorem codiscreteWithin_iff_locallyFiniteComplementWithinU' {X : Type u_1} [TopologicalSpace X] [T1Space X]
     {U s : Set X} :
     (s ∈ Filter.codiscreteWithin U) ↔ ∀ z ∈ U, ∃ t ∈ 𝓝 z, Set.Finite (t ∩ (U \ s)) := by
   rw [codiscreteWithin_iff_locallyFiniteComplementWithinU]
@@ -36,11 +60,9 @@ theorem codiscreteWithin_iff_locallyFiniteComplementWithinU' {X : Type u_1} [Top
         simp
   · intro h z h₁z
     obtain ⟨t, h₁t, h₂t⟩ := h z h₁z
-    use t \ (U \ s)
+    use t \ (t ∩ (U \ s))
     constructor
-    ·
-      apply?
-      exact h₁t
-    · rw [← Set.inter_assoc, Set.inter_self]
+    · apply xx
+      exact mem_nhdsWithin_of_mem_nhds h₁t
       exact h₂t
-    sorry
+    · simp
