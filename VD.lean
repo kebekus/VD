@@ -1,9 +1,11 @@
 import VD.NormalFormAt
 import VD.ToMathlib.analyticAt
 import VD.ToMathlib.analyticAt_preimgCodiscrete
+import VD.ToMathlib.bilinear
 import VD.ToMathlib.codiscreteWithin
 import VD.ToMathlib.intervalIntegrability
 import VD.cauchyRiemann
+import VD.codiscreteWithin
 import VD.divisor
 import VD.firstMain
 import VD.harmonicAt
@@ -15,7 +17,6 @@ import VD.holomorphic_primitive
 import VD.intervalIntegrability
 import VD.laplace
 import VD.leftovers.analyticOnNhd_zeroSet
-import VD.leftovers.bilinear
 import VD.leftovers.diffOp
 import VD.leftovers.holomorphic
 import VD.leftovers.holomorphic_zero
