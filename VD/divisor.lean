@@ -11,7 +11,8 @@ import VD.codiscreteWithin
 
 This file defines divisors, a standard book-keeping tool in complex analysis
 used to keep track of pole/vanishing orders of meromorphic objects, typically
-functions or differential forms.
+functions or differential forms. It provides supporting API and establishes
+divisors as an instance of a lattice ordered commutative group.
 
 Throughout the present file, `𝕜` denotes a nontrivially normed field, and `U` a
 subset of `𝕜`.
