@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Stefan Kebekus
 -/
 import Mathlib.Analysis.Normed.Field.Basic
-import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import VD.ToMathlib.codiscreteWithin
+import VD.codiscreteWithin
 
 /-!
 # Divisors on subsets of normed fields
@@ -19,7 +18,6 @@ subset of `𝕜`.
 
 ## TODOs
 
-- Decomposition into positive/negative components
 - Constructions: The divisor of a meromorphic function, behavior under product
   of meromorphic functions, behavior under addition, behavior under restriction
 - Construction: The divisor of a rational polynomial
@@ -31,6 +29,12 @@ variable {𝕜 : Type u_1} [NontriviallyNormedField 𝕜] {U : Set 𝕜}
 
 /-!
 ## Definition
+
+A divisor on `U` is a function `𝕜 → ℤ` whose support is discrete within `U` and
+entirely contained within `U`.  The theorem
+`supportDiscreteWithin_iff_locallyFiniteWithin` shows that this is equivalent to
+the textbook definition, which requires the support of `f` to be locally finite
+within `U`.
 -/
 
 /-- A divisor on `U` is a function `𝕜 → ℤ` whose support is discrete within `U`
@@ -40,9 +44,19 @@ structure Divisor (U : Set 𝕜) where
   supportInU : toFun.support ⊆ U
   supportDiscreteWithinU : toFun =ᶠ[Filter.codiscreteWithin U] 0
 
+theorem supportDiscreteWithin_iff_locallyFiniteWithin {f : 𝕜 → ℤ} (h : f.support ⊆ U) :
+    f =ᶠ[Filter.codiscreteWithin U] 0 ↔ ∀ z ∈ U, ∃ t ∈ 𝓝 z, Set.Finite (t ∩ f.support) := by
+  have : f.support = (U \ {x | f x = (0 : 𝕜 → ℤ) x}) := by
+    ext x
+    simp only [Function.mem_support, ne_eq, Pi.zero_apply, mem_diff, mem_setOf_eq, iff_and_self]
+    exact (h ·)
+  rw [EventuallyEq, Filter.Eventually, codiscreteWithin_iff_locallyFiniteComplementWithinU, this]
+
 /-!
 ## Coercion to functions and basic extensionality
 -/
+
+namespace Divisor
 
 /-- A divisor can be coerced into a function 𝕜 → ℤ -/
 instance (U : Set 𝕜) : CoeFun (Divisor U) (fun _ ↦ 𝕜 → ℤ) where
@@ -61,7 +75,7 @@ associated functions agree. -/
 theorem ext {D₁ D₂ : Divisor U} (h : ∀ a, D₁.toFun a = D₂.toFun a) : D₁ = D₂ := DFunLike.ext _ _ h
 
 /-!
-## Ordered group structure
+## Lattice ordered group structure
 
 This section equips divisors on `U` with the standard structure of an ordered
 group, where addition and comparison of divisors are addition and pointwise
@@ -192,11 +206,76 @@ instance : OrderedAddCommGroup (Divisor U) where
   le_antisymm := fun _ _ h₁₂ h₂₁ ↦ by ext x; exact Int.le_antisymm (h₁₂ x) (h₂₁ x)
   add_le_add_left := fun _ _ _ _ ↦ by simpa
 
+/-- Divisors have a partial ordering by pointwise comparison of the associated
+functions. -/
+instance : LT (Divisor U) where
+  lt := fun D₁ D₂ ↦ D₁.toFun < D₂.toFun
+
+/-- Helper lemma for the `simp` tactic: a divisor is smaller than another one
+if the same relation holds with the associated functions. -/
+@[simp]
+lemma lt_fun {D₁ D₂ : Divisor U} : D₁ < D₂ ↔ D₁.toFun < D₂.toFun := ⟨(·),(·)⟩
+
+instance : Max (Divisor U) where
+  max := fun D₁ D₂ ↦
+    {
+      toFun := fun z ↦ max (D₁ z) (D₂ z)
+      supportInU := by
+        intro x
+        contrapose
+        intro hx
+        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportInU a),
+          Function.nmem_support.1 fun a ↦ hx (D₂.supportInU a)]
+      supportDiscreteWithinU := by
+        filter_upwards [D₁.supportDiscreteWithinU, D₂.supportDiscreteWithinU]
+        intro _ h₁ h₂
+        simp [h₁, h₂]
+    }
+
+@[simp]
+lemma max_fun {D₁ D₂ : Divisor U} {x : 𝕜} : max D₁ D₂ x = max (D₁ x) (D₂ x) := rfl
+
+instance : Min (Divisor U) where
+  min := fun D₁ D₂ ↦
+    {
+      toFun := fun z ↦ min (D₁ z) (D₂ z)
+      supportInU := by
+        intro x
+        contrapose
+        intro hx
+        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportInU a),
+          Function.nmem_support.1 fun a ↦ hx (D₂.supportInU a)]
+      supportDiscreteWithinU := by
+        filter_upwards [D₁.supportDiscreteWithinU, D₂.supportDiscreteWithinU]
+        intro _ h₁ h₂
+        simp [h₁, h₂]
+    }
+
+@[simp]
+lemma min_fun {D₁ D₂ : Divisor U} {x : 𝕜} : min D₁ D₂ x = min (D₁ x) (D₂ x) := rfl
+
+instance : Lattice (Divisor U) where
+  le := (· ≤ ·)
+  le_refl := by simp
+  le_trans := by exact fun D₁ D₂ D₃ h₁₂ h₂₃ x ↦ (h₁₂ x).trans (h₂₃ x)
+  le_antisymm := by
+    intro D₁ D₂ h₁₂ h₂₁
+    ext x
+    exact Int.le_antisymm (h₁₂ x) (h₂₁ x)
+  sup := (max · ·)
+  le_sup_left := fun D₁ D₂ x ↦ by simp
+  le_sup_right := fun D₁ D₂ x ↦ by simp
+  sup_le := fun D₁ D₂ D₃ h₁₃ h₂₃ x ↦ by simp [h₁₃ x, h₂₃ x]
+  inf := (min · ·)
+  inf_le_left := fun D₁ D₂ x ↦ by simp
+  inf_le_right := fun D₁ D₂ x ↦ by simp
+  le_inf := fun D₁ D₂ D₃ h₁₃ h₂₃ x ↦ by simp [h₁₃ x, h₂₃ x]
+
 /-!
 ## Elementary properties of the support
 -/
 
-theorem Divisor.discreteSupport (D : Divisor U) :
+theorem discreteSupport (D : Divisor U) :
     DiscreteTopology D.toFun.support := by
   have : Function.support D = {x | D x = 0}ᶜ ∩ U := by
     ext x
@@ -207,7 +286,7 @@ theorem Divisor.discreteSupport (D : Divisor U) :
       tauto
   convert discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinU)
 
-theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
+theorem closedSupport (D : Divisor U) (hU : IsClosed U) :
     IsClosed D.toFun.support := by
   rw [← isOpen_compl_iff, isOpen_iff_eventually]
   intro x hx
@@ -231,7 +310,7 @@ theorem Divisor.closedSupport (D : Divisor U) (hU : IsClosed U) :
     simp only [mem_compl_iff, Function.mem_support, ne_eq, Decidable.not_not]
     exact Function.nmem_support.mp fun a ↦ hy (D.supportInU a)
 
-theorem Divisor.finiteSupport (D : Divisor U) (hU : IsCompact U) :
+theorem finiteSupport (D : Divisor U) (hU : IsCompact U) :
     Set.Finite D.toFun.support :=
   (hU.of_isClosed_subset (D.closedSupport hU.isClosed) D.supportInU).finite D.discreteSupport
 
@@ -239,7 +318,7 @@ theorem Divisor.finiteSupport (D : Divisor U) (hU : IsCompact U) :
 ## Restriction
 -/
 
-noncomputable def Divisor.restrict {V : Set 𝕜} (D : Divisor U) (h : V ⊆ U) :
+noncomputable def restrict {V : Set 𝕜} (D : Divisor U) (h : V ⊆ U) :
     Divisor V where
   toFun := by
     classical
@@ -255,7 +334,7 @@ noncomputable def Divisor.restrict {V : Set 𝕜} (D : Divisor U) (h : V ⊆ U) 
     intro x hx
     simp [hx]
 
-noncomputable def Divisor.restrict_orderHom {V : Set 𝕜} (h : V ⊆ U) : Divisor U →o Divisor V where
+noncomputable def restrict_orderHom {V : Set 𝕜} (h : V ⊆ U) : Divisor U →o Divisor V where
   toFun := fun D ↦ D.restrict h
   monotone' := by
     intro D₁ D₂ h₁₂
@@ -264,12 +343,26 @@ noncomputable def Divisor.restrict_orderHom {V : Set 𝕜} (h : V ⊆ U) : Divis
     by_cases hx : x ∈ V
     <;> simp [hx, reduceDIte, h₁₂ x]
 
-noncomputable def Divisor.restrict_groupHom {V : Set 𝕜} (h : V ⊆ U) : Divisor U →+ Divisor V where
+noncomputable def restrict_groupHom {V : Set 𝕜} (h : V ⊆ U) : Divisor U →+ Divisor V where
   toFun := fun D ↦ D.restrict h
   map_zero' := by
     ext x
-    simp [Divisor.restrict]
+    simp [restrict]
   map_add' := by
+    intro D₁ D₂
+    ext x
+    by_cases hx : x ∈ V
+    <;> simp [restrict, hx]
+
+noncomputable def restrict_latticeHom {V : Set 𝕜} (h : V ⊆ U) :
+    LatticeHom (Divisor U) (Divisor V) where
+  toFun := fun D ↦ D.restrict h
+  map_sup' := by
+    intro D₁ D₂
+    ext x
+    by_cases hx : x ∈ V
+    <;> simp [Divisor.restrict, hx]
+  map_inf' := by
     intro D₁ D₂
     ext x
     by_cases hx : x ∈ V
@@ -281,4 +374,4 @@ noncomputable def Divisor.restrict_groupHom {V : Set 𝕜} (h : V ⊆ U) : Divis
 
 /-- The degree of a divisor is the sum of its values, or 0 if the support is
 infinite. -/
-noncomputable def Divisor.deg (D : Divisor U) : ℤ := ∑ᶠ z, D z
+noncomputable def deg (D : Divisor U) : ℤ := ∑ᶠ z, D z

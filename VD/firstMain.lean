@@ -36,6 +36,7 @@ noncomputable def MeromorphicOn.N_zero
   (hf : MeromorphicOn f ⊤) :
   ℝ → ℝ :=
   fun r ↦ ∑ᶠ z, (max 0 ((hf.restrict |r|).divisor z)) * log (r * ‖z‖⁻¹)
+  --hf.divisor⁺.logCounting
 
 noncomputable def MeromorphicOn.N_infty
   {f : ℂ → ℂ}
