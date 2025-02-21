@@ -7,7 +7,7 @@ Authors: Stefan Kebekus
 import Mathlib.Analysis.InnerProductSpace.PiL2
 
 /-!
-# Canoncial Elements in Tensor Powers of Real Inner Product Spaces
+# Canoncial tensors in real inner product spaces
 
 Given an `InnerProductSpace ℝ E`, this file defines two canonical tensors.
 
