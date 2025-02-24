@@ -285,7 +285,7 @@ theorem jensen₀
     apply Finset.sum_congr rfl
     intro s hs
     have : s ∈ Metric.closedBall 0 R := by
-      let A := h₁f.meromorphicOn.divisor.supportInU
+      let A := h₁f.meromorphicOn.divisor.supportWithinDomain
       have : s ∈ Function.support h₁f.meromorphicOn.divisor := by
         simp at hs
         exact hs

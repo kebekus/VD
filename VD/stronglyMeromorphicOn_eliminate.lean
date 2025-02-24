@@ -312,7 +312,7 @@ theorem MeromorphicOn.decompose₃'
     rwa [h₁d]
     --
     rw [h₁d]
-    exact (StronglyMeromorphicOn.meromorphicOn h₁f).divisor.supportInU
+    exact (StronglyMeromorphicOn.meromorphicOn h₁f).divisor.supportWithinDomain
   have h₃h₁ : ∀ (z : ℂ) (hz : z ∈ U), (h₁h₁ z hz).meromorphicAt.order ≠ ⊤ := by
     intro z hz
     apply stronglyMeromorphicOn_ratlPolynomial₃order
@@ -469,7 +469,7 @@ theorem MeromorphicOn.decompose₃'
           have : z ∉ t₁.toFinset := by
             simp
             have : h₁f.meromorphicOn.divisor z = 0 := by
-              let A := h₁f.meromorphicOn.divisor.supportInU
+              let A := h₁f.meromorphicOn.divisor.supportWithinDomain
               simp at A
               by_contra H
               let B := A z H
@@ -519,7 +519,7 @@ theorem StronglyMeromorphicOn.decompose_log
   rw [Filter.eventuallyEq_iff_exists_mem]
   use {z | f z ≠ 0}
   constructor
-  · have A := h₁f.meromorphicOn.divisor.supportDiscreteWithinU
+  · have A := h₁f.meromorphicOn.divisor.supportDiscreteWithinDomain
     have : {z | f z ≠ 0} ∩ U = (Function.support h₁f.meromorphicOn.divisor)ᶜ ∩ U := by
       rw [← h₁f.support_divisor h₂f h₂U]
       ext u
@@ -540,7 +540,7 @@ theorem StronglyMeromorphicOn.decompose_log
     intro x hx
     simp at hx
     have h₁x : x ∈ U := by
-      exact h₁f.meromorphicOn.divisor.supportInU hx
+      exact h₁f.meromorphicOn.divisor.supportWithinDomain hx
 
     apply zpow_ne_zero
     simp
@@ -569,7 +569,7 @@ theorem StronglyMeromorphicOn.decompose_log
     intro x hx
     simp at hx
     have h₁x : x ∈ U := by
-      exact h₁f.meromorphicOn.divisor.supportInU hx
+      exact h₁f.meromorphicOn.divisor.supportWithinDomain hx
 
     apply zpow_ne_zero
     simp

@@ -20,13 +20,13 @@ noncomputable def MeromorphicOn.divisor
     else
       exact 0
 
-  supportInU := by
+  supportWithinDomain := by
     intro z hz
     simp at hz
     by_contra h₂z
     simp [h₂z] at hz
 
-  supportDiscreteWithinU := by
+  supportDiscreteWithinDomain := by
     have A₁ := hf.eventually_codiscreteWithin_analyticAt
     let U' := { x ∈ U | AnalyticAt ℂ f x}
     have A₂ : U' ⊆ U := fun x hx ↦ hx.1
@@ -129,9 +129,9 @@ theorem MeromorphicOn.divisor_mul
   · rw [MeromorphicOn.divisor_mul₀ hz h₁f₁ (h₂f₁ z hz) h₁f₂ (h₂f₂ z hz)]
     simp
   · simp
-    rw [Function.nmem_support.mp (fun a => hz (h₁f₁.divisor.supportInU a))]
-    rw [Function.nmem_support.mp (fun a => hz (h₁f₂.divisor.supportInU a))]
-    rw [Function.nmem_support.mp (fun a => hz ((h₁f₁.mul h₁f₂).divisor.supportInU a))]
+    rw [Function.nmem_support.mp (fun a => hz (h₁f₁.divisor.supportWithinDomain a))]
+    rw [Function.nmem_support.mp (fun a => hz (h₁f₂.divisor.supportWithinDomain a))]
+    rw [Function.nmem_support.mp (fun a => hz ((h₁f₁.mul h₁f₂).divisor.supportWithinDomain a))]
     simp
 
 
@@ -371,9 +371,9 @@ theorem StronglyMeromorphicOn.support_divisor
     exact hu.2
   · intro hu
     simp at hu
-    let A := h₁f.meromorphicOn.divisor.supportInU hu
+    let A := h₁f.meromorphicOn.divisor.supportWithinDomain hu
     constructor
-    · exact h₁f.meromorphicOn.divisor.supportInU hu
+    · exact h₁f.meromorphicOn.divisor.supportWithinDomain hu
     · simp
       let B := (h₁f u A).order_eq_zero_iff.not
       simp at B
