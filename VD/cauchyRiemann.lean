@@ -4,6 +4,19 @@ import VD.partialDeriv
 
 section
 
+variable {z : ℂ} {f : ℂ → ℂ}
+
+lemma ContinuousLinearMap.comp_lineDeriv (w : ℂ) (l : ℂ →L[ℝ] ℝ) (h : DifferentiableAt ℂ f z) :
+    lineDeriv ℝ (l ∘ f) z w = l ((fderiv ℝ f z) w) := by
+  rw [DifferentiableAt.lineDeriv_eq_fderiv _, fderiv_comp _ (by fun_prop) (h.restrictScalars _)]
+  simp
+  apply (l.differentiableAt).comp
+  exact h.restrictScalars ℝ
+
+end
+
+section
+
 variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F] {f : ℂ → F} {z : ℂ}
 
 theorem CauchyRiemann₅ (h : DifferentiableAt ℂ f z) :
@@ -11,7 +24,7 @@ theorem CauchyRiemann₅ (h : DifferentiableAt ℂ f z) :
   unfold partialDeriv
   simp [DifferentiableAt.fderiv_restrictScalars ℝ h]
 
-theorem CauchyRiemann₄ {f : ℂ → F} (h : Differentiable ℂ f) :
+theorem CauchyRiemann₄ (h : Differentiable ℂ f) :
     partialDeriv ℝ Complex.I f = Complex.I • partialDeriv ℝ 1 f := by
   ext z
   exact CauchyRiemann₅ (h z)
@@ -32,13 +45,6 @@ theorem CauchyRiemann₂ (h : DifferentiableAt ℂ f z) :
     lineDeriv ℝ f z Complex.I = Complex.I * lineDeriv ℝ f z 1 := by
   repeat rw [DifferentiableAt.lineDeriv_eq_fderiv (h.restrictScalars ℝ)]
   exact CauchyRiemann₁ h
-
-lemma ContinuousLinearMap.comp_lineDeriv (w : ℂ) (l : ℂ →L[ℝ] ℝ) (h : DifferentiableAt ℂ f z) :
-    lineDeriv ℝ (l ∘ f) z w = l ((fderiv ℝ f z) w) := by
-  rw [DifferentiableAt.lineDeriv_eq_fderiv _, fderiv_comp _ (by fun_prop) (h.restrictScalars _)]
-  simp
-  apply (l.differentiableAt).comp
-  exact h.restrictScalars ℝ
 
 theorem CauchyRiemann₃ (h : DifferentiableAt ℂ f z) :
     (lineDeriv ℝ (Complex.reCLM ∘ f) z 1 = lineDeriv ℝ (Complex.imCLM ∘ f) z Complex.I)
