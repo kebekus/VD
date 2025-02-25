@@ -11,7 +11,8 @@ open Real Filter
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [CompleteSpace E]
 
-theorem MeromorphicOn.codiscrete_setOf_order_eq_zero_or_top {f : 𝕜 → E} {U : Set 𝕜} (hf : MeromorphicOn f U) :
+theorem MeromorphicOn.codiscrete_setOf_order_eq_zero_or_top {f : 𝕜 → E} {U : Set 𝕜}
+    (hf : MeromorphicOn f U) :
     {u : U | (hf u u.2).order = 0 ∨ (hf u u.2).order = ⊤} ∈ Filter.codiscrete U := by
   rw [mem_codiscrete_subtype_iff_mem_codiscreteWithin, mem_codiscreteWithin]
   intro x hx
@@ -62,45 +63,13 @@ noncomputable def MeromorphicOn.divisor
     simp [h₂z] at hz
 
   supportDiscreteWithinDomain := by
-    have A₁ := hf.eventually_codiscreteWithin_analyticAt
-    let U' := { x ∈ U | AnalyticAt 𝕜 f x}
-    have A₂ : U' ⊆ U := fun x hx ↦ hx.1
-    have A₃ : AnalyticOnNhd 𝕜 f U' := fun x hx ↦ hx.2
-    rw [Filter.EventuallyEq, Filter.Eventually]
-    rw [mem_codiscreteWithin]
-    intro z hz
-    rw [Filter.disjoint_principal_right]
-    simp
-    have A := (hf z hz).eventually_analyticAt
-    rcases MeromorphicAt.eventually_eq_zero_or_eventually_ne_zero (hf z hz) with h | h
-    · have C := hf.isClopen_setOf_order_eq_top
-      have D := (hf z hz).order_eq_top_iff.2 h
-      rw [← eventually_eventually_nhdsWithin] at h
-      have h' : ∀ᶠ (y : 𝕜) in 𝓝[≠] z, ∀ᶠ (x : 𝕜) in 𝓝 y, f x = 0:= by
-        simp_rw [eventually_nhdsWithin_iff] at h
-        simp_rw [eventually_nhdsWithin_iff]
-        filter_upwards [h]
-        intro a h₁a h₂a
-        have h₃a : ∀ᶠ (y : 𝕜) in 𝓝 a, y ≠ z := by
-          exact ContinuousAt.eventually_ne (fun ⦃U⦄ a ↦ a) h₂a
-        filter_upwards [h₁a h₂a, h₃a]
-        intro b h₁b h₂b
-        tauto
-      filter_upwards [h, h', A]
-      intro a h₁a h₂a h₃a
-      simp
-      intro h₄a h₅a
-      rw [MeromorphicAt.order_eq_top_iff]
-      exact eventually_nhdsWithin_of_eventually_nhds h₂a
-    · filter_upwards [h, A]
-      intro a h₁a h₂a
-      simp
-      intro h₃a
-      let D := h₂a.order_eq_zero_iff.2 h₁a
-      have : (hf a h₃a).order = 0 := by
-        rw [AnalyticAt.meromorphicAt_order h₂a, D]
-        simp
-      tauto
+    filter_upwards [mem_codiscrete_subtype_iff_mem_codiscreteWithin.1
+      hf.codiscrete_setOf_order_eq_zero_or_top]
+    intro _ _
+    simp_all only [Set.mem_image, Set.mem_setOf_eq, Subtype.exists, exists_and_right,
+      exists_eq_right, Pi.zero_apply, dite_eq_right_iff, WithTop.untopD_eq_self_iff,
+      WithTop.coe_zero]
+    tauto
 
 theorem MeromorphicOn.divisor_def₁
   {f : 𝕜 → E}
