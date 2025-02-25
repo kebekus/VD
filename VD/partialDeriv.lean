@@ -4,45 +4,30 @@ import Mathlib.Analysis.Calculus.ContDiff.Basic
 import Mathlib.Topology.Basic
 import Mathlib.Topology.Defs.Filter
 
-
-variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
-variable {F : Type*} [NormedAddCommGroup F] [NormedSpace 𝕜 F]
-variable {G : Type*} [NormedAddCommGroup G] [NormedSpace 𝕜 G]
-variable (𝕜)
-
+variable (𝕜 : Type*) [NontriviallyNormedField 𝕜]
+variable {E F G : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
+  [NormedAddCommGroup F] [NormedSpace 𝕜 F] [NormedAddCommGroup G] [NormedSpace 𝕜 G]
 
 noncomputable def partialDeriv : E → (E → F) → (E → F) :=
   fun v ↦ (fun f ↦ (fun w ↦ fderiv 𝕜 f w v))
 
-
-theorem partialDeriv_eventuallyEq'
-  {f₁ f₂ : E → F}
-  {x : E}
-  (h : f₁ =ᶠ[nhds x] f₂) :
-  ∀ v : E, partialDeriv 𝕜 v f₁ =ᶠ[nhds x] partialDeriv 𝕜 v f₂ := by
+theorem partialDeriv_eventuallyEq' {f₁ f₂ : E → F} {x : E} (h : f₁ =ᶠ[nhds x] f₂) :
+    ∀ v : E, partialDeriv 𝕜 v f₁ =ᶠ[nhds x] partialDeriv 𝕜 v f₂ := by
   unfold partialDeriv
   intro v
   apply Filter.EventuallyEq.comp₂
   exact Filter.EventuallyEq.fderiv h
   simp
 
-
-theorem partialDeriv_eventuallyEq
-  {f₁ f₂ : E → F}
-  {x : E}
-  (h : f₁ =ᶠ[nhds x] f₂) :
-  ∀ v : E, partialDeriv 𝕜 v f₁ x = partialDeriv 𝕜 v f₂ x := by
+theorem partialDeriv_eventuallyEq {f₁ f₂ : E → F} {x : E} (h : f₁ =ᶠ[nhds x] f₂) :
+    ∀ v : E, partialDeriv 𝕜 v f₁ x = partialDeriv 𝕜 v f₂ x := by
   unfold partialDeriv
   rw [Filter.EventuallyEq.fderiv_eq h]
-  exact fun v => rfl
+  intro v
+  simp
 
-
-theorem partialDeriv_smul₁
-  {f : E → F}
-  {a : 𝕜}
-  {v : E} :
-  partialDeriv 𝕜 (a • v) f = a • partialDeriv 𝕜 v f := by
+theorem partialDeriv_smul₁ {f : E → F} {a : 𝕜} {v : E} :
+    partialDeriv 𝕜 (a • v) f = a • partialDeriv 𝕜 v f := by
   unfold partialDeriv
   conv =>
     left
@@ -51,8 +36,8 @@ theorem partialDeriv_smul₁
   funext w
   simp
 
-
-theorem partialDeriv_add₁ {f : E → F} {v₁ v₂ : E} : partialDeriv 𝕜 (v₁ + v₂) f = (partialDeriv 𝕜 v₁ f) + (partialDeriv 𝕜 v₂ f) := by
+theorem partialDeriv_add₁ {f : E → F} {v₁ v₂ : E} :
+    partialDeriv 𝕜 (v₁ + v₂) f = (partialDeriv 𝕜 v₁ f) + (partialDeriv 𝕜 v₂ f) := by
   unfold partialDeriv
   conv =>
     left
@@ -61,8 +46,8 @@ theorem partialDeriv_add₁ {f : E → F} {v₁ v₂ : E} : partialDeriv 𝕜 (v
   funext w
   simp
 
-
-theorem partialDeriv_smul₂ {f : E → F} {a : 𝕜} {v : E} : partialDeriv 𝕜 v (a • f) = a • partialDeriv 𝕜 v f := by
+theorem partialDeriv_smul₂ {f : E → F} {a : 𝕜} {v : E} :
+    partialDeriv 𝕜 v (a • f) = a • partialDeriv 𝕜 v f := by
   unfold partialDeriv
   funext w
   have : a • f = fun y ↦ a • f y := by rfl
@@ -87,8 +72,8 @@ theorem partialDeriv_smul₂ {f : E → F} {a : 𝕜} {v : E} : partialDeriv �
       rw [fderiv_zero_of_not_differentiableAt this]
       simp
 
-
-theorem partialDeriv_add₂ {f₁ f₂ : E → F} (h₁ : Differentiable 𝕜 f₁) (h₂ : Differentiable 𝕜 f₂) : ∀ v : E, partialDeriv 𝕜 v (f₁ + f₂) = (partialDeriv 𝕜 v f₁) + (partialDeriv 𝕜 v f₂) := by
+theorem partialDeriv_add₂ {f₁ f₂ : E → F} (h₁ : Differentiable 𝕜 f₁) (h₂ : Differentiable 𝕜 f₂) :
+    ∀ v : E, partialDeriv 𝕜 v (f₁ + f₂) = (partialDeriv 𝕜 v f₁) + (partialDeriv 𝕜 v f₂) := by
   unfold partialDeriv
   intro v
   have : f₁ + f₂ = fun y ↦ f₁ y + f₂ y := by rfl
@@ -101,33 +86,20 @@ theorem partialDeriv_add₂ {f₁ f₂ : E → F} (h₁ : Differentiable 𝕜 f�
   funext w
   simp
 
-
-theorem partialDeriv_add₂_differentiableAt
-  {f₁ f₂ : E → F}
-  {v : E}
-  {x : E}
-  (h₁ : DifferentiableAt 𝕜 f₁ x)
-  (h₂ : DifferentiableAt 𝕜 f₂ x) :
-  partialDeriv 𝕜 v (f₁ + f₂) x = (partialDeriv 𝕜 v f₁) x + (partialDeriv 𝕜 v f₂) x := by
-
+theorem partialDeriv_add₂_differentiableAt {f₁ f₂ : E → F} {v x : E}
+    (h₁ : DifferentiableAt 𝕜 f₁ x) (h₂ : DifferentiableAt 𝕜 f₂ x) :
+    partialDeriv 𝕜 v (f₁ + f₂) x = (partialDeriv 𝕜 v f₁) x + (partialDeriv 𝕜 v f₂) x := by
   unfold partialDeriv
   have : f₁ + f₂ = fun y ↦ f₁ y + f₂ y := by rfl
   rw [this]
   rw [fderiv_add h₁ h₂]
   rfl
 
-
-theorem partialDeriv_add₂_contDiffAt
-  {f₁ f₂ : E → F}
-  {v : E}
-  {x : E}
-  (h₁ : ContDiffAt 𝕜 1 f₁ x)
-  (h₂ : ContDiffAt 𝕜 1 f₂ x) :
-  partialDeriv 𝕜 v (f₁ + f₂) =ᶠ[nhds x] (partialDeriv 𝕜 v f₁) + (partialDeriv 𝕜 v f₂) := by
-
+theorem partialDeriv_add₂_contDiffAt {f₁ f₂ : E → F} {v x : E}
+    (h₁ : ContDiffAt 𝕜 1 f₁ x) (h₂ : ContDiffAt 𝕜 1 f₂ x) :
+    partialDeriv 𝕜 v (f₁ + f₂) =ᶠ[nhds x] (partialDeriv 𝕜 v f₁) + (partialDeriv 𝕜 v f₂) := by
   obtain ⟨f₁', u₁, hu₁, _, hf₁'⟩ := contDiffAt_one_iff.1 h₁
   obtain ⟨f₂', u₂, hu₂, _, hf₂'⟩ := contDiffAt_one_iff.1 h₂
-
   apply Filter.eventuallyEq_iff_exists_mem.2
   use u₁ ∩ u₂, Filter.inter_mem hu₁ hu₂
   intro x hx
@@ -136,8 +108,8 @@ theorem partialDeriv_add₂_contDiffAt
   exact (hf₁' x hx.1).differentiableAt
   exact (hf₂' x hx.2).differentiableAt
 
-
-theorem partialDeriv_sub₂ {f₁ f₂ : E → F} (h₁ : Differentiable 𝕜 f₁) (h₂ : Differentiable 𝕜 f₂) : ∀ v : E, partialDeriv 𝕜 v (f₁ - f₂) = (partialDeriv 𝕜 v f₁) - (partialDeriv 𝕜 v f₂) := by
+theorem partialDeriv_sub₂ {f₁ f₂ : E → F} (h₁ : Differentiable 𝕜 f₁) (h₂ : Differentiable 𝕜 f₂) :
+    ∀ v : E, partialDeriv 𝕜 v (f₁ - f₂) = (partialDeriv 𝕜 v f₁) - (partialDeriv 𝕜 v f₂) := by
   unfold partialDeriv
   intro v
   have : f₁ - f₂ = fun y ↦ f₁ y - f₂ y := by rfl
@@ -150,33 +122,20 @@ theorem partialDeriv_sub₂ {f₁ f₂ : E → F} (h₁ : Differentiable 𝕜 f�
   funext w
   simp
 
-
-theorem partialDeriv_sub₂_differentiableAt
-  {f₁ f₂ : E → F}
-  {v : E}
-  {x : E}
-  (h₁ : DifferentiableAt 𝕜 f₁ x)
-  (h₂ : DifferentiableAt 𝕜 f₂ x) :
-  partialDeriv 𝕜 v (f₁ - f₂) x = (partialDeriv 𝕜 v f₁) x - (partialDeriv 𝕜 v f₂) x := by
-
+theorem partialDeriv_sub₂_differentiableAt {f₁ f₂ : E → F} {v x : E}
+    (h₁ : DifferentiableAt 𝕜 f₁ x) (h₂ : DifferentiableAt 𝕜 f₂ x) :
+    partialDeriv 𝕜 v (f₁ - f₂) x = (partialDeriv 𝕜 v f₁) x - (partialDeriv 𝕜 v f₂) x := by
   unfold partialDeriv
   have : f₁ - f₂ = fun y ↦ f₁ y - f₂ y := by rfl
   rw [this]
   rw [fderiv_sub h₁ h₂]
   rfl
 
-
-theorem partialDeriv_sub₂_contDiffAt
-  {f₁ f₂ : E → F}
-  {v : E}
-  {x : E}
-  (h₁ : ContDiffAt 𝕜 1 f₁ x)
-  (h₂ : ContDiffAt 𝕜 1 f₂ x) :
-  partialDeriv 𝕜 v (f₁ - f₂) =ᶠ[nhds x] (partialDeriv 𝕜 v f₁) - (partialDeriv 𝕜 v f₂) := by
-
+theorem partialDeriv_sub₂_contDiffAt {f₁ f₂ : E → F} {v x : E}
+    (h₁ : ContDiffAt 𝕜 1 f₁ x) (h₂ : ContDiffAt 𝕜 1 f₂ x) :
+    partialDeriv 𝕜 v (f₁ - f₂) =ᶠ[nhds x] (partialDeriv 𝕜 v f₁) - (partialDeriv 𝕜 v f₂) := by
   obtain ⟨f₁', u₁, hu₁, _, hf₁'⟩ := contDiffAt_one_iff.1 h₁
   obtain ⟨f₂', u₂, hu₂, _, hf₂'⟩ := contDiffAt_one_iff.1 h₂
-
   apply Filter.eventuallyEq_iff_exists_mem.2
   use u₁ ∩ u₂
   constructor
@@ -187,15 +146,10 @@ theorem partialDeriv_sub₂_contDiffAt
     exact (hf₁' x (Set.mem_of_mem_inter_left hx)).differentiableAt
     exact (hf₂' x (Set.mem_of_mem_inter_right hx)).differentiableAt
 
-
-theorem partialDeriv_compContLin
-  {f : E → F}
-  {l : F →L[𝕜] G}
-  {v : E}
-  (h : Differentiable 𝕜 f) :
+theorem partialDeriv_compContLin {f : E → F} {l : F →L[𝕜] G} {v : E}
+    (h : Differentiable 𝕜 f) :
   partialDeriv 𝕜 v (l ∘ f) = l ∘ partialDeriv 𝕜 v f := by
   unfold partialDeriv
-
   conv =>
     left
     intro w
@@ -204,14 +158,15 @@ theorem partialDeriv_compContLin
   simp
   rfl
 
-
-theorem partialDeriv_compContLinAt {f : E → F} {l : F →L[𝕜] G} {v : E} {x : E} (h : DifferentiableAt 𝕜 f x) : (partialDeriv 𝕜 v (l ∘ f)) x = (l ∘ partialDeriv 𝕜 v f) x:= by
+theorem partialDeriv_compContLinAt {f : E → F} {l : F →L[𝕜] G} {v x : E}
+    (h : DifferentiableAt 𝕜 f x) :
+    (partialDeriv 𝕜 v (l ∘ f)) x = (l ∘ partialDeriv 𝕜 v f) x:= by
   unfold partialDeriv
   rw [fderiv_comp x (ContinuousLinearMap.differentiableAt l) h]
   simp
 
-
-theorem partialDeriv_compCLE {f : E → F} {l : F ≃L[𝕜] G} {v : E} : partialDeriv 𝕜 v (l ∘ f) = l ∘ partialDeriv 𝕜 v f := by
+theorem partialDeriv_compCLE {f : E → F} {l : F ≃L[𝕜] G} {v : E} :
+    partialDeriv 𝕜 v (l ∘ f) = l ∘ partialDeriv 𝕜 v f := by
   funext x
   by_cases hyp : DifferentiableAt 𝕜 f x
   · let lCLM : F →L[𝕜] G := l
@@ -227,17 +182,15 @@ theorem partialDeriv_compCLE {f : E → F} {l : F ≃L[𝕜] G} {v : E} : partia
     rw [ContinuousLinearEquiv.comp_differentiableAt_iff]
     exact hyp
 
-
-theorem partialDeriv_contDiff {n : ℕ} {f : E → F} (h : ContDiff 𝕜 (n + 1) f) : ∀ v : E, ContDiff 𝕜 n (partialDeriv 𝕜 v f) := by
+@[simp]
+theorem partialDeriv_contDiff {n : ℕ} {f : E → F} (h : ContDiff 𝕜 (n + 1) f) :
+    ∀ v : E, ContDiff 𝕜 n (partialDeriv 𝕜 v f) := by
   unfold partialDeriv
   intro v
-
   let A := (contDiff_succ_iff_fderiv.1 h).right
   simp at A
-
   have : (fun w => (fderiv 𝕜 f w) v) = (fun f => f v) ∘ (fun w => (fderiv 𝕜 f w)) := by
     rfl
-
   rw [this]
   refine ContDiff.comp ?hg A
   refine ContDiff.of_succ ?hg.h
@@ -245,37 +198,26 @@ theorem partialDeriv_contDiff {n : ℕ} {f : E → F} (h : ContDiff 𝕜 (n + 1)
   exact contDiff_id
   exact contDiff_const
 
-
-theorem partialDeriv_contDiffAt
-  {n : ℕ}
-  {f : E → F}
-  {x : E}
-  (h : ContDiffAt 𝕜 (n + 1) f x) :
-  ∀ v : E, ContDiffAt 𝕜 n (partialDeriv 𝕜 v f) x := by
-
+theorem partialDeriv_contDiffAt {n : ℕ} {f : E → F} {x : E} (h : ContDiffAt 𝕜 (n + 1) f x) :
+    ∀ v : E, ContDiffAt 𝕜 n (partialDeriv 𝕜 v f) x := by
   unfold partialDeriv
   intro v
-
   let eval_at_v : (E →L[𝕜] F) →L[𝕜] F :=
   {
     toFun := fun l ↦ l v
     map_add' := by simp
     map_smul' := by simp
   }
-
   have : (fun w => (fderiv 𝕜 f w) v) = eval_at_v ∘ (fun w => (fderiv 𝕜 f w)) := by
     rfl
   rw [this]
-
   apply ContDiffAt.continuousLinearMap_comp
   -- ContDiffAt 𝕜 (↑n) (fun w => fderiv 𝕜 f w) x
   apply ContDiffAt.fderiv_right h
   rfl
 
-
 lemma partialDeriv_fderiv {f : E → F} (hf : ContDiff 𝕜 2 f) (z a b : E) :
     fderiv 𝕜 (fderiv 𝕜 f) z b a = partialDeriv 𝕜 b (partialDeriv 𝕜 a f) z := by
-
   unfold partialDeriv
   rw [fderiv_clm_apply]
   · simp
@@ -286,14 +228,9 @@ lemma partialDeriv_fderiv {f : E → F} (hf : ContDiff 𝕜 2 f) (z a b : E) :
     simp
   · simp
 
-
-lemma partialDeriv_fderivOn
-  {s : Set E}
-  {f : E → F}
-  (hs : IsOpen s)
-  (hf : ContDiffOn 𝕜 2 f s) (a b : E) :
-  ∀ z ∈ s, fderiv 𝕜 (fderiv 𝕜 f) z b a = partialDeriv 𝕜 b (partialDeriv 𝕜 a f) z := by
-
+lemma partialDeriv_fderivOn {s : Set E} {f : E → F} (hs : IsOpen s)
+    (hf : ContDiffOn 𝕜 2 f s) (a b : E) :
+    ∀ z ∈ s, fderiv 𝕜 (fderiv 𝕜 f) z b a = partialDeriv 𝕜 b (partialDeriv 𝕜 a f) z := by
   intro z hz
   unfold partialDeriv
   rw [fderiv_clm_apply]
@@ -305,14 +242,8 @@ lemma partialDeriv_fderivOn
     exact hf.2.2
   · simp
 
-
-lemma partialDeriv_fderivAt
-  {z : E}
-  {f : E → F}
-  (hf : ContDiffAt 𝕜 2 f z)
-  (a b : E) :
+lemma partialDeriv_fderivAt {z : E} {f : E → F} (hf : ContDiffAt 𝕜 2 f z) (a b : E) :
   fderiv 𝕜 (fderiv 𝕜 f) z b a = partialDeriv 𝕜 b (partialDeriv 𝕜 a f) z := by
-
   unfold partialDeriv
   rw [fderiv_clm_apply]
   simp
@@ -420,28 +351,23 @@ theorem partialDeriv_comm
   rw [derivSymm]
   rw [partialDeriv_fderiv ℝ h z v₁ v₂]
 
+section
 
-theorem partialDeriv_commOn
-  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-  {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
-  {s : Set E}
-  {f : E → F}
-  (hs : IsOpen s)
-  (h : ContDiffOn ℝ 2 f s) :
-  ∀ v₁ v₂ : E, ∀ z ∈ s, partialDeriv ℝ v₁ (partialDeriv ℝ v₂ f) z = partialDeriv ℝ v₂ (partialDeriv ℝ v₁ f) z := by
+variable {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
+  [NormedAddCommGroup F] [NormedSpace ℝ F] {f : E → F}
 
+theorem partialDeriv_commOn {s : Set E} (hs : IsOpen s) (h : ContDiffOn ℝ 2 f s) :
+    ∀ v₁ v₂ : E, ∀ z ∈ s,
+      partialDeriv ℝ v₁ (partialDeriv ℝ v₂ f) z = partialDeriv ℝ v₂ (partialDeriv ℝ v₁ f) z := by
   intro v₁ v₂ z hz
-
   have derivSymm :
     (fderiv ℝ (fun w => fderiv ℝ f w) z) v₁ v₂ = (fderiv ℝ (fun w => fderiv ℝ f w) z) v₂ v₁ := by
-
     let f' := fderiv ℝ f
     have h₀1 : ∀ y ∈ s, HasFDerivAt f (f' y) y := by
       intro y hy
       apply DifferentiableAt.hasFDerivAt
       apply DifferentiableOn.differentiableAt _ (IsOpen.mem_nhds hs hy)
       apply h.differentiableOn one_le_two
-
     let f'' := (fderiv ℝ f' z)
     have h₁ : HasFDerivAt f' f'' z := by
       apply DifferentiableAt.hasFDerivAt
@@ -449,30 +375,20 @@ theorem partialDeriv_commOn
       apply ContDiffOn.differentiableOn _ (Preorder.le_refl 1)
       rw [← one_add_one_eq_two] at h
       exact ((contDiffOn_succ_iff_fderiv_of_isOpen hs).1 h).2.2
-
     have h₀' : ∀ᶠ (y : E) in nhds z, HasFDerivAt f (f' y) y := by
       apply eventually_nhds_iff.mpr
       use s
-
     exact second_derivative_symmetric_of_eventually h₀' h₁ v₁ v₂
-
   rw [← partialDeriv_fderivOn ℝ hs h v₂ v₁ z hz]
   rw [derivSymm]
   rw [← partialDeriv_fderivOn ℝ hs h v₁ v₂ z hz]
 
-
-theorem partialDeriv_commAt
-  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-  {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
-  {z : E}
-  {f : E → F}
-  (h : ContDiffAt ℝ 2 f z) :
-  ∀ v₁ v₂ : E, partialDeriv ℝ v₁ (partialDeriv ℝ v₂ f) z = partialDeriv ℝ v₂ (partialDeriv ℝ v₁ f) z := by
-
+theorem partialDeriv_commAt {z : E} {f : E → F} (h : ContDiffAt ℝ 2 f z) :
+    ∀ v₁ v₂ : E,
+      partialDeriv ℝ v₁ (partialDeriv ℝ v₂ f) z = partialDeriv ℝ v₂ (partialDeriv ℝ v₁ f) z := by
   let A := h.contDiffOn le_rfl
   simp at A
   obtain ⟨u, hu₁, hu₂⟩ := A
   obtain ⟨v, hv₁, hv₂, hv₃⟩ := mem_nhds_iff.1 hu₁
-
   intro v₁ v₂
   exact partialDeriv_commOn hv₂ (hu₂.mono hv₁) v₁ v₂ z hv₃
