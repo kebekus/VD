@@ -41,6 +41,7 @@ theorem AnalyticOnNhd.codiscrete_setOf_order_eq_zero_or_top {f : 𝕜 → E} {U 
 
 -- TODO: Remove the assumption CompleteSpace E.
 
+/-
 lemma ContinuousAt.x {f g : 𝕜 → E} {z₀ : 𝕜} (hf : ContinuousAt f z₀) (hg : ContinuousAt f z₀)
     (hfg : f =ᶠ[𝓝[≠] z₀] g) :
     f z₀ = g z₀ := by
@@ -81,7 +82,7 @@ theorem MeromorphicAt.order_eq_zero_iff {f : 𝕜 → E} {z₀ : 𝕜} (hf : Mer
         sorry
       tauto
     sorry
-
+-/
 
 
 theorem MeromorphicOn.codiscrete_setOf_order_eq_zero_or_top [CompleteSpace E] {f : 𝕜 → E} {U : Set 𝕜}
@@ -116,10 +117,7 @@ theorem MeromorphicOn.codiscrete_setOf_order_eq_zero_or_top [CompleteSpace E] {f
     rw [h₁a.meromorphicAt_order, h₁a.order_eq_zero_iff.2 h₂a]
     tauto
 
-noncomputable def MeromorphicOn.divisor
-  {f : 𝕜 → E}
-  {U : Set 𝕜}
-  (hf : MeromorphicOn f U) :
+noncomputable def MeromorphicOn.divisor [CompleteSpace E] {f : 𝕜 → E} {U : Set 𝕜} (hf : MeromorphicOn f U) :
   Divisor U where
 
   toFun := by
@@ -144,7 +142,7 @@ noncomputable def MeromorphicOn.divisor
       WithTop.coe_zero]
     tauto
 
-theorem MeromorphicOn.divisor_def₁
+theorem MeromorphicOn.divisor_def₁ [CompleteSpace E]
   {f : 𝕜 → E}
   {U : Set 𝕜}
   {z : 𝕜}
@@ -155,7 +153,7 @@ theorem MeromorphicOn.divisor_def₁
   simp [hz]
 
 
-theorem MeromorphicOn.divisor_def₂
+theorem MeromorphicOn.divisor_def₂ [CompleteSpace E]
   {f : 𝕜 → E}
   {U : Set 𝕜}
   {z : 𝕜}
