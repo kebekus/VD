@@ -1,30 +1,30 @@
 import VD.laplace
 
-variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
-variable {F₁ : Type*} [NormedAddCommGroup F₁] [NormedSpace ℂ F₁]
-variable {G : Type*} [NormedAddCommGroup G] [NormedSpace ℝ G]
-variable {G₁ : Type*} [NormedAddCommGroup G₁] [NormedSpace ℂ G₁]
-
+variable {F G F₁ G₁ : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F]
+  [NormedAddCommGroup G] [NormedSpace ℝ G]
+  [NormedAddCommGroup F₁] [NormedSpace ℂ F₁]
+  [NormedAddCommGroup G₁] [NormedSpace ℂ G₁]
 
 def Harmonic (f : ℂ → F) : Prop := (ContDiff ℝ 2 f) ∧ (∀ z, Δ f z = 0)
 
 def HarmonicAt (f : ℂ → F) (x : ℂ) : Prop := (ContDiffAt ℝ 2 f x) ∧ (Δ f =ᶠ[nhds x] 0)
 
-#check Filter.EventuallyEq.eq_of_nhds
-#check Filter.eventuallyEq_iff_exists_mem
-
-example (f : ℂ → F) (x : ℂ) (h : HarmonicAt f x) : (Δ f =ᶠ[nhds x] 0) := h.2
-
-example (f : ℂ → F) (x : ℂ) (h : HarmonicAt f x) : ∃ U ∈ nhds x, ∀ y ∈ U, Δ f y = 0 := by
-  exact Filter.eventuallyEq_iff_exists_mem.1 h.2
-
 def HarmonicOn (f : ℂ → F) (s : Set ℂ) : Prop := (ContDiffOn ℝ 2 f s) ∧ (∀ z ∈ s, Δ f z = 0)
 
-example {f : ℂ → F} {x : ℂ} :
-    HarmonicAt f x ↔ ∃ s : Set ℂ, IsOpen s ∧ x ∈ s ∧ HarmonicOn f s := by
+lemma Harmonic_iff_HarmonicOn_univ {f : ℂ → F} : Harmonic f ↔ HarmonicOn f Set.univ := by
+  constructor <;> intro h
+  · constructor
+    · exact contDiffOn_univ.mpr h.1
+    · simp [h.2]
+  · constructor
+    · exact contDiffOn_univ.mp h.1
+    · simp [h.2]
+
+lemma HarmonicOn_le {f : ℂ → F} {s t : Set ℂ} (h : HarmonicOn f s) (hst : t ⊆ s) :
+    HarmonicOn f t := by
   constructor
-  . sorry
-  · sorry
+  · exact h.1.mono hst
+  · exact fun z hz => h.2 z (hst hz)
 
 theorem HarmonicAt_iff {f : ℂ → F} {x : ℂ} :
     HarmonicAt f x ↔ ∃ s : Set ℂ, IsOpen s ∧ x ∈ s ∧ HarmonicOn f s := by
@@ -43,10 +43,6 @@ theorem HarmonicAt_iff {f : ℂ → F} {x : ℂ} :
     · apply Filter.eventuallyEq_iff_exists_mem.2
       use s, h₁s.mem_nhds_iff.2 h₂s, h₂f
 
-#loogle IsOpen, nhds
-
-example (f : ℂ → F) (x : ℂ) (h : HarmonicAt f x) : ∃ U ∈ nhds x, HarmonicOn f U := by sorry
-
 theorem HarmonicAt_isOpen (f : ℂ → F) : IsOpen { x : ℂ | HarmonicAt f x } := by
   rw [← subset_interior_iff_isOpen]
   intro x hx
@@ -63,11 +59,15 @@ theorem HarmonicAt_isOpen (f : ℂ → F) : IsOpen { x : ℂ | HarmonicAt f x } 
       use s
   · exact h₂s
 
+theorem HarmonicAt_eventuallyEq' {f₁ f₂ : ℂ → F} {x : ℂ} (hf : HarmonicAt f₁ x) (h : f₁ =ᶠ[nhds x] f₂) :
+    HarmonicAt f₂ x :=
+  ⟨hf.1.congr_of_eventuallyEq h.symm, (laplace_eventuallyEq' h.symm).trans hf.2⟩
+
 theorem HarmonicAt_eventuallyEq {f₁ f₂ : ℂ → F} {x : ℂ} (h : f₁ =ᶠ[nhds x] f₂) :
     HarmonicAt f₁ x ↔ HarmonicAt f₂ x := by
-  constructor
-  · exact fun h₁ ↦ ⟨h₁.1.congr_of_eventuallyEq h.symm, (laplace_eventuallyEq' h.symm).trans h₁.2⟩
-  · exact fun h₁ ↦ ⟨h₁.1.congr_of_eventuallyEq h, (laplace_eventuallyEq' h).trans h₁.2⟩
+  constructor <;> intro hf
+  · apply HarmonicAt_eventuallyEq' hf h
+  · apply HarmonicAt_eventuallyEq' hf h.symm
 
 theorem HarmonicOn_of_locally_HarmonicOn {f : ℂ → F} {s : Set ℂ}
     (h : ∀ x ∈ s, ∃ (u : Set ℂ), IsOpen u ∧ x ∈ u ∧ HarmonicOn f (s ∩ u)) :
@@ -110,71 +110,31 @@ theorem HarmonicOn_congr {f₁ f₂ : ℂ → F} {s : Set ℂ} (hs : IsOpen s) (
       rw [laplace_eventuallyEq this]
       exact h₁.2 z hz
 
-theorem harmonic_add_harmonic_is_harmonic {f₁ f₂ : ℂ → F} (h₁ : Harmonic f₁) (h₂ : Harmonic f₂) :
-  Harmonic (f₁ + f₂) := by
-  constructor
-  · exact ContDiff.add h₁.1 h₂.1
-  · intro z
-    simp [laplace_add h₁.1 h₂.1, h₁.2 z, h₂.2 z]
+section harmonicOn
 
-theorem harmonicOn_add_harmonicOn_is_harmonicOn {f₁ f₂ : ℂ → F} {s : Set ℂ} (hs : IsOpen s)
+variable {f f₁ f₂ : ℂ → F} {s : Set ℂ} {c : ℝ}
+
+theorem harmonicOn_add_harmonicOn_is_harmonicOn (hs : IsOpen s)
     (h₁ : HarmonicOn f₁ s) (h₂ : HarmonicOn f₂ s) :
-  HarmonicOn (f₁ + f₂) s := by
+    HarmonicOn (f₁ + f₂) s := by
   constructor
   · exact h₁.1.add h₂.1
   · intro z hz
     simp [laplace_add_ContDiffOn hs h₁.1 h₂.1 hz, h₁.2 _ hz, h₂.2 _ hz]
 
-theorem harmonicAt_add_harmonicAt_is_harmonicAt {f₁ f₂ : ℂ → F} {x : ℂ}
-  (h₁ : HarmonicAt f₁ x) (h₂ : HarmonicAt f₂ x) : HarmonicAt (f₁ + f₂) x := by
-  constructor
-  · exact h₁.1.add h₂.1
-  · apply (laplace_add_ContDiffAt' h₁.1 h₂.1).trans
-    apply (h₁.2.add h₂.2).trans
-    simp
-    rfl
-
-theorem harmonic_smul_const_is_harmonic {f : ℂ → F} {c : ℝ} (h : Harmonic f) :
-  Harmonic (c • f) := by
+theorem harmonicOn_smul_const_is_harmonicOn (_ : IsOpen s) (h : HarmonicOn f s) :
+    HarmonicOn (c • f) s := by
   constructor
   · exact h.1.const_smul c
-  · intro z
-    simp [laplace_smul, h.2 z]
+  · intro z hz
+    simp [laplace_smul, h.2 z hz]
 
-theorem harmonicAt_smul_const_is_harmonicAt {f : ℂ → F} {x : ℂ} {c : ℝ} (h : HarmonicAt f x) :
-  HarmonicAt (c • f) x := by
+theorem harmonicOn_iff_smul_const_is_harmonicOn (hs : IsOpen s) (hc : c ≠ 0) :
+  HarmonicOn f s ↔ HarmonicOn (c • f) s := by
   constructor
-  · exact h.1.const_smul c
-  · rw [laplace_smul]
-    have A := h.2.const_smul c
-    simp at A
-    assumption
-
-theorem harmonic_iff_smul_const_is_harmonic {f : ℂ → F} {c : ℝ} (hc : c ≠ 0) :
-  Harmonic f ↔ Harmonic (c • f) := by
-  constructor
-  · exact harmonic_smul_const_is_harmonic
+  · exact harmonicOn_smul_const_is_harmonicOn hs
   · nth_rewrite 2 [((eq_inv_smul_iff₀ hc).mpr rfl : f = c⁻¹ • c • f)]
-    exact fun a => harmonic_smul_const_is_harmonic a
-
-theorem harmonicAt_iff_smul_const_is_harmonicAt {f : ℂ → F} {x : ℂ} {c : ℝ} (hc : c ≠ 0) :
-  HarmonicAt f x ↔ HarmonicAt (c • f) x := by
-  constructor
-  · exact harmonicAt_smul_const_is_harmonicAt
-  · nth_rewrite 2 [((eq_inv_smul_iff₀ hc).mpr rfl : f = c⁻¹ • c • f)]
-    exact fun a => harmonicAt_smul_const_is_harmonicAt a
-
-theorem harmonic_comp_CLM_is_harmonic {f : ℂ → F₁} {l : F₁ →L[ℝ] G} (h : Harmonic f) :
-  Harmonic (l ∘ f) := by
-  constructor
-  · -- Continuous differentiability
-    exact ContDiff.comp l.contDiff h.1
-  · rw [laplace_compCLM]
-    simp
-    intro z
-    rw [h.2 z]
-    simp
-    exact h.1.restrict_scalars ℝ
+    exact fun a => harmonicOn_smul_const_is_harmonicOn hs a
 
 theorem harmonicOn_comp_CLM_is_harmonicOn {f : ℂ → F₁} {s : Set ℂ} {l : F₁ →L[ℝ] G} (hs : IsOpen s)
     (h : HarmonicOn f s) : HarmonicOn (l ∘ f) s := by
@@ -190,38 +150,85 @@ theorem harmonicOn_comp_CLM_is_harmonicOn {f : ℂ → F₁} {s : Set ℂ} {l : 
     assumption
     apply h.1.contDiffAt (hs.mem_nhds zHyp)
 
-theorem harmonicAt_comp_CLM_is_harmonicAt {f : ℂ → F₁} {z : ℂ} {l : F₁ →L[ℝ] G}
-    (h : HarmonicAt f z) : HarmonicAt (l ∘ f) z := by
+theorem harmonicOn_iff_comp_CLE_is_harmonicOn {f : ℂ → F₁} {s : Set ℂ} {l : F₁ ≃L[ℝ] G₁}
+    (hs : IsOpen s) : HarmonicOn f s ↔ HarmonicOn (l ∘ f) s := by
   constructor
-  · -- ContDiffAt ℝ 2 (⇑l ∘ f) z
-    exact ContDiffAt.continuousLinearMap_comp _ h.1
-  · -- Δ (⇑l ∘ f) =ᶠ[nhds z] 0
-    -- rw [Filter.eventuallyEq_iff_exists_mem]
-    obtain ⟨r, h₁r, h₂r⟩ := h.1.contDiffOn le_rfl (by trivial)
-    obtain ⟨s, h₁s, h₂s, h₃s⟩ := mem_nhds_iff.1 h₁r
-    obtain ⟨t, h₁t, h₂t⟩ := Filter.eventuallyEq_iff_exists_mem.1 h.2
-    obtain ⟨u, h₁u, h₂u, h₃u⟩ := mem_nhds_iff.1 h₁t
-    apply Filter.eventuallyEq_iff_exists_mem.2
-    use s ∩ u, (h₂s.inter h₂u).mem_nhds ⟨h₃s, h₃u⟩
-    intro x xHyp
-    rw [laplace_compCLMAt]
-    simp
-    rw [h₂t]
-    simp
-    exact h₁u xHyp.2
-    apply (h₂r.mono h₁s).contDiffAt (h₂s.mem_nhds xHyp.1)
-
-theorem harmonic_iff_comp_CLE_is_harmonic {f : ℂ → F₁} {l : F₁ ≃L[ℝ] G₁} :
-  Harmonic f ↔ Harmonic (l ∘ f) := by
-  constructor
-  · have : l ∘ f = (l : F₁ →L[ℝ] G₁) ∘ f := by rfl
-    rw [this]
-    exact harmonic_comp_CLM_is_harmonic
+  · exact harmonicOn_comp_CLM_is_harmonicOn (l := l.toContinuousLinearMap) hs
   · have : f = (l.symm : G₁ →L[ℝ] F₁) ∘ l ∘ f := by
       unfold Function.comp
       simp
     nth_rewrite 2 [this]
-    exact harmonic_comp_CLM_is_harmonic
+    exact harmonicOn_comp_CLM_is_harmonicOn hs
+end harmonicOn
+
+section harmonic
+
+variable {f f₁ f₂ : ℂ → F} {s : Set ℂ} {c : ℝ}
+
+theorem harmonic_add_harmonic_is_harmonic (h₁ : Harmonic f₁) (h₂ : Harmonic f₂) :
+    Harmonic (f₁ + f₂) := by
+  rw [Harmonic_iff_HarmonicOn_univ] at *
+  exact harmonicOn_add_harmonicOn_is_harmonicOn isOpen_univ h₁ h₂
+
+theorem harmonic_smul_const_is_harmonic (h : Harmonic f) :
+    Harmonic (c • f) := by
+  rw [Harmonic_iff_HarmonicOn_univ] at *
+  exact harmonicOn_smul_const_is_harmonicOn isOpen_univ h
+
+theorem harmonic_iff_smul_const_is_harmonic (hc : c ≠ 0) :
+  Harmonic f ↔ Harmonic (c • f) := by
+  repeat rw [Harmonic_iff_HarmonicOn_univ]
+  exact harmonicOn_iff_smul_const_is_harmonicOn isOpen_univ hc
+
+theorem harmonic_comp_CLM_is_harmonic {f : ℂ → F₁} {l : F₁ →L[ℝ] G} (h : Harmonic f) :
+    Harmonic (l ∘ f) := by
+  rw [Harmonic_iff_HarmonicOn_univ] at *
+  apply harmonicOn_comp_CLM_is_harmonicOn isOpen_univ h
+
+theorem harmonic_iff_comp_CLE_is_harmonic {f : ℂ → F₁} {l : F₁ ≃L[ℝ] G₁} :
+    Harmonic f ↔ Harmonic (l ∘ f) := by
+  repeat rw [Harmonic_iff_HarmonicOn_univ]
+  exact harmonicOn_iff_comp_CLE_is_harmonicOn isOpen_univ
+
+end harmonic
+
+section harmonicAt
+
+variable {f f₁ f₂ : ℂ → F} {s : Set ℂ} {c : ℝ} {x : ℂ}
+
+theorem harmonicAt_add_harmonicAt_is_harmonicAt
+    (h₁ : HarmonicAt f₁ x) (h₂ : HarmonicAt f₂ x) : HarmonicAt (f₁ + f₂) x := by
+  rw [HarmonicAt_iff] at *
+  obtain ⟨s₁, h₁s₁, h₂s₁, h₃s₁⟩ := h₁
+  obtain ⟨s₂, h₁s₂, h₂s₂, h₃s₂⟩ := h₂
+  use s₁ ∩ s₂
+  refine ⟨h₁s₁.inter h₁s₂, Set.mem_inter h₂s₁ h₂s₂, ?_⟩
+  apply harmonicOn_add_harmonicOn_is_harmonicOn (h₁s₁.inter h₁s₂)
+  apply HarmonicOn_le h₃s₁ Set.inter_subset_left
+  apply HarmonicOn_le h₃s₂ Set.inter_subset_right
+
+theorem harmonicAt_smul_const_is_harmonicAt (h : HarmonicAt f x) :
+    HarmonicAt (c • f) x := by
+  rw [HarmonicAt_iff] at *
+  obtain ⟨s, h₁s, h₂s, h₃s⟩ := h
+  use s
+  refine ⟨h₁s, h₂s, ?_⟩
+  apply harmonicOn_smul_const_is_harmonicOn h₁s h₃s
+
+theorem harmonicAt_iff_smul_const_is_harmonicAt (hc : c ≠ 0) :
+  HarmonicAt f x ↔ HarmonicAt (c • f) x := by
+  constructor
+  · exact harmonicAt_smul_const_is_harmonicAt
+  · nth_rewrite 2 [((eq_inv_smul_iff₀ hc).mpr rfl : f = c⁻¹ • c • f)]
+    exact fun a => harmonicAt_smul_const_is_harmonicAt a
+
+theorem harmonicAt_comp_CLM_is_harmonicAt {f : ℂ → F₁} {z : ℂ} {l : F₁ →L[ℝ] G}
+    (h : HarmonicAt f z) : HarmonicAt (l ∘ f) z := by
+  rw [HarmonicAt_iff] at *
+  obtain ⟨s, h₁s, h₂s, h₃s⟩ := h
+  use s
+  refine ⟨h₁s, h₂s, ?_⟩
+  apply harmonicOn_comp_CLM_is_harmonicOn h₁s h₃s
 
 theorem harmonicAt_iff_comp_CLE_is_harmonicAt {f : ℂ → F₁} {z : ℂ} {l : F₁ ≃L[ℝ] G₁} :
   HarmonicAt f z ↔ HarmonicAt (l ∘ f) z := by
@@ -235,14 +242,4 @@ theorem harmonicAt_iff_comp_CLE_is_harmonicAt {f : ℂ → F₁} {z : ℂ} {l : 
     nth_rewrite 2 [this]
     exact harmonicAt_comp_CLM_is_harmonicAt
 
-theorem harmonicOn_iff_comp_CLE_is_harmonicOn {f : ℂ → F₁} {s : Set ℂ} {l : F₁ ≃L[ℝ] G₁}
-    (hs : IsOpen s) : HarmonicOn f s ↔ HarmonicOn (l ∘ f) s := by
-  constructor
-  · have : l ∘ f = (l : F₁ →L[ℝ] G₁) ∘ f := by rfl
-    rw [this]
-    exact harmonicOn_comp_CLM_is_harmonicOn hs
-  · have : f = (l.symm : G₁ →L[ℝ] F₁) ∘ l ∘ f := by
-      unfold Function.comp
-      simp
-    nth_rewrite 2 [this]
-    exact harmonicOn_comp_CLM_is_harmonicOn hs
+end harmonicAt
