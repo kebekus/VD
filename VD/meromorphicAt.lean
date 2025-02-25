@@ -66,8 +66,8 @@ theorem meromorphicAt_congr'
 
 
 theorem MeromorphicAt.order_congr
-  {f₁ f₂ : ℂ → ℂ}
-  {z₀ : ℂ}
+  {f₁ f₂ : 𝕜 → E}
+  {z₀ : 𝕜}
   (hf₁ : MeromorphicAt f₁ z₀)
   (h : f₁ =ᶠ[𝓝[≠] z₀] f₂):
   hf₁.order = (hf₁.congr h).order := by
@@ -83,8 +83,8 @@ theorem MeromorphicAt.order_congr
     exact EventuallyEq.rw h₃g (fun x => Eq (f₂ x)) (_root_.id (EventuallyEq.symm h))
 
 theorem MeromorphicAt.order_inv
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
+  {f : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
   (hf : MeromorphicAt f z₀) :
   hf.order = -hf.inv.order := by
 
@@ -122,9 +122,9 @@ theorem MeromorphicAt.order_inv
 
 
 theorem AnalyticAt.meromorphicAt_order_nonneg
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
-  (hf : AnalyticAt ℂ f z₀) :
+  {f : 𝕜 → E}
+  {z₀ : 𝕜}
+  (hf : AnalyticAt 𝕜 f z₀) :
   0 ≤ hf.meromorphicAt.order := by
   rw [hf.meromorphicAt_order]
   rw [(by rfl : (0 : WithTop ℤ) = WithTop.map Nat.cast (0 : ℕ∞))]
@@ -133,8 +133,8 @@ theorem AnalyticAt.meromorphicAt_order_nonneg
 
 
 theorem MeromorphicAt.order_add
-  {f₁ f₂ : ℂ → ℂ}
-  {z₀ : ℂ}
+  {f₁ f₂ : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
   (hf₁ : MeromorphicAt f₁ z₀)
   (hf₂ : MeromorphicAt f₂ z₀) :
   min hf₁.order hf₂.order ≤ (hf₁.add hf₂).order := by
@@ -174,7 +174,7 @@ theorem MeromorphicAt.order_add
     exact Int.min_le_right n₁ n₂
 
   let g := (fun z ↦ (z - z₀) ^ (n₁ - n)) * g₁ +  (fun z ↦ (z - z₀) ^ (n₂ - n)) * g₂
-  have h₁g : AnalyticAt ℂ g z₀ := by
+  have h₁g : AnalyticAt 𝕜 g z₀ := by
     apply AnalyticAt.add
     apply AnalyticAt.mul (AnalyticAt.zpow_nonneg (by fun_prop) h₁n₁) h₁g₁
     apply AnalyticAt.mul (AnalyticAt.zpow_nonneg (by fun_prop) h₁n₂) h₁g₂
@@ -211,8 +211,8 @@ theorem MeromorphicAt.order_add
 
 
 theorem MeromorphicAt.order_add_of_ne_orders
-  {f₁ f₂ : ℂ → ℂ}
-  {z₀ : ℂ}
+  {f₁ f₂ : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
   (hf₁ : MeromorphicAt f₁ z₀)
   (hf₂ : MeromorphicAt f₂ z₀)
   (hf₁₂ : hf₁.order ≠ hf₂.order) :
@@ -259,7 +259,7 @@ theorem MeromorphicAt.order_add_of_ne_orders
     exact Int.min_le_right n₁ n₂
 
   let g := (fun z ↦ (z - z₀) ^ (n₁ - n)) * g₁ +  (fun z ↦ (z - z₀) ^ (n₂ - n)) * g₂
-  have h₁g : AnalyticAt ℂ g z₀ := by
+  have h₁g : AnalyticAt 𝕜 g z₀ := by
     apply AnalyticAt.add
     apply (AnalyticAt.zpow_nonneg (by fun_prop) h₁n₁).mul h₁g₁
     apply (AnalyticAt.zpow_nonneg (by fun_prop) h₁n₂).mul h₁g₂
@@ -280,7 +280,7 @@ theorem MeromorphicAt.order_add_of_ne_orders
       have : n₂ - n₁ ≠ 0 := by
         rw [sub_ne_zero, ne_comm]
         apply hn₁₂
-      have : (0 : ℂ) ^ (n₂ - n₁) = 0 := by
+      have : (0 : 𝕜) ^ (n₂ - n₁) = 0 := by
         rwa [zpow_eq_zero_iff]
       simp [this]
       exact h₂g₁
@@ -288,7 +288,7 @@ theorem MeromorphicAt.order_add_of_ne_orders
       have : n₁ - n₂ ≠ 0 := by
         rw [sub_ne_zero]
         apply hn₁₂
-      have : (0 : ℂ) ^ (n₁ - n₂) = 0 := by
+      have : (0 : 𝕜) ^ (n₁ - n₂) = 0 := by
         rwa [zpow_eq_zero_iff]
       simp [this]
       exact h₂g₂

@@ -4,12 +4,15 @@ import VD.stronglyMeromorphicAt
 open Topology
 
 
+variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [CompleteSpace E]
 
-theorem MeromorphicOn.analyticOnCodiscreteWithin
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+
+theorem MeromorphicOn.analyticOnCodiscreteWithin [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (hf : MeromorphicOn f U) :
-  { x | AnalyticAt ℂ f x } ∈ Filter.codiscreteWithin U := by
+  { x | AnalyticAt 𝕜 f x } ∈ Filter.codiscreteWithin U := by
 
   rw [mem_codiscreteWithin]
   intro x hx
@@ -22,15 +25,15 @@ theorem MeromorphicOn.analyticOnCodiscreteWithin
 
 /- Strongly MeromorphicOn -/
 def StronglyMeromorphicOn
-  (f : ℂ → ℂ)
-  (U : Set ℂ) :=
+  (f : 𝕜 → 𝕜)
+  (U : Set 𝕜) :=
   ∀ z ∈ U, MeromorphicNFAt f z
 
 
 /- Strongly MeromorphicAt is Meromorphic -/
 theorem StronglyMeromorphicOn.meromorphicOn
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (hf : StronglyMeromorphicOn f U) :
   MeromorphicOn f U := by
   intro z hz
@@ -39,11 +42,11 @@ theorem StronglyMeromorphicOn.meromorphicOn
 
 /- Strongly MeromorphicOn of non-negative order is analytic -/
 theorem StronglyMeromorphicOn.analytic
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (h₁f : StronglyMeromorphicOn f U)
   (h₂f : ∀ x, (hx : x ∈ U) → 0 ≤ (h₁f x hx).meromorphicAt.order) :
-  AnalyticOnNhd ℂ f U := by
+  AnalyticOnNhd 𝕜 f U := by
   intro z hz
   apply MeromorphicNFAt.analyticAt
   exact h₂f z hz
@@ -52,9 +55,9 @@ theorem StronglyMeromorphicOn.analytic
 
 /- Analytic functions are strongly meromorphic -/
 theorem AnalyticOn.stronglyMeromorphicOn
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  (h₁f : AnalyticOnNhd ℂ f U) :
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  (h₁f : AnalyticOnNhd 𝕜 f U) :
   StronglyMeromorphicOn f U := by
   intro z hz
   apply AnalyticAt.MeromorphicNFAt
@@ -62,9 +65,9 @@ theorem AnalyticOn.stronglyMeromorphicOn
 
 
 theorem stronglyMeromorphicOn_of_mul_analytic'
-  {f g : ℂ → ℂ}
-  {U : Set ℂ}
-  (h₁g : AnalyticOnNhd ℂ g U)
+  {f g : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  (h₁g : AnalyticOnNhd 𝕜 g U)
   (h₂g : ∀ u : U, g u ≠ 0)
   (h₁f : StronglyMeromorphicOn f U) :
   StronglyMeromorphicOn (g * f) U := by
@@ -76,20 +79,20 @@ theorem stronglyMeromorphicOn_of_mul_analytic'
 
 /- Make strongly MeromorphicOn -/
 noncomputable def MeromorphicOn.makeStronglyMeromorphicOn
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (hf : MeromorphicOn f U) :
-  ℂ → ℂ := by
+  𝕜 → 𝕜 := by
   intro z
   by_cases hz : z ∈ U
   · exact (hf z hz).toNF z
   · exact f z
 
 
-theorem makeStronglyMeromorphicOn_changeDiscrete
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  {z₀ : ℂ}
+theorem makeStronglyMeromorphicOn_changeDiscrete [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  {z₀ : 𝕜}
   (hf : MeromorphicOn f U)
   (hz₀ : z₀ ∈ U) :
   hf.makeStronglyMeromorphicOn =ᶠ[𝓝[≠] z₀] f := by
@@ -108,10 +111,10 @@ theorem makeStronglyMeromorphicOn_changeDiscrete
     · simp [h₂v]
 
 
-theorem makeStronglyMeromorphicOn_changeDiscrete'
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  {z₀ : ℂ}
+theorem makeStronglyMeromorphicOn_changeDiscrete' [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  {z₀ : 𝕜}
   (hf : MeromorphicOn f U)
   (hz₀ : z₀ ∈ U) :
   hf.makeStronglyMeromorphicOn =ᶠ[𝓝 z₀] (hf z₀ hz₀).toNF := by
@@ -122,14 +125,14 @@ theorem makeStronglyMeromorphicOn_changeDiscrete'
     simp [hz₀]
 
 
-theorem makeStronglyMeromorphicOn_changeDiscrete''
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+theorem makeStronglyMeromorphicOn_changeDiscrete'' [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (hf : MeromorphicOn f U) :
   f =ᶠ[Filter.codiscreteWithin U] hf.makeStronglyMeromorphicOn := by
 
   rw [Filter.eventuallyEq_iff_exists_mem]
-  use { x | AnalyticAt ℂ f x }
+  use { x | AnalyticAt 𝕜 f x }
   constructor
   · exact MeromorphicOn.analyticOnCodiscreteWithin hf
   · intro x hx
@@ -141,9 +144,9 @@ theorem makeStronglyMeromorphicOn_changeDiscrete''
     · simp [h₁x]
 
 
-theorem stronglyMeromorphicOn_of_makeStronglyMeromorphicOn
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+theorem stronglyMeromorphicOn_of_makeStronglyMeromorphicOn [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (hf : MeromorphicOn f U) :
   StronglyMeromorphicOn hf.makeStronglyMeromorphicOn U := by
   intro z hz
@@ -152,10 +155,10 @@ theorem stronglyMeromorphicOn_of_makeStronglyMeromorphicOn
   exact  MeromorphicAt.MeromorphicNFAt_of_toNF (hf z hz)
 
 
-theorem makeStronglyMeromorphicOn_changeOrder
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  {z₀ : ℂ}
+theorem makeStronglyMeromorphicOn_changeOrder [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  {z₀ : 𝕜}
   (hf : MeromorphicOn f U)
   (hz₀ : z₀ ∈ U) :
   (stronglyMeromorphicOn_of_makeStronglyMeromorphicOn hf z₀ hz₀).meromorphicAt.order = (hf z₀ hz₀).order := by

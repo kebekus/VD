@@ -1,24 +1,26 @@
+import Mathlib.Analysis.Meromorphic.Order
+import Mathlib.Topology.DiscreteSubset
 import VD.divisor
+import VD.mathlibAddOn
 import VD.meromorphicOn
-import VD.ToMathlib.analyticAt_preimgCodiscrete
-import VD.ToMathlib.codiscreteWithin
-
+import VD.stronglyMeromorphicOn
 
 open scoped Interval Topology
-open Real Filter MeasureTheory intervalIntegral
+open Real Filter
 
+variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [CompleteSpace E]
 
-theorem MeromorphicOn.orx {f : ℂ → ℂ} {U : Set ℂ} (hf : MeromorphicOn f U) :
+theorem MeromorphicOn.codiscrete_setOf_order_eq_zero_or_top {f : 𝕜 → E} {U : Set 𝕜} (hf : MeromorphicOn f U) :
     {u : U | (hf u u.2).order = 0 ∨ (hf u u.2).order = ⊤} ∈ Filter.codiscrete U := by
-
-  rw [mem_codiscrete_subtype_iff_mem_codiscreteWithin]
-  rw [mem_codiscreteWithin]
+  rw [mem_codiscrete_subtype_iff_mem_codiscreteWithin, mem_codiscreteWithin]
   intro x hx
   rw [Filter.disjoint_principal_right]
   rcases (hf x hx).eventually_eq_zero_or_eventually_ne_zero with A₂ | A₂
-  · filter_upwards [(hf x hx).eventually_analyticAt, A₂, eventually_eventually_nhdsWithin.2 A₂]
-    simp
-    intro a h₁a h₂a h₃a h₄a
+  · filter_upwards [eventually_eventually_nhdsWithin.2 A₂]
+    simp only [Set.mem_compl_iff, Set.mem_diff, Set.mem_image, Set.mem_setOf_eq, Subtype.exists,
+      exists_and_right, exists_eq_right, not_exists, not_or, not_and, not_forall, Decidable.not_not]
+    intro a h₃a h₄a
     use h₄a
     by_cases h₅a : a = x
     · rw [← (hf x hx).order_eq_top_iff] at A₂
@@ -28,14 +30,8 @@ theorem MeromorphicOn.orx {f : ℂ → ℂ} {U : Set ℂ} (hf : MeromorphicOn f 
         rw [(hf a h₄a).order_eq_top_iff]
         rw [eventually_nhdsWithin_iff, eventually_nhds_iff] at h₃a ⊢
         obtain ⟨t, h₁t, h₂t, h₃t⟩ := h₃a
-        use t \ {x}
-        constructor
-        · intro y h₁y h₂y
-          exact h₁t y h₁y.1 h₁y.2
-        · constructor
-          · apply IsOpen.sdiff h₂t
-            exact isClosed_singleton
-          · exact Set.mem_diff_of_mem h₃t h₅a
+        use t \ {x}, fun y h₁y _ ↦ h₁t y h₁y.1 h₁y.2
+        exact ⟨h₂t.sdiff isClosed_singleton, Set.mem_diff_of_mem h₃t h₅a⟩
       tauto
   · filter_upwards [(hf x hx).eventually_analyticAt, A₂]
     intro a h₁a h₂a
@@ -46,10 +42,9 @@ theorem MeromorphicOn.orx {f : ℂ → ℂ} {U : Set ℂ} (hf : MeromorphicOn f 
     rw [h₁a.meromorphicAt_order, h₁a.order_eq_zero_iff.2 h₂a]
     tauto
 
-
 noncomputable def MeromorphicOn.divisor
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+  {f : 𝕜 → E}
+  {U : Set 𝕜}
   (hf : MeromorphicOn f U) :
   Divisor U where
 
@@ -68,9 +63,9 @@ noncomputable def MeromorphicOn.divisor
 
   supportDiscreteWithinDomain := by
     have A₁ := hf.eventually_codiscreteWithin_analyticAt
-    let U' := { x ∈ U | AnalyticAt ℂ f x}
+    let U' := { x ∈ U | AnalyticAt 𝕜 f x}
     have A₂ : U' ⊆ U := fun x hx ↦ hx.1
-    have A₃ : AnalyticOnNhd ℂ f U' := fun x hx ↦ hx.2
+    have A₃ : AnalyticOnNhd 𝕜 f U' := fun x hx ↦ hx.2
     rw [Filter.EventuallyEq, Filter.Eventually]
     rw [mem_codiscreteWithin]
     intro z hz
@@ -81,12 +76,12 @@ noncomputable def MeromorphicOn.divisor
     · have C := hf.isClopen_setOf_order_eq_top
       have D := (hf z hz).order_eq_top_iff.2 h
       rw [← eventually_eventually_nhdsWithin] at h
-      have h' : ∀ᶠ (y : ℂ) in 𝓝[≠] z, ∀ᶠ (x : ℂ) in 𝓝 y, f x = 0:= by
+      have h' : ∀ᶠ (y : 𝕜) in 𝓝[≠] z, ∀ᶠ (x : 𝕜) in 𝓝 y, f x = 0:= by
         simp_rw [eventually_nhdsWithin_iff] at h
         simp_rw [eventually_nhdsWithin_iff]
         filter_upwards [h]
         intro a h₁a h₂a
-        have h₃a : ∀ᶠ (y : ℂ) in 𝓝 a, y ≠ z := by
+        have h₃a : ∀ᶠ (y : 𝕜) in 𝓝 a, y ≠ z := by
           exact ContinuousAt.eventually_ne (fun ⦃U⦄ a ↦ a) h₂a
         filter_upwards [h₁a h₂a, h₃a]
         intro b h₁b h₂b
@@ -108,9 +103,9 @@ noncomputable def MeromorphicOn.divisor
       tauto
 
 theorem MeromorphicOn.divisor_def₁
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  {z : ℂ}
+  {f : 𝕜 → E}
+  {U : Set 𝕜}
+  {z : 𝕜}
   (hf : MeromorphicOn f U)
   (hz : z ∈ U) :
   hf.divisor z = ((hf z hz).order.untopD 0 : ℤ) := by
@@ -119,9 +114,9 @@ theorem MeromorphicOn.divisor_def₁
 
 
 theorem MeromorphicOn.divisor_def₂
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  {z : ℂ}
+  {f : 𝕜 → E}
+  {U : Set 𝕜}
+  {z : 𝕜}
   (hf : MeromorphicOn f U)
   (hz : z ∈ U)
   (h₂f : (hf z hz).order ≠ ⊤) :
@@ -133,10 +128,10 @@ theorem MeromorphicOn.divisor_def₂
   exact Eq.symm (WithTop.coe_untop (hf z hz).order h₂f)
 
 
-theorem MeromorphicOn.divisor_mul₀
-  {f₁ f₂ : ℂ → ℂ}
-  {U : Set ℂ}
-  {z : ℂ}
+theorem MeromorphicOn.divisor_mul₀  [CompleteSpace 𝕜]
+  {f₁ f₂ : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  {z : 𝕜}
   (hz : z ∈ U)
   (h₁f₁ : MeromorphicOn f₁ U)
   (h₂f₁ : (h₁f₁ z hz).order ≠ ⊤)
@@ -156,9 +151,9 @@ theorem MeromorphicOn.divisor_mul₀
     simp [h₁z]
 
 
-theorem MeromorphicOn.divisor_mul
-  {f₁ f₂ : ℂ → ℂ}
-  {U : Set ℂ}
+theorem MeromorphicOn.divisor_mul [CompleteSpace 𝕜]
+  {f₁ f₂ : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (h₁f₁ : MeromorphicOn f₁ U)
   (h₂f₁ : ∀ z, (hz : z ∈ U) → (h₁f₁ z hz).order ≠ ⊤)
   (h₁f₂ : MeromorphicOn f₂ U)
@@ -175,9 +170,9 @@ theorem MeromorphicOn.divisor_mul
     simp
 
 
-theorem MeromorphicOn.divisor_inv
-  {f: ℂ → ℂ}
-  {U : Set ℂ}
+theorem MeromorphicOn.divisor_inv [CompleteSpace 𝕜]
+  {f: 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (h₁f : MeromorphicOn f U) :
   h₁f.inv.divisor.toFun = -h₁f.divisor.toFun := by
   funext z
@@ -198,12 +193,12 @@ theorem MeromorphicOn.divisor_inv
     simp [hz]
 
 
-theorem MeromorphicOn.divisor_add_const₁
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  {z : ℂ}
+theorem MeromorphicOn.divisor_add_const₁  [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  {z : 𝕜}
   (hf : MeromorphicOn f U)
-  (a : ℂ) :
+  (a : 𝕜) :
   0 ≤ hf.divisor z → 0 ≤ (hf.add (MeromorphicOn.const a)).divisor z := by
   intro h
 
@@ -253,12 +248,12 @@ theorem MeromorphicOn.divisor_add_const₁
     tauto
 
 
-theorem MeromorphicOn.divisor_add_const₂
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  {z : ℂ}
+theorem MeromorphicOn.divisor_add_const₂ [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  {z : 𝕜}
   (hf : MeromorphicOn f U)
-  (a : ℂ) :
+  (a : 𝕜) :
   hf.divisor z < 0 → (hf.add (MeromorphicOn.const a)).divisor z < 0 := by
   intro h
 
@@ -302,12 +297,12 @@ theorem MeromorphicOn.divisor_add_const₂
   rwa [this] at h
 
 
-theorem MeromorphicOn.divisor_add_const₃
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
-  {z : ℂ}
+theorem MeromorphicOn.divisor_add_const₃ [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
+  {z : 𝕜}
   (hf : MeromorphicOn f U)
-  (a : ℂ) :
+  (a : 𝕜) :
   hf.divisor z < 0 → (hf.add (MeromorphicOn.const a)).divisor z = hf.divisor z := by
   intro h
 
@@ -351,9 +346,9 @@ theorem MeromorphicOn.divisor_add_const₃
   rw [this]
 
 
-theorem MeromorphicOn.divisor_of_makeStronglyMeromorphicOn
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+theorem MeromorphicOn.divisor_of_makeStronglyMeromorphicOn [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (hf : MeromorphicOn f U) :
   hf.divisor = (stronglyMeromorphicOn_of_makeStronglyMeromorphicOn hf).meromorphicOn.divisor := by
   unfold MeromorphicOn.divisor
@@ -371,12 +366,12 @@ theorem MeromorphicOn.divisor_of_makeStronglyMeromorphicOn
 -- STRONGLY MEROMORPHIC THINGS
 
 /- Strongly MeromorphicOn of non-negative order is analytic -/
-theorem StronglyMeromorphicOn.analyticOnNhd
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+theorem StronglyMeromorphicOn.analyticOnNhd [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (h₁f : StronglyMeromorphicOn f U)
   (h₂f : ∀ x, (hx : x ∈ U) → 0 ≤ h₁f.meromorphicOn.divisor x) :
-  AnalyticOnNhd ℂ f U := by
+  AnalyticOnNhd 𝕜 f U := by
 
   apply StronglyMeromorphicOn.analytic
   intro z hz
@@ -392,9 +387,9 @@ theorem StronglyMeromorphicOn.analyticOnNhd
   assumption
 
 
-theorem StronglyMeromorphicOn.support_divisor
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+theorem StronglyMeromorphicOn.support_divisor [CompleteSpace 𝕜]
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (h₁f : StronglyMeromorphicOn f U)
   (h₂f : ∃ u : U, f u ≠ 0)
   (hU : IsConnected U) :

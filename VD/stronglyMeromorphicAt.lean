@@ -51,9 +51,9 @@ lemma MeromorphicNFAt_of_mul_analytic'
    after multiplication with a non-vanishing analytic function
 -/
 theorem MeromorphicNFAt_of_mul_analytic
-  {f g : ℂ → ℂ}
-  {z₀ : ℂ}
-  (h₁g : AnalyticAt ℂ g z₀)
+  {f g : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
+  (h₁g : AnalyticAt 𝕜 g z₀)
   (h₂g : g z₀ ≠ 0) :
   MeromorphicNFAt f z₀ ↔ MeromorphicNFAt (f * g) z₀ := by
   constructor
@@ -69,8 +69,8 @@ theorem MeromorphicNFAt_of_mul_analytic
     exact MeromorphicNFAt_of_mul_analytic' (h₁g.inv h₂g) (inv_ne_zero h₂g) (f := f * g) hprod
 
 theorem MeromorphicNFAt.order_eq_zero_iff
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
+  {f : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
   (hf : MeromorphicNFAt f z₀) :
   hf.meromorphicAt.order = 0 ↔ f z₀ ≠ 0 := by
   constructor
@@ -101,8 +101,8 @@ theorem MeromorphicNFAt.order_eq_zero_iff
       exact h₃g.filter_mono nhdsWithin_le_nhds
 
 theorem MeromorphicNFAt.localIdentity
-  {f g : ℂ → ℂ}
-  {z₀ : ℂ}
+  {f g : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
   (hf : MeromorphicNFAt f z₀)
   (hg : MeromorphicNFAt g z₀) :
   f =ᶠ[𝓝[≠] z₀] g → f =ᶠ[𝓝 z₀] g := by
@@ -124,8 +124,8 @@ theorem MeromorphicNFAt.localIdentity
 
 
 theorem MeromorphicNFAt.makeStronglyMeromorphic_id
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
+  {f : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
   (hf : MeromorphicNFAt f z₀) :
   f = hf.meromorphicAt.toNF := by
 
@@ -169,11 +169,11 @@ theorem MeromorphicNFAt.makeStronglyMeromorphic_id
 
 
 theorem MeromorphicNFAt.eliminate
-  {f : ℂ → ℂ}
-  {z₀ : ℂ}
+  {f : 𝕜 → 𝕜}
+  {z₀ : 𝕜}
   (h₁f : MeromorphicNFAt f z₀)
   (h₂f : h₁f.meromorphicAt.order ≠ ⊤) :
-  ∃ g : ℂ → ℂ, (AnalyticAt ℂ g z₀)
+  ∃ g : 𝕜 → 𝕜, (AnalyticAt 𝕜 g z₀)
     ∧ (g z₀ ≠ 0)
     ∧ (f = (fun z ↦ (z-z₀) ^ (h₁f.meromorphicAt.order.untop h₂f)) * g) := by
 

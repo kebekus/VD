@@ -6,10 +6,13 @@ import VD.mathlibAddOn
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
+variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
+  {f g : 𝕜 → 𝕜} {z₀ : 𝕜}
 
 theorem StronglyMeromorphicOn.order_ne_top
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (h₁f : StronglyMeromorphicOn f U)
   (hU : IsConnected U)
   (h₂f : ∃ u : U, f u ≠ 0) :
@@ -24,8 +27,8 @@ theorem StronglyMeromorphicOn.order_ne_top
 
 
 theorem MeromorphicOn.nonvanish_of_order_ne_top
-  {f : ℂ → ℂ}
-  {U : Set ℂ}
+  {f : 𝕜 → 𝕜}
+  {U : Set 𝕜}
   (h₁f : MeromorphicOn f U)
   (h₂f : ∃ u : U, (h₁f u u.2).order ≠ ⊤)
   (h₁U : IsConnected U)
