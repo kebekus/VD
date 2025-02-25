@@ -9,9 +9,82 @@ open scoped Interval Topology
 open Real Filter
 
 variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
-  {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E] [CompleteSpace E]
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace 𝕜 E]
 
-theorem MeromorphicOn.codiscrete_setOf_order_eq_zero_or_top {f : 𝕜 → E} {U : Set 𝕜}
+theorem AnalyticOnNhd.codiscrete_setOf_order_eq_zero_or_top {f : 𝕜 → E} {U : Set 𝕜}
+    (hf : AnalyticOnNhd 𝕜 f U) :
+    {u : U | (hf u u.2).order = 0 ∨ (hf u u.2).order = ⊤} ∈ Filter.codiscrete U := by
+  rw [mem_codiscrete_subtype_iff_mem_codiscreteWithin, mem_codiscreteWithin]
+  intro x hx
+  rw [Filter.disjoint_principal_right]
+  rcases (hf x hx).eventually_eq_zero_or_eventually_ne_zero with A₂ | A₂
+  · filter_upwards [eventually_nhdsWithin_of_eventually_nhds
+      (Filter.Eventually.eventually_nhds A₂)]
+    simp only [Set.mem_compl_iff, Set.mem_diff, Set.mem_image, Set.mem_setOf_eq, Subtype.exists,
+      exists_and_right, exists_eq_right, not_exists, not_or, not_and, not_forall, Decidable.not_not]
+    intro a h₃a h₄a
+    use h₄a
+    by_cases h₅a : a = x
+    · rw [← (hf x hx).order_eq_top_iff] at A₂
+      simp_rw [h₅a]
+      tauto
+    · have : (hf a h₄a).order = ⊤ := by rwa [(hf a h₄a).order_eq_top_iff]
+      tauto
+  · filter_upwards [A₂]
+    intro a h₂a
+    simp only [Set.mem_compl_iff, Set.mem_diff, Set.mem_image, Set.mem_setOf_eq, Subtype.exists,
+      exists_and_right, exists_eq_right, not_exists, not_or, not_and, not_forall, Decidable.not_not]
+    intro h₃a
+    use h₃a
+    rw [(hf a h₃a).order_eq_zero_iff.2 h₂a]
+    tauto
+
+-- TODO: Remove the assumption CompleteSpace E.
+
+lemma ContinuousAt.x {f g : 𝕜 → E} {z₀ : 𝕜} (hf : ContinuousAt f z₀) (hg : ContinuousAt f z₀)
+    (hfg : f =ᶠ[𝓝[≠] z₀] g) :
+    f z₀ = g z₀ := by
+  by_contra h
+  sorry
+
+
+theorem ContinuousAt.y {f g : 𝕜 → E} {z₀ : 𝕜} (hf : ContinuousAt f z₀) (hg : ContinuousAt f z₀) :
+    f =ᶠ[𝓝[≠] z₀] g ↔ f =ᶠ[𝓝 z₀] g := by
+  constructor
+  · intro h
+    apply eventuallyEq_nhdsWithin_of_eventuallyEq_nhds h
+    sorry
+  · intro h
+    apply eventuallyEq_nhdsWithin_iff.mpr
+    filter_upwards [h]
+    tauto
+
+theorem MeromorphicAt.order_eq_zero_iff {f : 𝕜 → E} {z₀ : 𝕜} (hf : MeromorphicAt f z₀) :
+    hf.order = 0 ↔ (∃ g, (ContinuousAt g z₀) ∧ (g z₀ ≠ 0) ∧ f =ᶠ[𝓝[≠] z₀] g ) := by
+  constructor
+  · intro h₂f
+    obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff 0).1 h₂f
+    use g, h₁g.continuousAt, h₂g
+    simp only [zpow_zero, one_smul] at h₃g
+    exact h₃g
+  · intro h₂f
+    obtain ⟨g, h₁g, h₂g, h₃g⟩ := h₂f
+    apply (hf.order_eq_int_iff 0).2
+    by_cases h₁ : hf.order = ⊤
+    · rw [hf.order_eq_top_iff] at h₁
+      have : ∀ᶠ (z : 𝕜) in 𝓝[≠] z₀, g z = 0 := by
+        filter_upwards [h₁, h₃g]
+        intro a h₁a h₂a
+        rw [← h₂a, h₁a]
+      have : g z₀ = 0 := by
+
+        sorry
+      tauto
+    sorry
+
+
+
+theorem MeromorphicOn.codiscrete_setOf_order_eq_zero_or_top [CompleteSpace E] {f : 𝕜 → E} {U : Set 𝕜}
     (hf : MeromorphicOn f U) :
     {u : U | (hf u u.2).order = 0 ∨ (hf u u.2).order = ⊤} ∈ Filter.codiscrete U := by
   rw [mem_codiscrete_subtype_iff_mem_codiscreteWithin, mem_codiscreteWithin]
