@@ -26,37 +26,26 @@ lemma MeromorphicNFAt_of_mul_analytic'
     use t
     constructor
     · intro y hy
-      simp
-      left
-      exact ht.1 y hy
+      simp [ht.1 y hy]
     · exact ht.2
   · right
     obtain ⟨n, g_f, h₁g_f, h₂g_f, h₃g_f⟩ := h₁f
-    use n
-    use g * g_f
+    use n, g * g_f, h₁g.mul h₁g_f
     constructor
-    · apply AnalyticAt.mul
-      exact h₁g
-      exact h₁g_f
-    · constructor
-      · simp
-        exact ⟨h₂g, h₂g_f⟩
-      · rw [Filter.EventuallyEq, eventually_nhds_iff] at h₃g_f
-        obtain ⟨t, ht⟩ := h₃g_f
-        rw [Filter.EventuallyEq, eventually_nhds_iff]
-        use t
-        constructor
-        · intro y hy
-          simp
-          rw [ht.1]
-          simp
-          ring
-          exact hy
-        · exact ht.2
-
-
-
-
+    · simp
+      exact ⟨h₂g, h₂g_f⟩
+    · rw [Filter.EventuallyEq, eventually_nhds_iff] at h₃g_f
+      obtain ⟨t, ht⟩ := h₃g_f
+      rw [Filter.EventuallyEq, eventually_nhds_iff]
+      use t
+      constructor
+      · intro y hy
+        simp
+        rw [ht.1]
+        simp
+        ring
+        exact hy
+      · exact ht.2
 
 /- A function is strongly meromorphic at a point iff it is strongly meromorphic
    after multiplication with a non-vanishing analytic function
@@ -86,7 +75,7 @@ theorem MeromorphicNFAt.order_eq_zero_iff
   hf.meromorphicAt.order = 0 ↔ f z₀ ≠ 0 := by
   constructor
   · intro h₁f
-    let A := hf.analyticAt (le_of_eq (id (Eq.symm h₁f)))
+    let A := hf.analyticAt (le_of_eq h₁f.symm)
     apply A.order_eq_zero_iff.1
     let B := A.meromorphicAt_order
     rw [h₁f] at B
@@ -106,18 +95,10 @@ theorem MeromorphicNFAt.order_eq_zero_iff
         tauto
       simp [this] at h₃g
 
-      have : hf'.meromorphicAt.order = 0 := by
-        apply (hf'.meromorphicAt.order_eq_int_iff 0).2
-        use g
-        constructor
-        · assumption
-        · constructor
-          · assumption
-          · simp
-            apply Filter.EventuallyEq.filter_mono h₃g
-            exact nhdsWithin_le_nhds
-      exact this
-
+      apply (hf'.meromorphicAt.order_eq_int_iff 0).2
+      use g, h₁g, h₂g
+      simp only [zpow_zero, smul_eq_mul, one_mul]
+      exact h₃g.filter_mono nhdsWithin_le_nhds
 
 theorem MeromorphicNFAt.localIdentity
   {f g : ℂ → ℂ}

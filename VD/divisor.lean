@@ -46,13 +46,13 @@ within `U`.
 -/
 structure Divisor (U : Set 𝕜) where
   toFun : 𝕜 → ℤ
-  supportInU : toFun.support ⊆ U
-  supportDiscreteWithinU : toFun =ᶠ[Filter.codiscreteWithin U] 0
+  supportWithinDomain : toFun.support ⊆ U
+  supportDiscreteWithinDomain : toFun =ᶠ[codiscreteWithin U] 0
 
 /-- The condition `supportDiscreteWithinU` in a divisor is equivalent to saying
 that the support is locally finite near every point of `U`. -/
 theorem supportDiscreteWithin_iff_locallyFiniteWithin {f : 𝕜 → ℤ} (h : f.support ⊆ U) :
-    f =ᶠ[Filter.codiscreteWithin U] 0 ↔ ∀ z ∈ U, ∃ t ∈ 𝓝 z, Set.Finite (t ∩ f.support) := by
+    f =ᶠ[codiscreteWithin U] 0 ↔ ∀ z ∈ U, ∃ t ∈ 𝓝 z, Set.Finite (t ∩ f.support) := by
   have : f.support = (U \ {x | f x = (0 : 𝕜 → ℤ) x}) := by
     ext x
     simp only [Function.mem_support, ne_eq, Pi.zero_apply, mem_diff, mem_setOf_eq, iff_and_self]
@@ -95,27 +95,27 @@ theorem discreteSupport (D : Divisor U) :
   have : Function.support D = {x | D x = 0}ᶜ ∩ U := by
     ext x
     constructor
-    · exact fun hx ↦ ⟨by tauto, D.supportInU hx⟩
+    · exact fun hx ↦ ⟨by tauto, D.supportWithinDomain hx⟩
     · intro hx
       rw [mem_inter_iff, mem_compl_iff, mem_setOf_eq] at hx
       tauto
-  convert discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinU)
+  convert discreteTopology_of_codiscreteWithin (D.supportDiscreteWithinDomain)
 
 /-- If `U` is closed, the the support of a divisor on `U` is also closed. -/
 theorem closedSupport (D : Divisor U) (hU : IsClosed U) :
     IsClosed D.toFun.support := by
-  convert closed_compl_of_codiscreteWithin D.supportDiscreteWithinU hU
+  convert closed_compl_of_codiscreteWithin D.supportDiscreteWithinDomain hU
   ext x
   constructor
   · intro hx
-    simp_all [D.supportInU hx]
+    simp_all [D.supportWithinDomain hx]
   · intro hx
     simp_all
 
 /-- If `U` is closed, the the support of a divisor on `U` is finite. -/
 theorem finiteSupport (D : Divisor U) (hU : IsCompact U) :
     Set.Finite D.toFun.support :=
-  (hU.of_isClosed_subset (D.closedSupport hU.isClosed) D.supportInU).finite D.discreteSupport
+  (hU.of_isClosed_subset (D.closedSupport hU.isClosed) D.supportWithinDomain).finite D.discreteSupport
 
 /-!
 ## Lattice ordered group structure
@@ -140,13 +140,13 @@ instance : Add (Divisor U) where
     intro D₁ D₂
     exact {
       toFun := D₁.toFun + D₂.toFun
-      supportInU := by
+      supportWithinDomain := by
         intro x
         contrapose
         intro hx
-        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportInU a),
-          Function.nmem_support.1 fun a ↦ hx (D₂.supportInU a)]
-      supportDiscreteWithinU := D₁.supportDiscreteWithinU.add D₂.supportDiscreteWithinU
+        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportWithinDomain a),
+          Function.nmem_support.1 fun a ↦ hx (D₂.supportWithinDomain a)]
+      supportDiscreteWithinDomain := D₁.supportDiscreteWithinDomain.add D₂.supportDiscreteWithinDomain
     }
 
 /-- Helper lemma for the `simp` tactic: the function of the sum of two divisors
@@ -160,11 +160,11 @@ instance : Neg (Divisor U) where
     intro D
     exact {
       toFun := -D.toFun
-      supportInU := by
+      supportWithinDomain := by
         intro x hx
         rw [Function.support_neg', Function.mem_support, ne_eq] at hx
-        exact D.supportInU hx
-      supportDiscreteWithinU := D.supportDiscreteWithinU.neg
+        exact D.supportWithinDomain hx
+      supportDiscreteWithinDomain := D.supportDiscreteWithinDomain.neg
     }
 
 /-- Helper lemma for the `simp` tactic: the function of the negative divisor
@@ -178,12 +178,12 @@ instance : SMul ℕ (Divisor U) where
     intro n D
     exact {
       toFun := fun z ↦ n * D z
-      supportInU := by
+      supportWithinDomain := by
         intro x hx
         simp at hx
-        exact D.supportInU hx.2
-      supportDiscreteWithinU := by
-        filter_upwards [D.supportDiscreteWithinU]
+        exact D.supportWithinDomain hx.2
+      supportDiscreteWithinDomain := by
+        filter_upwards [D.supportDiscreteWithinDomain]
         intro x hx
         simp [hx]
     }
@@ -199,12 +199,12 @@ instance : SMul ℤ (Divisor U) where
   smul := fun n D ↦
     {
       toFun := fun z ↦ n * D z
-      supportInU := by
+      supportWithinDomain := by
         intro x hx
         simp at hx
-        exact D.supportInU hx.2
-      supportDiscreteWithinU := by
-        filter_upwards [D.supportDiscreteWithinU]
+        exact D.supportWithinDomain hx.2
+      supportDiscreteWithinDomain := by
+        filter_upwards [D.supportDiscreteWithinDomain]
         intro _ hx
         simp [hx]
     }
@@ -264,14 +264,14 @@ instance : Max (Divisor U) where
   max := fun D₁ D₂ ↦
     {
       toFun := fun z ↦ max (D₁ z) (D₂ z)
-      supportInU := by
+      supportWithinDomain := by
         intro x
         contrapose
         intro hx
-        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportInU a),
-          Function.nmem_support.1 fun a ↦ hx (D₂.supportInU a)]
-      supportDiscreteWithinU := by
-        filter_upwards [D₁.supportDiscreteWithinU, D₂.supportDiscreteWithinU]
+        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportWithinDomain a),
+          Function.nmem_support.1 fun a ↦ hx (D₂.supportWithinDomain a)]
+      supportDiscreteWithinDomain := by
+        filter_upwards [D₁.supportDiscreteWithinDomain, D₂.supportDiscreteWithinDomain]
         intro _ h₁ h₂
         simp [h₁, h₂]
     }
@@ -286,14 +286,14 @@ instance : Min (Divisor U) where
   min := fun D₁ D₂ ↦
     {
       toFun := fun z ↦ min (D₁ z) (D₂ z)
-      supportInU := by
+      supportWithinDomain := by
         intro x
         contrapose
         intro hx
-        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportInU a),
-          Function.nmem_support.1 fun a ↦ hx (D₂.supportInU a)]
-      supportDiscreteWithinU := by
-        filter_upwards [D₁.supportDiscreteWithinU, D₂.supportDiscreteWithinU]
+        simp [Function.nmem_support.1 fun a ↦ hx (D₁.supportWithinDomain a),
+          Function.nmem_support.1 fun a ↦ hx (D₂.supportWithinDomain a)]
+      supportDiscreteWithinDomain := by
+        filter_upwards [D₁.supportDiscreteWithinDomain, D₂.supportDiscreteWithinDomain]
         intro _ h₁ h₂
         simp [h₁, h₂]
     }
@@ -332,14 +332,14 @@ noncomputable def restrict {V : Set 𝕜} (D : Divisor U) (h : V ⊆ U) :
   toFun := by
     classical
     exact fun z ↦ if hz : z ∈ V then D z else 0
-  supportInU := by
+  supportWithinDomain := by
     intro x hx
     simp_rw [dite_eq_ite, Function.mem_support, ne_eq, ite_eq_right_iff,
       Classical.not_imp] at hx
     exact hx.1
-  supportDiscreteWithinU := by
+  supportDiscreteWithinDomain := by
     apply Filter.codiscreteWithin.mono h
-    filter_upwards [D.supportDiscreteWithinU]
+    filter_upwards [D.supportDiscreteWithinDomain]
     intro x hx
     simp [hx]
 
