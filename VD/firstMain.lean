@@ -26,11 +26,6 @@ theorem MeromorphicOn.restrict_inv
   funext x
   simp
 
-noncomputable def Divisor.logCounting (D : Divisor (⊤ : Set ℂ)) :
-    ℝ → ℝ :=
-  fun r ↦ ∑ᶠ z, D.restrict (by tauto : Metric.closedBall (0 : ℂ) |r| ⊆ ⊤) z *
-    Real.log (r * ‖z‖⁻¹)
-
 noncomputable def MeromorphicOn.N_zero
   {f : ℂ → ℂ}
   (hf : MeromorphicOn f ⊤) :
