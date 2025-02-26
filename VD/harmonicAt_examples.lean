@@ -191,10 +191,9 @@ theorem logabs_of_holomorphicAt_is_harmonic
   have : (fun z ↦ Real.log ‖f z‖) = (2 : ℝ)⁻¹ • (Real.log ∘ Complex.normSq ∘ f) := by
     funext z
     simp
-    unfold Complex.abs
-    simp
+    rw [Complex.norm_def]
     rw [Real.log_sqrt]
-    rw [div_eq_inv_mul (Real.log (Complex.normSq (f z))) 2]
+    linarith
     exact Complex.normSq_nonneg (f z)
   rw [this]
 

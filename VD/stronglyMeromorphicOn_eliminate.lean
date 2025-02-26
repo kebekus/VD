@@ -546,6 +546,7 @@ theorem StronglyMeromorphicOn.decompose_log
     simp
 
     by_contra hCon
+    rw [sub_eq_zero] at hCon
     rw [← hCon] at hx
     unfold MeromorphicOn.divisor at hx
     rw [hCon] at hz
@@ -575,6 +576,7 @@ theorem StronglyMeromorphicOn.decompose_log
     simp
 
     by_contra hCon
+    rw [sub_eq_zero] at hCon
     rw [← hCon] at hx
     unfold MeromorphicOn.divisor at hx
     rw [hCon] at hz
