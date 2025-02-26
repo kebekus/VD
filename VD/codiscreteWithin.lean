@@ -12,15 +12,14 @@ variable {X : Type*} [TopologicalSpace X] {U : Set X}
   every point `z ∈ U` has a punctured neighborhood that does not intersect `U \ s`. -/
 lemma codiscreteWithin_iff_locallyEmptyComplementWithinU :
     (s ∈ codiscreteWithin U) ↔ (∀ z ∈ U, ∃ t ∈ 𝓝[≠] z, t ∩ (U \ s) = ∅) := by
-  simp [mem_codiscreteWithin, disjoint_principal_right]
-  constructor <;> intro h z hz
+  simp only [mem_codiscreteWithin, disjoint_principal_right]
+  constructor
+  <;> intro h z hz
   · use (U \ s)ᶜ, (h z hz)
     simp
   · rw [← exists_mem_subset_iff]
     obtain ⟨t, h₁t, h₂t⟩ := h z hz
-    use t, h₁t
-    apply Disjoint.subset_compl_right
-    exact disjoint_iff_inter_eq_empty.mpr h₂t
+    use t, h₁t, (disjoint_iff_inter_eq_empty.mpr h₂t).subset_compl_right
 
 /-- If `U` is closed and `s` is codiscrete within `U`, then `U \ s` is closed.-/
 theorem closed_compl_of_codiscreteWithin (hs : s ∈ codiscreteWithin U) (hU : IsClosed U) :
@@ -37,7 +36,7 @@ theorem closed_compl_of_codiscreteWithin (hs : s ∈ codiscreteWithin U) (hU : I
       simp only [mem_diff, not_and, not_not] at W
       by_cases h₃a : a ∈ U
       · tauto
-      · by_contra hCon
+      · by_contra
         tauto
   · rw [eventually_iff_exists_mem]
     use Uᶜ, hU.compl_mem_nhds h₁x
@@ -51,7 +50,7 @@ variable [T1Space X]
 
 /-- In a T1Space, punctured neighborhoods are stable under removing finite sets
 of points. -/
-theorem punctNhd_of_punctNhd_diff_finite {X : Type*} [TopologicalSpace X] [T1Space X]
+theorem nhdNE_of_nhdNE_diff_finite {X : Type*} [TopologicalSpace X] [T1Space X]
     {x : X} {U s : Set X} (hU : U ∈ 𝓝[≠] x) (hs : Finite s) :
     U \ s ∈ 𝓝[≠] x := by
   rw [mem_nhdsWithin] at hU ⊢
@@ -83,7 +82,7 @@ theorem codiscreteWithin_iff_locallyFiniteComplementWithin :
       simp
   · intro h z h₁z
     obtain ⟨t, h₁t, h₂t⟩ := h z h₁z
-    use t \ (t ∩ (U \ s)), punctNhd_of_punctNhd_diff_finite (mem_nhdsWithin_of_mem_nhds h₁t) h₂t
+    use t \ (t ∩ (U \ s)), nhdNE_of_nhdNE_diff_finite (mem_nhdsWithin_of_mem_nhds h₁t) h₂t
     simp
 
 end

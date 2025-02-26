@@ -5,7 +5,6 @@ Authors: Stefan Kebekus
 -/
 import Mathlib.Analysis.Meromorphic.Order
 import VD.meromorphicAt
-import VD.mathlibAddOn
 
 /-!
 # Normal form of meromorphic functions and continuous extension

@@ -11,7 +11,6 @@ open Real Filter MeasureTheory intervalIntegral
 
 
 /- Integral and Integrability up to changes on codiscrete sets -/
-
 theorem integrability_congr_changeDiscrete
     {f₁ f₂ : ℂ → ℝ} {U : Set ℂ} {r : ℝ}
     (hU : Metric.sphere (0 : ℂ) |r| ⊆ U)
