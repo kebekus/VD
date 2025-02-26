@@ -1,6 +1,7 @@
+import Mathlib.Analysis.Analytic.IsolatedZeros
 import Mathlib.MeasureTheory.Integral.CircleIntegral
 import Mathlib.MeasureTheory.Integral.IntervalAverage
-import VD.ToMathlib.analyticAt_preimgCodiscrete
+import VD.ToMathlib.codiscreteWithin
 
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
@@ -43,7 +44,7 @@ theorem analyticOnNhd_circleMap {c : ℂ} {R : ℝ} :
 theorem circleMap_preimg_codiscrete {c : ℂ} {R : ℝ} (hR : R ≠ 0) :
     map (circleMap c R) (codiscrete ℝ) ≤ (codiscreteWithin (Metric.sphere c |R|)) := by
   intro s hs
-  apply analyticOnNhd_circleMap.preimg_codiscrete
+  apply analyticOnNhd_circleMap.preimage_mem_codiscreteWithin
   · intro x hx
     by_contra hCon
     obtain ⟨a, ha⟩ := eventuallyConst_iff_exists_eventuallyEq.1 hCon

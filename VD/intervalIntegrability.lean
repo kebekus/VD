@@ -2,7 +2,6 @@ import Mathlib.Analysis.Analytic.Linear
 import Mathlib.MeasureTheory.Integral.CircleIntegral
 import Mathlib.MeasureTheory.Integral.IntervalAverage
 import Mathlib.MeasureTheory.Integral.Periodic
-import VD.ToMathlib.analyticAt_preimgCodiscrete
 import VD.ToMathlib.codiscreteWithin
 import VD.ToMathlib.intervalIntegrability
 
