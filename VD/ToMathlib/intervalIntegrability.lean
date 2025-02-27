@@ -6,15 +6,19 @@ import VD.ToMathlib.codiscreteWithin
 open scoped Interval Topology
 open Real Filter MeasureTheory intervalIntegral
 
-
-theorem ae_of_restrVol_le_codiscreteWithin {U : Set ℝ} (hU : MeasurableSet U) :
-    ae (volume.restrict U) ≤ codiscreteWithin U := by
+/-- Under reasonable assumptions, sets that are codiscrete within `U` are almost
+everywhere with respect to the restricted measur. -/
+theorem ae_of_restrVol_le_codiscreteWithin
+    {α : Type*} [MeasureSpace α] [TopologicalSpace α] [SecondCountableTopology α]
+    {μ : Measure α} [NoAtoms μ] {U : Set α} (hU : MeasurableSet U) :
+    ae (μ.restrict U) ≤ codiscreteWithin U := by
   intro s hs
   have := discreteTopology_of_codiscreteWithin hs
   rw [mem_ae_iff, Measure.restrict_apply' hU]
   apply Set.Countable.measure_zero (TopologicalSpace.separableSpace_iff_countable.1
     TopologicalSpace.SecondCountableTopology.to_separableSpace)
 
+/-- Interval integrability is invariant when functions change along discrete sets. -/
 theorem intervalIntegrable_congr_codiscreteWithin {E : Type*} [NormedAddCommGroup E] {a b : ℝ}
     {f₁ f₂ : ℝ → E} (hf : f₁ =ᶠ[codiscreteWithin (Ι a b)] f₂) :
     IntervalIntegrable f₁ volume a b ↔ IntervalIntegrable f₂ volume a b := by
@@ -52,6 +56,7 @@ theorem circleMap_preimg_codiscrete {c : ℂ} {R : ℝ} (hR : R ≠ 0) :
     simp [hR] at this
   · rwa [Set.image_univ, range_circleMap]
 
+/-- Circle integrability is invariant when functions change along discrete sets. -/
 theorem circleIntegrable_congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ}
     (hf : f₁ =ᶠ[codiscreteWithin (Metric.sphere c |R|)] f₂) :
     CircleIntegrable f₁ c R → CircleIntegrable f₂ c R := by
@@ -63,22 +68,27 @@ theorem circleIntegrable_congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ :
   use (circleMap c R)⁻¹' {z | f₁ z = f₂ z}, codiscreteWithin.mono
     (by simp only [Set.subset_univ]) (circleMap_preimg_codiscrete hR hf), (by tauto)
 
+/-- Integrals are invariant when functions change along sets that are almost
+everywhere for the restricted measure. -/
 theorem intervalIntegral.integral_congr_ae_restict {a b : ℝ} {f g : ℝ → E} {μ : Measure ℝ}
     [NormedAddCommGroup E] [NormedSpace ℝ E] (h : f =ᵐ[μ.restrict (Ι a b)] g) :
     ∫ x in a..b, f x ∂μ = ∫ x in a..b, g x ∂μ :=
   intervalIntegral.integral_congr_ae (ae_imp_of_ae_restrict h)
 
+/-- Integrals are invariant when functions change along discrete sets. -/
 theorem intervalIntegral.integral_congr_codiscreteWithin {a b : ℝ} {f₁ f₂ : ℝ → ℝ}
     (hf : f₁ =ᶠ[codiscreteWithin (Ι a b)] f₂) :
     ∫ (x : ℝ) in a..b, f₁ x = ∫ (x : ℝ) in a..b, f₂ x :=
   integral_congr_ae_restict (ae_of_restrVol_le_codiscreteWithin measurableSet_uIoc hf)
 
+/-- Interval averages are invariant when functions change along discrete sets. -/
 theorem intervalAverage_congr_codiscreteWithin {a b : ℝ} {f₁ f₂ : ℝ → ℝ}
     (hf : f₁ =ᶠ[codiscreteWithin (Ι a b)] f₂) :
     ⨍ (x : ℝ) in a..b, f₁ x = ⨍ (x : ℝ) in a..b, f₂ x := by
   rw [interval_average_eq, intervalIntegral.integral_congr_codiscreteWithin hf,
     ← interval_average_eq]
 
+/-- Circle integrals are invariant when functions change along discrete sets. -/
 theorem circleIntegral_congr_codiscreteWithin {c : ℂ} {R : ℝ} {f₁ f₂ : ℂ → ℂ}
     (hf : f₁ =ᶠ[codiscreteWithin (Metric.sphere c |R|)] f₂) (hR : R ≠ 0) :
     (∮ z in C(c, R), f₁ z) = (∮ z in C(c, R), f₂ z) := by
