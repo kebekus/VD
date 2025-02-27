@@ -2,11 +2,10 @@ import VD.NormalFormAt
 import VD.ToMathlib.analyticAt
 import VD.ToMathlib.bilinear
 import VD.ToMathlib.codiscreteWithin
+import VD.ToMathlib.divisor
 import VD.ToMathlib.intervalIntegrability
 import VD.ToMathlib.meromorphicOn_levelSetOfOrder
 import VD.cauchyRiemann
-import VD.codiscreteWithin
-import VD.divisor
 import VD.firstMain
 import VD.harmonicAt
 import VD.harmonicAt_examples

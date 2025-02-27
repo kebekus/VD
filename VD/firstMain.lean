@@ -1,6 +1,6 @@
 import Mathlib.Analysis.SpecialFunctions.Log.PosLog
 import Mathlib.MeasureTheory.Integral.CircleIntegral
-import VD.divisor
+import VD.ToMathlib.divisor
 import VD.meromorphicOn_divisor
 import VD.meromorphicOn_integrability
 import VD.stronglyMeromorphicOn

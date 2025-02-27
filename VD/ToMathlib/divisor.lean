@@ -5,7 +5,7 @@ Authors: Stefan Kebekus
 -/
 import Mathlib.Analysis.Normed.Field.Basic
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
-import VD.codiscreteWithin
+import VD.ToMathlib.codiscreteWithin
 
 open Metric Real
 

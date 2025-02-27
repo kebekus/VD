@@ -1,6 +1,6 @@
 import Mathlib.Analysis.Meromorphic.Order
 import Mathlib.Topology.DiscreteSubset
-import VD.divisor
+import VD.ToMathlib.divisor
 import VD.mathlibAddOn
 import VD.meromorphicOn
 import VD.stronglyMeromorphicOn
