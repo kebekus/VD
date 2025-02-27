@@ -38,7 +38,7 @@ theorem analyticOnNhd_circleMap {c : ℂ} {R : ℝ} :
   intro z hz
   apply analyticAt_const.add
   apply analyticAt_const.mul
-  rw [(by rfl : (fun θ ↦ exp (↑θ * I) : ℝ → ℂ) = cexp ∘ (fun θ : ℝ ↦ (θ * I)))]
+  rw [(by rfl : (fun θ ↦ exp (θ * I) : ℝ → ℂ) = cexp ∘ (fun θ : ℝ ↦ (θ * I)))]
   apply analyticAt_cexp.restrictScalars.comp ((ofRealCLM.analyticAt z).mul (by fun_prop))
 
 theorem circleMap_preimg_codiscrete {c : ℂ} {R : ℝ} (hR : R ≠ 0) :
