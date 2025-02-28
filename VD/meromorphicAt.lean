@@ -12,7 +12,6 @@ variable {𝕜 : Type*} [NontriviallyNormedField 𝕜]
   {f g : 𝕜 → 𝕜} {z₀ : 𝕜}
 
 -- TODO: AnalyticAt is a codiscrete property within MeromorphicAt
--- TODO: Preimages of discrete and countable sets
 
 /-- The order multiplies by `n` when taking an analytic function to its `n`th power -/
 
@@ -81,44 +80,22 @@ theorem MeromorphicAt.order_congr
     use g, h₁g, h₂g
     exact EventuallyEq.rw h₃g (fun x => Eq (f₂ x)) h.symm
 
-theorem MeromorphicAt.order_inv
-  {f : 𝕜 → 𝕜}
-  {z₀ : 𝕜}
-  (hf : MeromorphicAt f z₀) :
-  hf.order = -hf.inv.order := by
-
+theorem MeromorphicAt.order_inv {f : 𝕜 → 𝕜} {z₀ : 𝕜} (hf : MeromorphicAt f z₀) :
+    hf.order = -hf.inv.order := by
   by_cases h₂f : hf.order = ⊤
   · rw [h₂f, ← LinearOrderedAddCommGroupWithTop.neg_top, neg_eq_iff_eq_neg, neg_neg, eq_comm]
     rw [MeromorphicAt.order_eq_top_iff] at *
     filter_upwards [h₂f]
     simp
-
-  · have : hf.order = hf.order.untopD 0 := by
-      simp [h₂f, untop'_of_ne_top]
-    rw [this]
-    rw [eq_comm]
-    rw [neg_eq_iff_eq_neg]
+  · rw [(untop'_of_ne_top h₂f).symm, eq_comm, neg_eq_iff_eq_neg]
     apply (hf.inv.order_eq_int_iff (-hf.order.untopD 0)).2
-    rw [hf.order_eq_int_iff] at this
-    obtain ⟨g, h₁g, h₂g, h₃g⟩ := this
-    use g⁻¹, h₁g.inv h₂g
-    constructor
-    · simp [h₂g]
-    · rw [eventually_nhdsWithin_iff]
-      rw [eventually_nhds_iff]
-      rw [eventually_nhdsWithin_iff] at h₃g
-      rw [eventually_nhds_iff] at h₃g
-      obtain ⟨t, h₁t, h₂t, h₃t⟩ := h₃g
-      use t
-      constructor
-      · intro y h₁y h₂y
-        simp
-        let A := h₁t y h₁y h₂y
-        rw [A]
-        simp
-        rw [mul_comm]
-      · exact ⟨h₂t, h₃t⟩
-
+    obtain ⟨g, h₁g, h₂g, h₃g⟩ := (hf.order_eq_int_iff (hf.order.untopD 0)).1 (untop'_of_ne_top h₂f).symm
+    use g⁻¹, h₁g.inv h₂g, inv_eq_zero.not.2 h₂g
+    rw [eventually_nhdsWithin_iff] at *
+    filter_upwards [h₃g]
+    intro _ h₁a h₂a
+    simp only [Pi.inv_apply, h₁a h₂a, smul_eq_mul, mul_inv_rev, zpow_neg]
+    ring
 
 theorem AnalyticAt.meromorphicAt_order_nonneg
   {f : 𝕜 → E}
