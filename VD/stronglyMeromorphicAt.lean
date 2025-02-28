@@ -122,7 +122,6 @@ theorem MeromorphicNFAt.localIdentity
     simp [A, B]
 
 
-
 theorem MeromorphicNFAt.makeStronglyMeromorphic_id
   {f : 𝕜 → 𝕜}
   {z₀ : 𝕜}
@@ -157,7 +156,7 @@ theorem MeromorphicNFAt.makeStronglyMeromorphic_id
           apply h₁g.localIdentity h₀
           rw [hn] at h₃g
           simp at h₃g h₂
-          exact (Filter.EventuallyEq.symm (h₃g.filter_mono nhdsWithin_le_nhds)).trans h₂
+          exact (h₃g.filter_mono nhdsWithin_le_nhds).symm.trans h₂
         exact Filter.EventuallyEq.eq_of_nhds this
       · simp [h₃f]
         left
@@ -192,11 +191,9 @@ theorem MeromorphicNFAt.eliminate
         simp [g₁₁]
   have h₁g₁ : MeromorphicAt g₁ z₀ := h₁g₁₁.mul h₁f.meromorphicAt
   have h₂g₁ : h₁g₁.order = 0 := by
-    rw [h₁g₁₁.order_mul h₁f.meromorphicAt]
-    rw [h₂g₁₁]
-    simp
-    rw [add_comm]
-    rw [LinearOrderedAddCommGroupWithTop.add_neg_cancel_of_ne_top h₂f]
+    rw [h₁g₁₁.order_mul h₁f.meromorphicAt, h₂g₁₁]
+    simp only [WithTop.coe_untop, g₁₁]
+    rw [add_comm, LinearOrderedAddCommGroupWithTop.add_neg_cancel_of_ne_top h₂f]
   let g := h₁g₁.toNF
   use g
   have h₁g : MeromorphicNFAt g z₀ := by
@@ -223,8 +220,7 @@ theorem MeromorphicNFAt.eliminate
             rwa [this]
           rw [hz]
           unfold g
-          let A := makeStronglyMeromorphic_id this
-          rw [← A]
+          rw [← makeStronglyMeromorphic_id this]
           unfold g₁
           rw [hOrd]
           simp
@@ -237,16 +233,13 @@ theorem MeromorphicNFAt.eliminate
           rw [hz, A]
           simp
           left
-          rw [zpow_eq_zero_iff]
-          assumption
+          rwa [zpow_eq_zero_iff]
       · simp
-        have : g z = g₁ z := by
-          exact Eq.symm (h₁g₁.toNF_id_on_complement hz)
+        have : g z = g₁ z := (h₁g₁.toNF_id_on_complement hz).symm
         rw [this]
         unfold g₁
         simp [hz]
-        rw [← mul_assoc]
-        rw [mul_inv_cancel₀]
+        rw [← mul_assoc, mul_inv_cancel₀]
         simp
         apply zpow_ne_zero
         exact sub_ne_zero_of_ne hz

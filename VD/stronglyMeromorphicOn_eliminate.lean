@@ -88,53 +88,42 @@ theorem MeromorphicOn.decompose₁
     apply h₂g.analyticAt
     rw [h₃g]
 
-  use g
-  constructor
-  · exact h₁g
-  · constructor
-    · exact h₄g
-    · constructor
-      · exact (h₂g.order_eq_zero_iff).mp h₃g
-      · funext z
-        by_cases hz : z = z₀
-        · rw [hz]
-          simp
-          by_cases h : h₁f.divisor z₀ = 0
-          · simp [h]
-            have h₂h₁ : h₁ = 1 := by
-              funext w
-              unfold h₁
-              simp [h]
-            have h₃g₁ : g₁ = f := by
-              unfold g₁
-              rw [h₂h₁]
-              simp
-            have h₄g₁ : MeromorphicNFAt g₁ z₀ := by
-              rwa [h₃g₁]
-            let A := h₄g₁.makeStronglyMeromorphic_id
-            unfold g
-            rw [← A, h₃g₁]
-          · have : (0 : ℂ) ^ h₁f.divisor z₀ = (0 : ℂ) := by
-              exact zero_zpow (h₁f.divisor z₀) h
-            rw [this]
-            simp
-            let A := h₂f.order_eq_zero_iff.not
-            simp at A
-            rw [← A]
-            unfold MeromorphicOn.divisor at h
-            simp [hz₀] at h
-            exact h.1
-        · simp
-          let B := (h₁g₁ z₀ hz₀).toNF_id_on_complement hz
-          unfold g
-          rw [← B]
-          unfold g₁ h₁
-          simp [hz]
-          rw [mul_assoc]
-          rw [inv_mul_cancel₀]
-          simp
-          apply zpow_ne_zero
-          rwa [sub_ne_zero]
+  use g, h₁g, h₄g, (h₂g.order_eq_zero_iff).mp h₃g
+  funext z
+  by_cases hz : z = z₀
+  · rw [hz]
+    simp only [Pi.mul_apply, sub_self, h₁, n]
+    by_cases h : h₁f.divisor z₀ = 0
+    · simp [h]
+      have h₂h₁ : h₁ = 1 := by
+        funext w
+        unfold h₁
+        simp [h]
+      have h₃g₁ : g₁ = f := by
+        unfold g₁
+        rw [h₂h₁]
+        simp
+      have h₄g₁ : MeromorphicNFAt g₁ z₀ := by
+        rwa [h₃g₁]
+      unfold g
+      rw [← h₄g₁.makeStronglyMeromorphic_id, h₃g₁]
+    · rw [zero_zpow (h₁f.divisor z₀) h]
+      simp
+      let A := h₂f.order_eq_zero_iff.not
+      simp at A
+      rw [← A]
+      unfold MeromorphicOn.divisor at h
+      simp [hz₀] at h
+      exact h.1
+  · simp
+    unfold g
+    rw [← (h₁g₁ z₀ hz₀).toNF_id_on_complement hz]
+    unfold g₁ h₁
+    simp only [zpow_neg, Pi.mul_apply, h₁, n]
+    rw [mul_assoc, inv_mul_cancel₀]
+    simp only [mul_one, h₁, n]
+    apply zpow_ne_zero
+    rwa [sub_ne_zero]
 
 
 theorem MeromorphicOn.decompose₂
@@ -187,9 +176,7 @@ theorem MeromorphicOn.decompose₂
     apply zpow_ne_zero
     by_contra hCon
     rw [sub_eq_zero] at hCon
-    have : p.1 = u := by
-      exact SetCoe.ext (_root_.id (Eq.symm hCon))
-    rw [← this] at hu
+    rw [← SetCoe.ext hCon.symm] at hu
     simp [hp] at hu
 
   have h₅g₀ : MeromorphicNFAt g₀ u := by
